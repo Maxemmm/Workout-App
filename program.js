@@ -303,10 +303,9 @@ const PROGRAM = {
   // Jour ABSENT ou null → repos implicite (moteur gère seul).
   schedule: {
     1: "full-body",      // Lundi
-    2: "cardio",         // Mardi  ← 4ᵉ jour ajouté pour test d'extensibilité
     3: "haut-du-corps",  // Mercredi
     5: "bas-du-corps",   // Vendredi
-    // 0, 4, 6 non définis → repos implicite
+    // 0, 2, 4, 6 non définis → repos implicite
   },
 
   // ─── Règles de base (depuis workout.txt) ──────────────────────────────
