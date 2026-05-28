@@ -1,0 +1,10 @@
+Détecte automatiquement le jour d'aujourd'hui et charge le bon entraînement (Pousser / Tirer / Sculpt / Bas du corps / Cardio / Flex / Repos)
+• Suivi des séries... appuyez sur les points pour cocher chaque série, les cartes deviennent vertes lorsqu'elles sont complètes
+• Minuteur de repos en direct qui se déclenche automatiquement lorsque vous enregistrez une série, devient rouge à 10 secondes
+• Blocs d'exercice bonus intégrés (fins de fessiers le lundi, tirage de poids le mercredi)
+• Les jours de repos et de cardio montrent des conseils de récupération / étirements au lieu d'un écran vide
+• Tous les exercices d'un jour sont mixables / pas d'ordre (en faire un avant un autre etc.), donc l'utilisateur doit pouvoir swap quelques exos (en fonction des dispos machines à la salle). 
+• Suivi de poids pour que l'utilisateur sache où il en est, quels poids pour quel exercice.
+• Correspond à l'esthétique des photos (noir, doré, rouille, etc.)
+
+Pour le déployer : téléchargé le fichier HTML que Claude va donner sur GitHub, activer GitHub Pages, ouvrir l'URL dans Safari et taper sur « Ajouter à l'écran d'accueil. » > application native sur le téléphone.

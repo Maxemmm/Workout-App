@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Générateur d'icônes — Training App</title>
+  <style>
+    body {
+      font-family: -apple-system, sans-serif;
+      background: #111;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 40px 20px;
+    }
+    h1 { font-size: 20px; margin: 0; }
+    p  { font-size: 13px; color: #888; margin: 0; text-align: center; }
+    .previews {
+      display: flex;
+      gap: 32px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .preview { text-align: center; }
+    .preview span { display: block; font-size: 11px; color: #888; margin-top: 8px; }
+    .buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 1px solid #d4a23c;
+      background: transparent;
+      color: #d4a23c;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { background: #d4a23c22; }
+  </style>
+</head>
+<body>
+  <h1>Générateur d'icônes PNG</h1>
+  <p>Télécharge les trois fichiers et place-les dans le dossier de l'app.</p>
+
+  <div class="previews" id="previews"></div>
+
+  <div class="buttons">
+    <button onclick="download(180)">⬇ icon-180.png</button>
+    <button onclick="download(192)">⬇ icon-192.png</button>
+    <button onclick="download(512)">⬇ icon-512.png</button>
+    <button onclick="downloadAll()">⬇ Télécharger les 3</button>
+  </div>
+
+  <script>
+    const SIZES = [180, 192, 512];
+
+    /* Dessine l'icône haltère doré sur fond noir */
+    function drawIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      const s   = size / 180; // facteur d'échelle (SVG source en 180px)
+
+      // Fond noir arrondi
+      ctx.fillStyle = '#0a0a0a';
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(0, 0, size, size, 38 * s);
+      } else {
+        // Fallback pour navigateurs anciens
+        const r = 38 * s;
+        ctx.moveTo(r, 0);
+        ctx.lineTo(size - r, 0);
+        ctx.quadraticCurveTo(size, 0, size, r);
+        ctx.lineTo(size, size - r);
+        ctx.quadraticCurveTo(size, size, size - r, size);
+        ctx.lineTo(r, size);
+        ctx.quadraticCurveTo(0, size, 0, size - r);
+        ctx.lineTo(0, r);
+        ctx.quadraticCurveTo(0, 0, r, 0);
+      }
+      ctx.fill();
+
+      /* ── Haltère (coordonnées calquées sur icon.svg / viewBox 180×180) ── */
+
+      function rr(x, y, w, h, r, color) {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(x * s, y * s, w * s, h * s, r * s);
+        } else {
+          ctx.rect(x * s, y * s, w * s, h * s);
+        }
+        ctx.fill();
+      }
+
+      // Barre centrale
+      rr(34, 83, 112, 14, 7, '#d4a23c');
+
+      // Disque gauche
+      rr(20, 65, 26, 50, 9, '#d4a23c');
+
+      // Plaque gauche extrême (légèrement plus sombre)
+      rr(10, 74, 16, 32, 6, '#c49030');
+
+      // Disque droit
+      rr(134, 65, 26, 50, 9, '#d4a23c');
+
+      // Plaque droite extrême
+      rr(154, 74, 16, 32, 6, '#c49030');
+    }
+
+    /* Génère les aperçus au chargement */
+    function buildPreviews() {
+      const container = document.getElementById('previews');
+      SIZES.forEach(size => {
+        const display = Math.min(size, 128);
+        const canvas  = document.createElement('canvas');
+        canvas.width  = size;
+        canvas.height = size;
+        drawIcon(canvas, size);
+
+        const img = document.createElement('img');
+        img.src    = canvas.toDataURL();
+        img.width  = display;
+        img.height = display;
+        img.style.borderRadius = '16px';
+
+        const wrap = document.createElement('div');
+        wrap.className = 'preview';
+        const label = document.createElement('span');
+        label.textContent = `${size}×${size}`;
+        wrap.appendChild(img);
+        wrap.appendChild(label);
+        container.appendChild(wrap);
+      });
+    }
+
+    function download(size) {
+      const canvas  = document.createElement('canvas');
+      canvas.width  = size;
+      canvas.height = size;
+      drawIcon(canvas, size);
+      canvas.toBlob(blob => {
+        const a  = document.createElement('a');
+        a.href   = URL.createObjectURL(blob);
+        a.download = `icon-${size}.png`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      }, 'image/png');
+    }
+
+    function downloadAll() {
+      SIZES.forEach((size, i) => {
+        setTimeout(() => download(size), i * 300);
+      });
+    }
+
+    buildPreviews();
+  </script>
+</body>
+</html>

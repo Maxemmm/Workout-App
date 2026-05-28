@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <!-- Fond noir arrondi (iOS crop automatiquement en cercle) -->
+  <rect width="180" height="180" rx="38" fill="#0a0a0a"/>
+
+  <!-- Haltère — barre centrale -->
+  <rect x="34" y="83" width="112" height="14" rx="7" fill="#d4a23c"/>
+
+  <!-- Disques gauche -->
+  <rect x="20" y="65" width="26" height="50" rx="9" fill="#d4a23c"/>
+  <!-- Poignée gauche extrême -->
+  <rect x="10" y="74" width="16" height="32" rx="6" fill="#c49030"/>
+
+  <!-- Disques droite -->
+  <rect x="134" y="65" width="26" height="50" rx="9" fill="#d4a23c"/>
+  <!-- Poignée droite extrême -->
+  <rect x="154" y="74" width="16" height="32" rx="6" fill="#c49030"/>
+</svg>
