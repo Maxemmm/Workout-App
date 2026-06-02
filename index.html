@@ -63,7 +63,7 @@
       margin: 0 auto;
       /* Safe areas iOS */
       padding-top: env(safe-area-inset-top);
-      padding-bottom: calc(env(safe-area-inset-bottom) + 32px);
+      padding-bottom: calc(env(safe-area-inset-bottom) + 72px);
       padding-left:  env(safe-area-inset-left);
       padding-right: env(safe-area-inset-right);
       overflow-x: hidden;
@@ -652,10 +652,383 @@
       font-family: inherit;
     }
     .btn-reset:active { color: var(--rust); }
+
+    /* ============================================================
+       BOUTON TERMINER LA SÉANCE
+    ============================================================ */
+    .btn-finish-session {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: 2px solid #2a2a2a;
+      background: transparent;
+      color: var(--text-dim);
+      font-family: 'Oswald', -apple-system, sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transform: translateZ(0);
+      will-change: opacity, transform;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      /* cubic-bezier standard Material : accélération naturelle */
+      transition: background  0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                  border-color 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                  color        0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity      0.3s  ease;
+    }
+    .btn-finish-session:disabled {
+      cursor: default;
+    }
+    .btn-finish-session.is-all-done {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .btn-finish-session.is-logged {
+      background: var(--green-done);
+      border-color: var(--green-done);
+      color: #fff;
+    }
+    .btn-finish-session:not(.is-logged):active { opacity: 0.6; }
+
+    /* ── Animations du bouton "Terminer la séance" ───────────────── */
+    /* État neutre forcé (anti-flash vert pendant le fade-in) */
+    .btn-finish-session.is-resetting {
+      transition: none !important;
+      background: transparent !important;
+      border-color: #2a2a2a !important;
+      color: var(--text-dim) !important;
+    }
+
+    .btn-finish-session .finish-label {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+    .btn-finish-session .finish-label-main {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 180ms ease, transform 220ms ease;
+    }
+    .btn-finish-session .finish-label-success {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 220ms ease, transform 260ms ease;
+    }
+    .btn-finish-session.is-success .finish-label-main {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    .btn-finish-session.is-success .finish-label-success {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* Gèle les transitions de labels (anti-flicker iOS) */
+    .btn-finish-session.labels-freeze .finish-label-main,
+    .btn-finish-session.labels-freeze .finish-label-success {
+      transition: none !important;
+    }
+
+    @keyframes finishSuccess {
+      0%   { transform: translateZ(0) scale(1); }
+      18%  { transform: translateZ(0) scale(1.03); }
+      50%  { transform: translateZ(0) scale(1.00); }
+      100% { transform: translateZ(0) scale(1.00); }
+    }
+    @keyframes finishFadeOut {
+      from { opacity: 1; transform: translateZ(0) translateY(0); }
+      to   { opacity: 0; transform: translateZ(0) translateY(6px); }
+    }
+    @keyframes finishFadeIn {
+      from { opacity: 0; transform: translateZ(0) translateY(6px); }
+      to   { opacity: 1; transform: translateZ(0) translateY(0); }
+    }
+    .btn-finish-session.anim-success {
+      animation: finishSuccess 600ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+    }
+    .btn-finish-session.anim-fadeout {
+      animation: finishFadeOut 240ms ease both;
+    }
+    .btn-finish-session.anim-fadein {
+      animation: finishFadeIn 260ms ease both;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .btn-finish-session.anim-success,
+      .btn-finish-session.anim-fadeout,
+      .btn-finish-session.anim-fadein {
+        animation: none !important;
+      }
+      .btn-finish-session .finish-label-main,
+      .btn-finish-session .finish-label-success {
+        transition: none !important;
+      }
+    }
+
+    /* ============================================================
+       NAVIGATION BAS (écrans Séance / Stats)
+    ============================================================ */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 540px;
+      display: flex;
+      background: #111;
+      border-top: 1px solid var(--border);
+      padding-bottom: env(safe-area-inset-bottom);
+      z-index: 200;
+    }
+
+    .nav-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 10px 0 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: color 0.15s;
+      font-family: inherit;
+    }
+    .nav-btn.is-active { color: var(--gold); }
+    .nav-icon { font-size: 20px; line-height: 1; }
+    .nav-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    /* ============================================================
+       ÉCRAN STATS — EN-TÊTE
+    ============================================================ */
+    .stats-hdr {
+      padding: 20px 20px 0;           /* identique à .header */
+      background: linear-gradient(172deg, #1c1308 0%, var(--bg) 58%);
+    }
+    .stats-hdr-title {
+      font-family: 'Oswald', -apple-system, sans-serif;
+      font-size: 54px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      color: var(--gold);
+      line-height: 0.92;
+      margin-bottom: 22px;            /* identique à .header-subtitle margin-bottom */
+    }
+
+    /* ── Sub-nav Résumé / Par exercice ── */
+    .stats-subnav {
+      display: flex;
+      gap: 8px;
+      padding: 0 20px 14px;           /* identique à .tabs-wrapper */
+    }
+    .stats-tab {
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      font-family: inherit;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .stats-tab.is-active { border-color: var(--gold); color: var(--text); }
+
+    /* ── Zone scrollable des vues stats ── */
+    .stats-view {
+      padding: 4px 16px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ── Ligne double : deux cartes côte à côte ── */
+    .stat-row {
+      display: flex;
+      gap: 10px;
+    }
+    .stat-row > .stat-card { flex: 1; min-width: 0; }
+    .stat-row .stat-big    { font-size: 28px; }
+    .stat-row .stat-sub    { font-size: 11px; }
+
+    /* ============================================================
+       CARTES DE MÉTRIQUES
+    ============================================================ */
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+    .stat-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+    .stat-big {
+      font-family: 'Oswald', -apple-system, sans-serif;
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    /* ── Boutons Export / Import ── */
+    .stats-actions {
+      display: flex;
+      gap: 10px;
+    }
+    .btn-action-stats {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-align: center;
+      display: block;
+      -webkit-tap-highlight-color: transparent;
+      font-family: inherit;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .btn-action-stats:hover,
+    .btn-action-stats:active { border-color: var(--gold); color: var(--gold); }
+
+    .btn-action-danger {
+      width: 100%;
+      border-color: #3a1a10;
+      color: #6b2a10;
+    }
+    .btn-action-danger:hover,
+    .btn-action-danger:active {
+      border-color: var(--rust);
+      color: var(--rust);
+      background: rgba(196,86,31,0.08);
+    }
+
+    /* ── Sélecteur d'exercice ── */
+    .exercise-select {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+      font-weight: 600;
+      -webkit-appearance: none;
+      appearance: none;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* ── Conteneur du chart ── */
+    .chart-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    /* ── Liste historique par exercice ── */
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .history-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .history-item.is-pr { border-color: #3a2e10; }
+    .history-date  { font-size: 11px; color: var(--text-dim); font-weight: 600; letter-spacing: 0.05em; }
+    .history-weight { font-size: 17px; font-weight: 700; color: var(--text); }
+    .history-item.is-pr .history-weight { color: var(--gold); }
+    .history-vol   { font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
+
+    /* ── Message vide ── */
+    .no-data {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 13px;
+      padding: 28px 0;
+    }
+
+    /* ── Toast de confirmation « Séance enregistrée » ── */
+    .finish-toast {
+      position: fixed;
+      bottom: 76px; /* au-dessus de la bottom nav */
+      left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: var(--green-done);
+      color: #fff;
+      font-family: 'Oswald', -apple-system, sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 12px 28px;
+      border-radius: 12px;
+      opacity: 0;
+      transition: opacity 0.25s, transform 0.25s;
+      z-index: 300;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .finish-toast.is-visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
   </style>
 </head>
 
 <body>
+
+  <div id="screen-workout">
 
   <!-- ══════════════════════════════════════════════════════════
        EN-TÊTE : bandeau + titre de séance
@@ -701,6 +1074,108 @@
        CONTENU PRINCIPAL (exercices ou tips)
   ══════════════════════════════════════════════════════════ -->
   <main id="content" class="content"></main>
+
+  </div><!-- fin screen-workout -->
+
+  <!-- ══════════════════════════════════════════════════════════
+       ÉCRAN STATS
+  ══════════════════════════════════════════════════════════ -->
+  <div id="screen-stats" style="display:none">
+
+    <div class="stats-hdr">
+      <div class="header-meta">
+        <span class="header-label">PROGRESSION</span>
+        <span id="stats-hdr-date" class="header-date"></span>
+      </div>
+      <div class="stats-hdr-title">STATS</div>
+    </div>
+
+    <div class="stats-subnav">
+      <button class="stats-tab is-active" data-view="summary">Résumé</button>
+      <button class="stats-tab" data-view="exercise">Par exercice</button>
+    </div>
+
+    <!-- Vue résumé -->
+    <div id="view-summary" class="stats-view">
+
+      <!-- Streak + Volume sur la même ligne -->
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-label">STREAK</div>
+          <div class="stat-big" id="stat-streak">—</div>
+          <div class="stat-sub" id="stat-streak-sub">consécutives</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">VOLUME SEMAINE</div>
+          <div class="stat-big" id="stat-vol-week">—</div>
+          <div class="stat-sub" id="stat-vol-vs"></div>
+        </div>
+      </div>
+
+      <!-- Dernière séance pleine largeur -->
+      <div class="stat-card">
+        <div class="stat-label">DERNIÈRE SÉANCE</div>
+        <div class="stat-big" id="stat-last-name">—</div>
+        <div class="stat-sub" id="stat-last-date">Aucune séance enregistrée</div>
+      </div>
+
+      <!-- Graphe fréquence mensuelle -->
+      <div class="chart-wrap" id="monthly-chart-wrap">
+        <div class="stat-label">SÉANCES PAR MOIS</div>
+        <canvas id="chart-monthly"></canvas>
+      </div>
+
+      <div class="stats-actions">
+        <button id="btn-export" class="btn-action-stats">⬇ EXPORTER</button>
+        <label class="btn-action-stats" for="input-import">⬆ IMPORTER</label>
+        <input type="file" id="input-import" accept=".json" style="display:none" />
+      </div>
+      <button id="btn-clear-history" class="btn-action-stats btn-action-danger">
+        🗑 EFFACER L'HISTORIQUE
+      </button>
+
+    </div><!-- fin view-summary -->
+
+    <!-- Vue par exercice -->
+    <div id="view-exercise" class="stats-view" style="display:none">
+
+      <select id="exercise-select" class="exercise-select">
+        <option value="">— Choisir un exercice —</option>
+      </select>
+
+      <div id="no-history" class="no-data" style="display:none">
+        Aucun historique pour cet exercice.
+      </div>
+
+      <div id="pr-card" class="stat-card" style="display:none">
+        <div class="stat-label">RECORD PERSONNEL 🏆</div>
+        <div class="stat-big" id="stat-pr">—</div>
+        <div class="stat-sub" id="stat-pr-date"></div>
+      </div>
+
+      <div id="chart-wrap" class="chart-wrap" style="display:none">
+        <canvas id="chart-weight"></canvas>
+      </div>
+
+      <div id="history-list" class="history-list"></div>
+
+    </div><!-- fin view-exercise -->
+
+  </div><!-- fin screen-stats -->
+
+  <!-- ══════════════════════════════════════════════════════════
+       NAVIGATION BAS
+  ══════════════════════════════════════════════════════════ -->
+  <nav class="bottom-nav" aria-label="Navigation principale">
+    <button id="nav-workout" class="nav-btn is-active">
+      <span class="nav-icon">🏋️</span>
+      <span class="nav-label">SÉANCE</span>
+    </button>
+    <button id="nav-stats" class="nav-btn">
+      <span class="nav-icon">📈</span>
+      <span class="nav-label">STATS</span>
+    </button>
+  </nav>
 
   <!-- ============================================================
        DONNÉES DU PROGRAMME
@@ -884,6 +1359,7 @@
     function render(dayIndex) {
       stopTimer();   // annule le timer avant de détruire le DOM
       cancelDrag();  // nettoie le ghost si un drag est en cours
+      finishBtnEl = null;
       jourActif = dayIndex;
       const session = getSession(dayIndex);
 
@@ -953,6 +1429,12 @@
       document.getElementById('sets-total').textContent = total;
       const pct = total > 0 ? (done / total) * 100 : 0;
       document.getElementById('progress-fill').style.width = pct + '%';
+
+      if (finishBtnEl && !finishBtnEl.classList.contains('is-logged')) {
+        const allDone = total > 0 && done >= total;
+        finishBtnEl.classList.toggle('is-all-done', allDone);
+        setFinishButtonMainText(finishBtnEl, allDone ? '✓ TERMINER LA SÉANCE' : 'TERMINER LA SÉANCE');
+      }
     }
 
     /* ── Réinitialisation de la séance du jour ─────────────────────── */
@@ -1024,6 +1506,49 @@
 
       // Bouton reset
       document.getElementById('btn-reset').onclick = resetJour;
+
+      // Bouton Terminer la séance
+      const finishBtn = document.createElement('button');
+      finishBtn.className = 'btn-finish-session';
+      const initAllDone = totalSets(session) > 0 && doneSets(session.key) >= totalSets(session);
+      finishBtn.classList.toggle('is-all-done', initAllDone);
+      finishBtn.innerHTML =
+        `<span class="finish-label finish-label-main"></span>` +
+        `<span class="finish-label finish-label-success">✓ SÉANCE ENREGISTRÉE</span>`;
+      setFinishButtonMainText(finishBtn, initAllDone ? '✓ TERMINER LA SÉANCE' : 'TERMINER LA SÉANCE');
+      finishBtnEl = finishBtn;
+
+      finishBtn.addEventListener('click', () => {
+        if (finishBtn.disabled) return;
+
+        // Guard d'abord : empêche le double-clic
+        finishBtn.classList.add('is-logged');
+        finishBtn.disabled = true;
+
+        // 1. Log (etatSeries encore à jour, avant tout reset)
+        const allDone = totalSets(session) > 0 && doneSets(session.key) >= totalSets(session);
+        logSession(allDone);
+
+        // 2. Reset persistence + mémoire
+        clearTrack(jourActif, session.key);
+        stopTimer();
+        const st = etatSeries[session.key];
+        if (st) Object.values(st).forEach(arr => arr.fill(false));
+
+        // 3. Reset DOM direct (sans re-render complet)
+        document.querySelectorAll('#content .set-circle').forEach(el =>
+          el.classList.remove('is-checked')
+        );
+        document.querySelectorAll('#content .exercise-card').forEach(el =>
+          el.classList.remove('is-complete')
+        );
+        renderCounter(session, true);
+
+        // 4. Animation fluide (sans toast externe)
+        runFinishButtonAnimation(finishBtn);
+      });
+
+      container.appendChild(finishBtn);
     }
 
     /* ── Minuteur de repos ─────────────────────────────────────────── */
@@ -1031,6 +1556,7 @@
     let timerInterval = null;
     let timerBarEl    = null;
     let timerRestSec  = 0;
+    let finishBtnEl   = null;
 
     // AudioContext partagé — créé au premier geste, réutilisé ensuite.
     // Évite le blocage "autoplay policy" de Chrome/Safari sur PC.
@@ -1122,6 +1648,154 @@
           osc.stop(ctx.currentTime + offset + 0.25);
         });
       } catch (_) {}
+    }
+
+    /* ── Parsing reps depuis le scheme ─────────────────────────────── */
+
+    // "4×8" → 8   |   "3×45 sec" / "3×MAX" → null
+    function parseReps(scheme) {
+      const m = scheme.match(/[×x](\d+)$/);
+      return m ? parseInt(m[1], 10) : null;
+    }
+
+    // Extrait un poids depuis ex.load (poids de base du programme)
+    // "100 à 120 kg" -> 100  |  "10 kg" -> 10  |  "assistance 21 kg" -> 21
+    function parseSuggestedWeight(load) {
+      if (!load) return null;
+      const m = String(load).match(/(\d+(?:[.,]\d+)?)/);
+      if (!m) return null;
+      return parseFloat(m[1].replace(',', '.'));
+    }
+
+    /* ── Toast de confirmation ──────────────────────────────────────── */
+
+    function showToast(msg) {
+      const toast = document.createElement('div');
+      toast.className = 'finish-toast';
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add('is-visible'));
+      setTimeout(() => {
+        toast.classList.remove('is-visible');
+        setTimeout(() => toast.remove(), 300);
+      }, 2200);
+    }
+
+    /* ── Animation du bouton "Terminer la séance" ───────────────────── */
+
+    function setFinishButtonMainText(btn, text) {
+      const el = btn?.querySelector?.('.finish-label-main');
+      if (el) el.textContent = text;
+      else if (btn) btn.textContent = text; // fallback sécurité
+    }
+
+    function runFinishButtonAnimation(btn) {
+      if (!btn || !document.contains(btn)) return;
+
+      // Nettoyage (si un état précédent a été interrompu par un re-render)
+      btn.classList.remove('anim-success', 'anim-fadeout', 'anim-fadein');
+      btn.classList.remove('is-success');
+      btn.classList.remove('labels-freeze');
+      btn.classList.remove('is-resetting');
+
+      const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduceMotion) {
+        // Pas d'animation : reset rapide mais lisible.
+        setTimeout(() => {
+          if (!document.contains(btn)) return;
+          btn.classList.add('is-success');
+          setTimeout(() => {
+            if (!document.contains(btn)) return;
+            btn.classList.remove('is-success', 'is-logged', 'is-all-done');
+            setFinishButtonMainText(btn, 'TERMINER LA SÉANCE');
+            btn.disabled = false;
+          }, 350);
+          btn.disabled = false;
+        }, 350);
+        return;
+      }
+
+      // Phase 1 : petit "pop" de confirmation
+      btn.classList.add('anim-success');
+      btn.classList.add('is-success');
+
+      const onSuccessEnd = (e) => {
+        if (e.target !== btn) return;
+        btn.removeEventListener('animationend', onSuccessEnd);
+        if (!document.contains(btn)) return;
+
+        btn.classList.remove('anim-success');
+        // Laisser "SÉANCE ENREGISTRÉE" visible un court instant,
+        // puis fondu de tout le bouton.
+        setTimeout(() => {
+          if (!document.contains(btn)) return;
+          btn.classList.add('anim-fadeout');
+
+          const onFadeOutEnd = (e2) => {
+            if (e2.target !== btn) return;
+            btn.removeEventListener('animationend', onFadeOutEnd);
+            if (!document.contains(btn)) return;
+
+            // Swap invisible (btn est opacity:0 à la fin de fadeout)
+            // 1) Gèle 1 frame les transitions internes (évite le "flash" du label success)
+            btn.classList.add('labels-freeze');
+            // 2) Force l'état visuel neutre (évite un flash vert sur iOS)
+            btn.classList.add('is-resetting');
+            // 3) Reset des états (toujours invisible)
+            btn.classList.remove('is-success', 'is-logged', 'is-all-done', 'anim-fadeout');
+            setFinishButtonMainText(btn, 'TERMINER LA SÉANCE');
+
+            // 4) Force un reflow avant le fade-in (Safari peut rejouer l'ancien style sinon)
+            void btn.offsetWidth;
+
+            // 5) Fade-in vers l'état neutre (au prochain frame)
+            requestAnimationFrame(() => {
+              if (!document.contains(btn)) return;
+              btn.classList.add('anim-fadein');
+              // On dégèle après le paint du nouveau state
+              requestAnimationFrame(() => {
+                if (!document.contains(btn)) return;
+                btn.classList.remove('labels-freeze');
+              });
+            });
+
+            const onFadeInEnd = (e3) => {
+              if (e3.target !== btn) return;
+              btn.removeEventListener('animationend', onFadeInEnd);
+              if (!document.contains(btn)) return;
+
+              btn.classList.remove('anim-fadein');
+              btn.classList.remove('is-resetting');
+              btn.disabled = false;
+            };
+            btn.addEventListener('animationend', onFadeInEnd);
+          };
+          btn.addEventListener('animationend', onFadeOutEnd);
+        }, 650);
+      };
+      btn.addEventListener('animationend', onSuccessEnd);
+    }
+
+    /* ── Log de séance (clé "log:YYYY-MM-DD") ──────────────────────── */
+
+    function logSession(completed) {
+      const session = getSession(jourActif);
+      if (!session.exercises) return null;
+
+      const date  = dateForDay(jourActif);
+      const state = etatSeries[session.key] || {};
+
+      const exercises = (session.exercises || []).map(ex => ({
+        id:     ex.id,
+        // Poids : toujours depuis localStorage (semé au 1er rendu avec la valeur du programme)
+        weight: parseFloat(loadWeight(ex.id)) || 0,
+        sets:   (state[ex.id] || []).filter(Boolean).length,
+        reps:   parseReps(ex.scheme),
+      }));
+
+      const entry = { date, session: session.key, completed, exercises };
+      try { localStorage.setItem(`log:${date}`, JSON.stringify(entry)); } catch (_) {}
+      return entry;
     }
 
     /* ── Drag-and-drop ─────────────────────────────────────────────── */
@@ -1247,14 +1921,21 @@
       const restText   = fmtRest(restSec);
       const units      = PROGRAM.meta.units;
       const savedPoids = loadWeight(ex.id);
+      const poidsBase  = parseSuggestedWeight(ex.load);
       const poidsVal   = savedPoids !== ''
         ? savedPoids
-        : (ex.load?.match(/\d+(\.\d+)?/)?.[0] ?? '');
+        : (poidsBase != null ? String(poidsBase) : '');
       const showWeight = /\d/.test(ex.load ?? '') || savedPoids !== '';
       const hasAlts    = (ex.alternatives?.length ?? 0) > 0;
       const curSwap    = ex._swapIdx ?? 0;
       const nextSwap   = (curSwap + 1) % ((ex.alternatives?.length ?? 0) + 1);
       const nextLabel  = nextSwap === 0 ? ex.name : (ex.alternatives?.[nextSwap - 1] ?? '');
+
+      // Si aucun poids n'a encore été saisi, on "sème" le poids de base du programme
+      // pour que les logs et le dashboard (volume) reflètent tes poids actuels.
+      if (savedPoids === '' && poidsVal !== '') {
+        saveWeight(ex.id, poidsVal);
+      }
 
       card.innerHTML =
         // Poignée de drag (toujours présente, inactive si 1 seul exercice)
@@ -1353,12 +2034,480 @@
 
     /* ── Initialisation ────────────────────────────────────────────── */
 
-    // Date du jour dans le bandeau (toujours aujourd'hui, quelle que soit l'onglet actif)
-    document.getElementById('hdr-label').textContent = PROGRAM.meta.label;
-    document.getElementById('hdr-date').textContent  = fmtDate(AUJOURD_HUI);
+    // Date du jour dans les deux bandeau (workout et stats), toujours aujourd'hui
+    document.getElementById('hdr-label').textContent       = PROGRAM.meta.label;
+    document.getElementById('hdr-date').textContent        = fmtDate(AUJOURD_HUI);
+    document.getElementById('stats-hdr-date').textContent  = fmtDate(AUJOURD_HUI);
 
     // Premier rendu sur le jour courant
     render(JOUR_COURANT);
+  </script>
+
+  <!-- Chart.js via CDN (courbes de progression) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- ============================================================
+       DASHBOARD — STATS
+       Lit localStorage, calcule les métriques, pilote Chart.js.
+       Dépend de PROGRAM, AUJOURD_HUI, JOURS_ABBR, MOIS_ABBR
+       définis dans le bloc principal.
+  ============================================================ -->
+  <script>
+    /* ── Navigation entre écrans ─────────────────────────────────── */
+
+    function showScreen(name) {
+      document.getElementById('screen-workout').style.display = name === 'workout' ? '' : 'none';
+      document.getElementById('screen-stats').style.display   = name === 'stats'   ? '' : 'none';
+      document.getElementById('nav-workout').classList.toggle('is-active', name === 'workout');
+      document.getElementById('nav-stats').classList.toggle('is-active',   name === 'stats');
+      window.scrollTo(0, 0); // remet le scroll en haut à chaque changement d'écran
+      if (name === 'stats') renderDashboard();
+    }
+
+    function switchStatsView(view) {
+      document.querySelectorAll('.stats-tab').forEach(t =>
+        t.classList.toggle('is-active', t.dataset.view === view)
+      );
+      document.getElementById('view-summary').style.display  = view === 'summary'  ? '' : 'none';
+      document.getElementById('view-exercise').style.display = view === 'exercise' ? '' : 'none';
+    }
+
+    /* ── Lecture des logs ────────────────────────────────────────── */
+
+    function getAllLogs() {
+      const logs = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key || !key.startsWith('log:')) continue;
+        try {
+          const entry = JSON.parse(localStorage.getItem(key));
+          if (entry?.date) logs.push(entry);
+        } catch (_) {}
+      }
+      return logs.sort((a, b) => a.date.localeCompare(b.date));
+    }
+
+    /* ── Streak (séances prévues au planning et complétées) ──────── */
+    // Ne casse pas le streak sur les jours sans séance programmée.
+
+    function getStreak() {
+      const logMap = {};
+      getAllLogs().forEach(l => { if (l.completed) logMap[l.date] = true; });
+
+      let streak = 0;
+      const d = new Date(AUJOURD_HUI);
+
+      for (let daysBack = 0; daysBack < 365; daysBack++) {
+        const dayIdx  = d.getDay();
+        const dateStr = d.toISOString().slice(0, 10);
+        const scheduled = PROGRAM.schedule[dayIdx] != null;
+
+        if (scheduled) {
+          if (logMap[dateStr]) {
+            streak++;
+          } else if (daysBack === 0) {
+            // Séance d'aujourd'hui pas encore terminée — ne casse pas le streak
+          } else {
+            break; // Séance prévue manquée
+          }
+        }
+
+        d.setDate(d.getDate() - 1);
+      }
+      return streak;
+    }
+
+    /* ── Volume hebdomadaire ─────────────────────────────────────── */
+    // weekOffset 0 = semaine en cours, 1 = semaine précédente.
+
+    function getWeekVolume(weekOffset) {
+      const ref = new Date(AUJOURD_HUI);
+      const dow  = ref.getDay() === 0 ? 7 : ref.getDay(); // 1=lun…7=dim
+      ref.setDate(ref.getDate() - (dow - 1) - weekOffset * 7);
+      const mondayStr = ref.toISOString().slice(0, 10);
+      ref.setDate(ref.getDate() + 6);
+      const sundayStr = ref.toISOString().slice(0, 10);
+
+      let vol = 0;
+      getAllLogs().forEach(log => {
+        if (log.date < mondayStr || log.date > sundayStr) return;
+        (log.exercises || []).forEach(ex => {
+          if (ex.reps && ex.weight && ex.sets) vol += ex.sets * ex.reps * ex.weight;
+        });
+      });
+      return Math.round(vol);
+    }
+
+    /* ── Dernière séance (complète ou partielle) ────────────────── */
+
+    function getLastSession() {
+      const logs = getAllLogs();
+      return logs.length ? logs[logs.length - 1] : null;
+    }
+
+    /* ── Historique par exercice ─────────────────────────────────── */
+
+    function getExerciseHistory(exId) {
+      const history = [];
+      getAllLogs().forEach(log => {
+        const ex = (log.exercises || []).find(e => e.id === exId);
+        if (ex && ex.weight > 0) history.push({ date: log.date, ...ex });
+      });
+      return history; // trié par date croissante (getAllLogs est trié)
+    }
+
+    // Retourne { id → nom } pour tous les exercices présents dans les logs
+    function getAllLoggedExercises() {
+      const map = {};
+      // Noms canoniques depuis PROGRAM (prioritaires)
+      Object.values(PROGRAM.sessions).forEach(s =>
+        (s.exercises || []).forEach(e => { map[e.id] = e.name; })
+      );
+      // Fallback pour les exercices supprimés du programme
+      getAllLogs().forEach(log =>
+        (log.exercises || []).forEach(ex => { if (!map[ex.id]) map[ex.id] = ex.id; })
+      );
+      return map;
+    }
+
+    /* ── Formatage ───────────────────────────────────────────────── */
+
+    function fmtVolume(v) {
+      if (v === 0) return '0 kg';
+      if (v >= 10000) return (v / 1000).toFixed(1) + ' t';
+      return v.toLocaleString('fr-FR') + ' kg';
+    }
+
+    // Convertit "2026-06-02" → "LUN 2 JUN"
+    function fmtDateStr(dateStr) {
+      const d = new Date(dateStr + 'T12:00:00'); // T12 évite les décalages UTC
+      return `${JOURS_ABBR[d.getDay()]} ${d.getDate()} ${MOIS_ABBR[d.getMonth()]}`;
+    }
+
+    /* ── Fréquence mensuelle ─────────────────────────────────────── */
+
+    function fmtMonth(d) {
+      return `${MOIS_ABBR[d.getMonth()]} ${String(d.getFullYear()).slice(2)}`;
+    }
+
+    // Retourne les N derniers mois avec le nombre de séances (toutes, pas seulement complètes)
+    function getMonthlyFrequency(nbMois = 6) {
+      const counts = {};
+      getAllLogs().forEach(log => {
+        const key = log.date.slice(0, 7); // "2026-05"
+        counts[key] = (counts[key] || 0) + 1;
+      });
+
+      const months = [];
+      for (let i = nbMois - 1; i >= 0; i--) {
+        const d   = new Date(AUJOURD_HUI.getFullYear(), AUJOURD_HUI.getMonth() - i, 1);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        months.push({ key, count: counts[key] || 0, label: fmtMonth(d) });
+      }
+      return months;
+    }
+
+    let monthlyChart = null;
+
+    function renderMonthlyChart() {
+      if (typeof Chart === 'undefined') return;
+      if (monthlyChart) { monthlyChart.destroy(); monthlyChart = null; }
+
+      // Recrée le canvas (Chart.js exige un canvas neuf après destroy)
+      const wrap = document.getElementById('monthly-chart-wrap');
+      const old  = wrap.querySelector('canvas');
+      if (old) old.remove();
+      const canvas = document.createElement('canvas');
+      canvas.id = 'chart-monthly';
+      wrap.appendChild(canvas);
+
+      const months  = getMonthlyFrequency();
+      const curKey  = `${AUJOURD_HUI.getFullYear()}-${String(AUJOURD_HUI.getMonth() + 1).padStart(2, '0')}`;
+
+      monthlyChart = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+          labels: months.map(m => m.label),
+          datasets: [{
+            data: months.map(m => m.count),
+            backgroundColor: months.map(m =>
+              m.key === curKey ? 'rgba(212,162,60,0.9)' : 'rgba(212,162,60,0.3)'
+            ),
+            borderColor: '#d4a23c',
+            borderWidth: 1,
+            borderRadius: 6,
+            borderSkipped: false,
+          }],
+        },
+        options: {
+          responsive: true,
+          animation: { duration: 300 },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1e1e1e',
+              titleColor: '#8a8a8a',
+              bodyColor: '#f5f5f5',
+              borderColor: '#2a2a2a',
+              borderWidth: 1,
+              callbacks: {
+                label: ctx => `${ctx.raw} séance${ctx.raw !== 1 ? 's' : ''}`,
+              },
+            },
+          },
+          scales: {
+            x: {
+              ticks:  { color: '#8a8a8a', font: { size: 11 } },
+              grid:   { display: false },
+              border: { display: false },
+            },
+            y: {
+              ticks: {
+                color: '#8a8a8a',
+                font:  { size: 11 },
+                stepSize: 1,
+                callback: v => Number.isInteger(v) ? v : '',
+              },
+              grid:   { color: '#1e1e1e' },
+              border: { display: false },
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+    }
+
+    /* ── Rendu du dashboard ──────────────────────────────────────── */
+
+    function renderDashboard() {
+      const streak  = getStreak();
+      const curVol  = getWeekVolume(0);
+      const prevVol = getWeekVolume(1);
+      const last    = getLastSession();
+
+      // Streak
+      document.getElementById('stat-streak').textContent =
+        streak > 0 ? `${streak} 🔥` : '0';
+      document.getElementById('stat-streak-sub').textContent =
+        streak <= 1 ? 'séance consécutive' : 'séances consécutives';
+
+      // Volume semaine
+      document.getElementById('stat-vol-week').textContent = fmtVolume(curVol);
+      let vsText = '';
+      if (prevVol === 0 && curVol > 0) {
+        vsText = 'Première semaine tracée';
+      } else if (prevVol > 0) {
+        const pct = Math.round((curVol - prevVol) / prevVol * 100);
+        vsText = (pct >= 0 ? `+${pct}` : `${pct}`) + ' % vs semaine préc.';
+      }
+      document.getElementById('stat-vol-vs').textContent = vsText;
+
+      // Dernière séance
+      if (last) {
+        const s = PROGRAM.sessions[last.session];
+        document.getElementById('stat-last-name').textContent = s ? s.name : last.session;
+        document.getElementById('stat-last-date').textContent = fmtDateStr(last.date);
+      } else {
+        document.getElementById('stat-last-name').textContent = '—';
+        document.getElementById('stat-last-date').textContent = 'Aucune séance enregistrée';
+      }
+
+      // Sélecteur exercice (conserve la sélection courante si possible)
+      populateExerciseSelect();
+
+      // Graphe fréquence mensuelle
+      renderMonthlyChart();
+    }
+
+    function populateExerciseSelect() {
+      const sel   = document.getElementById('exercise-select');
+      const prev  = sel.value;
+      const exMap = getAllLoggedExercises();
+
+      sel.innerHTML = '<option value="">— Choisir un exercice —</option>';
+      Object.entries(exMap).sort((a, b) => a[1].localeCompare(b[1])).forEach(([id, name]) => {
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = name;
+        sel.appendChild(opt);
+      });
+
+      if (prev && exMap[prev]) { sel.value = prev; onExerciseSelect(prev); }
+    }
+
+    /* ── Vue par exercice ────────────────────────────────────────── */
+
+    let weightChart = null;
+
+    function onExerciseSelect(exId) {
+      const historyList = document.getElementById('history-list');
+      const prCard      = document.getElementById('pr-card');
+      const chartWrap   = document.getElementById('chart-wrap');
+      const noHistory   = document.getElementById('no-history');
+
+      historyList.innerHTML   = '';
+      prCard.style.display    = 'none';
+      chartWrap.style.display = 'none';
+      noHistory.style.display = 'none';
+
+      if (!exId) return;
+
+      const history = getExerciseHistory(exId);
+      if (!history.length) { noHistory.style.display = ''; return; }
+
+      // Record personnel
+      const pr     = Math.max(...history.map(h => h.weight));
+      const prEntry = [...history].reverse().find(h => h.weight === pr);
+      document.getElementById('stat-pr').textContent      = `${pr} ${PROGRAM.meta.units}`;
+      document.getElementById('stat-pr-date').textContent = prEntry ? fmtDateStr(prEntry.date) : '';
+      prCard.style.display = '';
+
+      // Chart
+      chartWrap.style.display = '';
+      renderWeightChart(history, pr);
+
+      // Historique texte (8 dernières entrées, plus récent en premier)
+      [...history].reverse().slice(0, 8).forEach(h => {
+        const vol  = (h.reps && h.sets && h.weight) ? h.sets * h.reps * h.weight : null;
+        const item = document.createElement('div');
+        item.className = 'history-item' + (h.weight === pr ? ' is-pr' : '');
+        item.innerHTML =
+          `<span class="history-date">${fmtDateStr(h.date)}</span>` +
+          `<span class="history-weight">${h.weight} ${PROGRAM.meta.units}` +
+          (h.weight === pr ? ' 🏆' : '') + `</span>` +
+          (vol ? `<span class="history-vol">${vol.toLocaleString('fr-FR')} kg vol.</span>` : '');
+        historyList.appendChild(item);
+      });
+    }
+
+    function renderWeightChart(history, pr) {
+      if (typeof Chart === 'undefined') return;
+      if (weightChart) { weightChart.destroy(); weightChart = null; }
+
+      // Recrée le canvas (Chart.js exige un canvas neuf après destroy)
+      const wrap = document.getElementById('chart-wrap');
+      wrap.innerHTML = '<canvas id="chart-weight"></canvas>';
+      const ctx = document.getElementById('chart-weight').getContext('2d');
+
+      const labels  = history.map(h => fmtDateStr(h.date));
+      const weights = history.map(h => h.weight);
+
+      weightChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            data: weights,
+            borderColor: '#d4a23c',
+            backgroundColor: 'rgba(212,162,60,0.07)',
+            pointBackgroundColor: weights.map(w => w === pr ? '#d4a23c' : '#555'),
+            pointBorderColor:     weights.map(w => w === pr ? '#d4a23c' : '#555'),
+            pointRadius:          weights.map(w => w === pr ? 8 : 4),
+            pointHoverRadius: 8,
+            tension: 0.35,
+            fill: true,
+            borderWidth: 2,
+          }],
+        },
+        options: {
+          responsive: true,
+          animation: { duration: 300 },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1e1e1e',
+              titleColor: '#8a8a8a',
+              bodyColor: '#f5f5f5',
+              borderColor: '#2a2a2a',
+              borderWidth: 1,
+              callbacks: { label: ctx => `${ctx.raw} ${PROGRAM.meta.units}` },
+            },
+          },
+          scales: {
+            x: {
+              ticks: { color: '#8a8a8a', font: { size: 10 }, maxRotation: 35 },
+              grid:  { color: '#1e1e1e' },
+            },
+            y: {
+              ticks: {
+                color: '#8a8a8a',
+                font:  { size: 10 },
+                callback: v => `${v} ${PROGRAM.meta.units}`,
+              },
+              grid: { color: '#1e1e1e' },
+              beginAtZero: false,
+            },
+          },
+        },
+      });
+    }
+
+    /* ── Export / Import ─────────────────────────────────────────── */
+
+    function exportData() {
+      const logs = getAllLogs();
+      const blob = new Blob(
+        [JSON.stringify({ exportedAt: new Date().toISOString(), version: 1, logs }, null, 2)],
+        { type: 'application/json' }
+      );
+      const url = URL.createObjectURL(blob);
+      const a   = document.createElement('a');
+      a.href     = url;
+      a.download = `training-${AUJOURD_HUI.toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function importData(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const raw  = JSON.parse(e.target.result);
+          const logs = raw.logs || (Array.isArray(raw) ? raw : []);
+          let count  = 0;
+          logs.forEach(log => {
+            if (log?.date && log?.session) {
+              localStorage.setItem(`log:${log.date}`, JSON.stringify(log));
+              count++;
+            }
+          });
+          document.getElementById('input-import').value = '';
+          alert(`${count} séance${count > 1 ? 's' : ''} importée${count > 1 ? 's' : ''}.`);
+          renderDashboard();
+        } catch (_) {
+          alert('Fichier invalide ou corrompu.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    /* ── Câblage des événements ──────────────────────────────────── */
+
+    function clearHistory() {
+      if (!confirm('Effacer tout l\'historique d\'entraînement ?\nCette action est irréversible.')) return;
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('log:')) keys.push(k);
+      }
+      keys.forEach(k => localStorage.removeItem(k));
+      renderDashboard();
+    }
+
+    document.getElementById('nav-workout').addEventListener('click', () => showScreen('workout'));
+    document.getElementById('nav-stats').addEventListener('click',   () => showScreen('stats'));
+    document.getElementById('btn-export').addEventListener('click',  exportData);
+    document.getElementById('input-import').addEventListener('change', e => importData(e.target.files[0]));
+    document.getElementById('btn-clear-history').addEventListener('click', clearHistory);
+    document.querySelectorAll('.stats-tab').forEach(btn =>
+      btn.addEventListener('click', () => switchStatsView(btn.dataset.view))
+    );
+    document.getElementById('exercise-select').addEventListener('change', e =>
+      onExerciseSelect(e.target.value)
+    );
   </script>
 
   <!-- Enregistrement du service worker (hors-ligne) -->
