@@ -989,6 +989,23 @@
     .history-weight { font-size: 17px; font-weight: 700; color: var(--text); }
     .history-item.is-pr .history-weight { color: var(--gold); }
     .history-vol   { font-size: 11px; color: var(--text-dim); flex-shrink: 0; }
+    .history-detail { font-size: 11px; color: var(--text-dim); flex-shrink: 0; letter-spacing: 0.04em; }
+
+    /* ── Vue Par exercice ── */
+    /* Même espacement que .stats-view (cartes imbriquées sans gap sinon) */
+    #exercise-content,
+    #exercise-stats-block {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    #view-exercise .chart-wrap canvas {
+      min-height: 200px;
+      max-height: 260px;
+    }
+    .exercise-panel-empty {
+      margin-top: 4px;
+    }
 
     /* ── Message vide ── */
     .no-data {
@@ -1023,10 +1040,316 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+
+    /* ============================================================
+       ONBOARDING / PARAMÈTRES (branche multi-user)
+    ============================================================ */
+    .onboarding {
+      min-height: 100dvh;
+      background: linear-gradient(172deg, #1c1308 0%, var(--bg) 58%);
+      padding-bottom: calc(env(safe-area-inset-bottom) + 14px);
+    }
+
+    .onboarding-wrap {
+      padding: calc(env(safe-area-inset-top) + 22px) 16px 18px;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    .onboarding-hero {
+      text-align: left;
+      margin-bottom: 14px;
+    }
+
+    .onboarding-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .app-mark {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: rgba(212,162,60,0.10);
+      border: 1px solid rgba(212,162,60,0.25);
+      color: var(--gold);
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .panel-title {
+      font-family: 'Oswald', -apple-system, sans-serif;
+      font-size: 44px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      text-transform: uppercase;
+      color: var(--text);
+      line-height: 0.92;
+    }
+
+    .panel-subtitle {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin-top: 6px;
+    }
+
+    .onboarding-features {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .feature-pill {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: rgba(22,22,22,0.75);
+      border: 1px solid rgba(42,42,42,0.9);
+      border-radius: 14px;
+      padding: 12px 12px;
+      color: var(--text-dim);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .feature-pill b { color: var(--text); font-weight: 700; }
+    .feature-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: rgba(212,162,60,0.10);
+      border: 1px solid rgba(212,162,60,0.20);
+      color: var(--gold);
+      font-weight: 900;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .panel-card {
+      width: 100%;
+      background: rgba(22,22,22,0.86);
+      border: 1px solid rgba(42,42,42,0.95);
+      border-radius: 18px;
+      padding: 16px 14px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .panel-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      min-height: 44px;
+      padding: 14px 14px;
+      border-radius: 14px;
+      border: 2px solid var(--gold);
+      background: linear-gradient(180deg, rgba(212,162,60,0.18), rgba(212,162,60,0.06));
+      color: var(--gold);
+      font-family: 'Oswald', -apple-system, sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.18s ease, opacity 0.18s ease;
+    }
+    .btn-primary:active { opacity: 0.72; transform: scale(0.99); }
+
+    .btn-secondary {
+      width: 100%;
+      min-height: 44px;
+      padding: 14px 14px;
+      border-radius: 14px;
+      border: 2px solid #2a2a2a;
+      background: rgba(16,16,16,0.55);
+      color: var(--text);
+      font-family: 'Oswald', -apple-system, sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.18s ease, opacity 0.18s ease, border-color 0.2s ease;
+    }
+    .btn-secondary:active { opacity: 0.78; transform: scale(0.99); }
+    .btn-secondary:hover { border-color: rgba(212,162,60,0.35); }
+
+    .btn-danger {
+      border-color: var(--rust);
+      color: var(--rust);
+      background: rgba(196,86,31,0.08);
+    }
+
+    .json-textarea {
+      width: 100%;
+      min-height: 180px;
+      resize: vertical;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #101010;
+      color: var(--text);
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      outline: none;
+    }
+
+    .paste-details {
+      margin-top: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(42,42,42,0.95);
+      background: rgba(16,16,16,0.35);
+      overflow: hidden;
+    }
+    .paste-summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .paste-summary::-webkit-details-marker { display: none; }
+    .paste-summary .sum-title {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .paste-summary .sum-cta {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(212,162,60,0.9);
+    }
+    .paste-body {
+      padding: 0 14px 14px;
+    }
+
+    .panel-error {
+      background: rgba(210,58,58,0.08);
+      border: 1px solid rgba(210,58,58,0.35);
+      color: #ffb4b4;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 10px;
+      display: none;
+      white-space: pre-wrap;
+    }
+
+    .kv-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .kv-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--bg-card-soft);
+      color: var(--text-dim);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .kv-val { color: var(--text); letter-spacing: 0.02em; text-transform: none; font-weight: 700; }
   </style>
 </head>
 
 <body>
+
+  <!-- ══════════════════════════════════════════════════════════
+       ONBOARDING (premier lancement multi-user)
+  ══════════════════════════════════════════════════════════ -->
+  <div id="screen-onboarding" style="display:none">
+    <div class="onboarding">
+      <div class="onboarding-wrap">
+        <div class="onboarding-hero">
+          <div class="onboarding-brand">
+            <div class="app-mark">🏋️</div>
+            <div>
+              <div class="panel-title">TRAINING</div>
+              <div class="panel-subtitle">
+                Ton carnet d'entraînement, sans compte, sans serveur.<br/>
+                Importe ton programme et commence dès aujourd'hui.
+              </div>
+            </div>
+          </div>
+
+          <div class="onboarding-features">
+            <div class="feature-pill">
+              <div class="feature-dot">✓</div>
+              <div><b>Séance du jour</b> + suivi des séries + minuteur de repos.</div>
+            </div>
+            <div class="feature-pill">
+              <div class="feature-dot">✓</div>
+              <div><b>Poids mémorisés</b> par exercice, progression dans le temps.</div>
+            </div>
+            <div class="feature-pill">
+              <div class="feature-dot">✓</div>
+              <div><b>100% local</b> : tout vit sur ton appareil (localStorage).</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <div class="section-label" id="onboarding-card-title">Démarrer</div>
+          <div class="panel-subtitle" id="onboarding-card-subtitle" style="margin-top:6px">
+            Aucun programme trouvé sur cet appareil. Choisis une méthode d'import.
+          </div>
+
+          <div class="panel-actions">
+            <button id="btn-import-file" class="btn-primary">IMPORTER UN FICHIER JSON</button>
+            <input type="file" id="input-program-file" accept=".json,application/json" style="display:none" />
+
+            <button id="btn-load-example" class="btn-secondary">CHARGER LE PROGRAMME EXEMPLE</button>
+          </div>
+
+          <details class="paste-details">
+            <summary class="paste-summary">
+              <span class="sum-title">Coller du JSON</span>
+              <span class="sum-cta">Ouvrir</span>
+            </summary>
+            <div class="paste-body">
+              <textarea id="program-paste" class="json-textarea" placeholder="{ ... }"></textarea>
+              <div class="panel-actions" style="margin-top:10px">
+                <button id="btn-validate-paste" class="btn-secondary">VALIDER & ENREGISTRER</button>
+              </div>
+            </div>
+          </details>
+
+          <div id="onboarding-error" class="panel-error"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div id="screen-workout">
 
@@ -1119,6 +1442,13 @@
         <div class="stat-sub" id="stat-last-date">Aucune séance enregistrée</div>
       </div>
 
+      <!-- Assiduité semaine (prévu vs fait) -->
+      <div class="stat-card">
+        <div class="stat-label">ASSIDUITÉ (SEMAINE)</div>
+        <div class="stat-big" id="stat-adherence">—</div>
+        <div class="stat-sub" id="stat-adherence-sub"></div>
+      </div>
+
       <!-- Graphe fréquence mensuelle -->
       <div class="chart-wrap" id="monthly-chart-wrap">
         <div class="stat-label">SÉANCES PAR MOIS</div>
@@ -1126,9 +1456,12 @@
       </div>
 
       <div class="stats-actions">
-        <button id="btn-export" class="btn-action-stats">⬇ EXPORTER</button>
-        <label class="btn-action-stats" for="input-import">⬆ IMPORTER</label>
+        <button id="btn-export" class="btn-action-stats">⬇ EXPORTER LOGS</button>
+        <label class="btn-action-stats" for="input-import">⬆ IMPORTER LOGS</label>
         <input type="file" id="input-import" accept=".json" style="display:none" />
+      </div>
+      <div class="stat-sub" style="margin-top:-6px">
+        Export/import ici = historique (logs) uniquement. Pour une sauvegarde complète (programme + poids + ordre/swap), utilise ⚙️.
       </div>
       <button id="btn-clear-history" class="btn-action-stats btn-action-danger">
         🗑 EFFACER L'HISTORIQUE
@@ -1139,29 +1472,103 @@
     <!-- Vue par exercice -->
     <div id="view-exercise" class="stats-view" style="display:none">
 
-      <select id="exercise-select" class="exercise-select">
+      <select id="exercise-select" class="exercise-select" aria-label="Choisir un exercice">
         <option value="">— Choisir un exercice —</option>
       </select>
 
-      <div id="no-history" class="no-data" style="display:none">
-        Aucun historique pour cet exercice.
+      <div id="exercise-empty-global" class="no-data exercise-panel-empty" style="display:none">
+        Termine au moins une séance pour afficher la progression par exercice.
       </div>
 
-      <div id="pr-card" class="stat-card" style="display:none">
-        <div class="stat-label">RECORD PERSONNEL 🏆</div>
-        <div class="stat-big" id="stat-pr">—</div>
-        <div class="stat-sub" id="stat-pr-date"></div>
-      </div>
+      <div id="exercise-content" style="display:none">
 
-      <div id="chart-wrap" class="chart-wrap" style="display:none">
-        <canvas id="chart-weight"></canvas>
-      </div>
+        <div class="stat-card">
+          <div class="stat-label">EXERCICE</div>
+          <div class="stat-big" id="exercise-name-display">—</div>
+          <div class="stat-sub" id="exercise-scheme-display"></div>
+        </div>
 
-      <div id="history-list" class="history-list"></div>
+        <div id="no-history" class="no-data" style="display:none">
+          Aucune charge enregistrée pour cet exercice (poids &gt; 0 dans les séances terminées).
+        </div>
+
+        <div id="exercise-stats-block" style="display:none">
+
+          <div class="stat-row">
+            <div class="stat-card">
+              <div class="stat-label">RECORD 🏆</div>
+              <div class="stat-big" id="stat-pr">—</div>
+              <div class="stat-sub" id="stat-pr-date"></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">DERNIÈRE</div>
+              <div class="stat-big" id="stat-ex-last">—</div>
+              <div class="stat-sub" id="stat-ex-last-date"></div>
+            </div>
+          </div>
+
+          <div class="stat-card" id="stat-ex-progress-card">
+            <div class="stat-label">PROGRESSION</div>
+            <div class="stat-big" id="stat-ex-progress">—</div>
+            <div class="stat-sub" id="stat-ex-progress-sub"></div>
+          </div>
+
+          <div id="chart-wrap" class="chart-wrap">
+            <div class="stat-label">CHARGE AU FIL DU TEMPS</div>
+            <canvas id="chart-weight"></canvas>
+          </div>
+
+          <div class="section-label" id="history-section-label">Historique</div>
+          <div id="history-list" class="history-list"></div>
+
+        </div><!-- fin exercise-stats-block -->
+
+      </div><!-- fin exercise-content -->
 
     </div><!-- fin view-exercise -->
 
   </div><!-- fin screen-stats -->
+
+  <!-- ══════════════════════════════════════════════════════════
+       ÉCRAN PARAMÈTRES
+  ══════════════════════════════════════════════════════════ -->
+  <div id="screen-settings" style="display:none">
+    <div class="stats-hdr">
+      <div class="header-meta">
+        <span class="header-label">PARAMÈTRES</span>
+        <span id="settings-hdr-date" class="header-date"></span>
+      </div>
+      <div class="stats-hdr-title">RÉGLAGES</div>
+    </div>
+
+    <div class="stats-view">
+      <div class="stat-card">
+        <div class="stat-label">PROGRAMME ACTUEL</div>
+        <div class="stat-big" id="settings-prog-label">—</div>
+        <div class="stat-sub" id="settings-prog-sub">—</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">RÉSUMÉ</div>
+        <div class="kv-list">
+          <div class="kv-item"><span>Jours planifiés</span><span class="kv-val" id="settings-days">—</span></div>
+          <div class="kv-item"><span>Exercices</span><span class="kv-val" id="settings-exercises">—</span></div>
+        </div>
+      </div>
+
+      <div class="stats-actions">
+        <button id="btn-replace-program" class="btn-action-stats">⇄ REMPLACER</button>
+        <button id="btn-export-all" class="btn-action-stats">⬇ EXPORTER</button>
+      </div>
+
+      <label class="btn-action-stats" for="input-import-backup">⬆ IMPORTER SAUVEGARDE</label>
+      <input type="file" id="input-import-backup" accept=".json,application/json" style="display:none" />
+
+      <button id="btn-reset-all" class="btn-action-stats btn-action-danger">
+        🗑 RÉINITIALISER TOUT
+      </button>
+    </div>
+  </div><!-- fin screen-settings -->
 
   <!-- ══════════════════════════════════════════════════════════
        NAVIGATION BAS
@@ -1175,12 +1582,23 @@
       <span class="nav-icon">📈</span>
       <span class="nav-label">STATS</span>
     </button>
+    <button id="nav-settings" class="nav-btn">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">RÉGLAGES</span>
+    </button>
   </nav>
 
   <!-- ============================================================
-       DONNÉES DU PROGRAMME
+       DONNÉES DU PROGRAMME (multi-user)
   ============================================================ -->
-  <script src="program.js"></script>
+  <script>
+    // PROGRAM est stocké dans localStorage (un programme par appareil).
+    // Ne jamais démarrer le moteur sans validation.
+    let PROGRAM = null;
+
+    // Programme exemple embarqué (copie de program.example.json).
+    const EXAMPLE_PROGRAM = {"meta":{"label":"PROGRAMME SALLE","units":"kg","restDefaultSec":90,"repsInReserve":"1 à 2 reps en réserve"},"sessions":{"full-body":{"type":"lift","name":"FULL BODY","accent":"gold","subtitle":"JAMBES · PECS · DOS · ÉPAULES","note":null,"warmup":["Vélo ou tapis 5 à 7 min (léger)","Mobilité épaules et hanches","1 série légère sur presse et développé"],"exercises":[{"id":"presse-cuisses","name":"Presse à cuisses","scheme":"4×8","sets":4,"load":"100 à 120 kg","restSec":120,"cue":null,"alternatives":[]},{"id":"developpe-machine","name":"Développé machine","scheme":"4×8","sets":4,"load":"30 à 40 kg","restSec":120,"cue":null,"alternatives":["Développé haltères incliné"]},{"id":"tirage-horizontal","name":"Tirage horizontal","scheme":"4×10","sets":4,"load":"35 à 45 kg","restSec":90,"cue":null,"alternatives":["Rowing machine RH06"]},{"id":"leg-curl-lb","name":"Leg curl","scheme":"3×12","sets":3,"load":"25 à 35 kg","restSec":90,"cue":null,"alternatives":[]},{"id":"elevations-laterales-lb","name":"Élévations latérales","scheme":"3×12","sets":3,"load":"6 à 8 kg","restSec":60,"cue":null,"alternatives":[]},{"id":"gainage-lb","name":"Gainage","scheme":"3×45 sec","sets":3,"load":"Poids du corps","restSec":60,"cue":null,"alternatives":[]}],"cardio":{"label":"Marche inclinée","detail":"15 à 20 min — inclinaison 5 à 10 % — vitesse 5 à 6,5 km/h"},"bonus":null,"tips":null},"haut-du-corps":{"type":"lift","name":"HAUT DU CORPS","accent":"rust","subtitle":"PECS · DOS · BRAS · ÉPAULES","note":null,"warmup":["Vélo ou rameur 5 min","Mobilité épaules","1 série légère développé incliné (6 à 8 kg)"],"exercises":[{"id":"developpe-incline-halteres","name":"Développé incliné haltères","scheme":"3×10","sets":3,"load":"10 kg","restSec":90,"cue":null,"alternatives":[]},{"id":"tirage-vertical","name":"Tirage vertical","scheme":"3×10","sets":3,"load":"30 kg","restSec":90,"cue":null,"alternatives":[]},{"id":"rowing-unilateral","name":"Rowing unilatéral","scheme":"3×10","sets":3,"load":"14 à 20 kg","restSec":90,"cue":null,"alternatives":["Rowing machine RH06 — 45 kg"]},{"id":"dips-assistes","name":"Dips assistés","scheme":"3×MAX","sets":3,"load":"Assistance 21","restSec":90,"cue":null,"alternatives":[]},{"id":"curl-machine-rh15","name":"Curl machine RH15","scheme":"3×12","sets":3,"load":"20 kg","restSec":60,"cue":null,"alternatives":[]},{"id":"triceps-corde","name":"Triceps corde","scheme":"3×12","sets":3,"load":"20 à 30 kg","restSec":60,"cue":null,"alternatives":[]}],"cardio":{"label":"Vélo fractionné","detail":"15 à 20 min — 30 sec rapide / 1 min lent"},"bonus":null,"tips":null},"bas-du-corps":{"type":"lift","name":"BAS DU CORPS","accent":"rust","subtitle":"QUADS · ISCHIOS · MOLLETS · CORE","note":null,"warmup":["Vélo 5 à 7 min","Mobilité hanches et genoux","1 série légère presse"],"exercises":[{"id":"presse-cuisses-vend","name":"Presse à cuisses","scheme":"4×8","sets":4,"load":"100 à 120 kg","restSec":120,"cue":null,"alternatives":[]},{"id":"fentes-marchees","name":"Fentes marchées","scheme":"3×12","sets":3,"load":"10 à 14 kg","restSec":90,"cue":null,"alternatives":[]},{"id":"leg-curl-vend","name":"Leg curl","scheme":"3×12","sets":3,"load":"25 à 35 kg","restSec":90,"cue":null,"alternatives":[]},{"id":"mollets-machine","name":"Mollets machine","scheme":"3×15","sets":3,"load":"60 à 80 kg","restSec":90,"cue":null,"alternatives":[]},{"id":"gainage-vend","name":"Gainage","scheme":"3×45 sec","sets":3,"load":"Poids du corps","restSec":60,"cue":null,"alternatives":[]}],"cardio":{"label":"Vélo","detail":"15 à 20 min — intensité modérée"},"bonus":null,"tips":null},"repos":{"type":"rest","name":"REPOS","accent":"gray","subtitle":"RÉCUPÈRE. MANGE. DORS.","note":null,"warmup":null,"exercises":[],"cardio":null,"bonus":null,"tips":[{"title":"Le sommeil est de l'entraînement","body":"7 à 9 h — c'est là que l'hormone de croissance culmine et que le muscle se construit vraiment.","accent":"gold"},{"title":"Protéines","body":"Ne pas baisser l'apport les jours de repos. Le muscle se répare en continu.","accent":"gold"},{"title":"Prépare la prochaine séance","body":"Vérifie tes charges de la dernière fois. Vise +1 rep ou +2,5 kg sur au moins un exercice.","accent":"rust"}]}},"schedule":{"1":"full-body","3":"haut-du-corps","5":"bas-du-corps"},"rules":["Garder 1 à 2 répétitions en réserve","Si trop facile, augmenter légèrement la charge","Si trop difficile, diminuer légèrement la charge","Priorité à l'exécution propre","Progression chaque semaine si possible"]};
+  </script>
 
   <!-- ============================================================
        MOTEUR — LOGIQUE GÉNÉRIQUE
@@ -1235,6 +1653,189 @@
     const etatSeries = {};
 
     /* ── Persistance localStorage ──────────────────────────────────── */
+    /* ── Multi-user : chargement / validation du programme ─────────── */
+
+    function readStoredProgram() {
+      try {
+        const raw = localStorage.getItem('program');
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function showOnboarding(errorMsg) {
+      document.getElementById('screen-onboarding').style.display = '';
+      document.getElementById('screen-workout').style.display   = 'none';
+      document.getElementById('screen-stats').style.display     = 'none';
+      document.getElementById('screen-settings').style.display  = 'none';
+      document.querySelector('.bottom-nav').style.display       = 'none';
+
+      const err = document.getElementById('onboarding-error');
+      if (errorMsg) {
+        err.textContent = errorMsg;
+        err.style.display = '';
+      } else {
+        err.textContent = '';
+        err.style.display = 'none';
+      }
+    }
+
+    // Mode d'onboarding : "start" (premier lancement) ou "replace" (depuis Paramètres)
+    let onboardingMode = 'start';
+
+    function setOnboardingMode(mode) {
+      onboardingMode = mode === 'replace' ? 'replace' : 'start';
+
+      const title = document.getElementById('onboarding-card-title');
+      const sub   = document.getElementById('onboarding-card-subtitle');
+      const btnPrimary = document.getElementById('btn-import-file');
+      const btnExample = document.getElementById('btn-load-example');
+
+      if (onboardingMode === 'replace') {
+        if (title) title.textContent = 'REMPLACER';
+        if (sub) sub.innerHTML = 'Importer un nouveau programme (JSON).<br/>Tes logs, poids et réglages (ordre/swap) seront conservés.';
+        if (btnPrimary) btnPrimary.textContent = 'IMPORTER UN NOUVEAU JSON';
+        if (btnExample) btnExample.textContent = 'CHARGER L’EXEMPLE (TEST)';
+      } else {
+        if (title) title.textContent = 'DÉMARRER';
+        if (sub) sub.innerHTML = 'Aucun programme trouvé sur cet appareil. Choisis une méthode d’import.';
+        if (btnPrimary) btnPrimary.textContent = 'IMPORTER UN FICHIER JSON';
+        if (btnExample) btnExample.textContent = 'CHARGER LE PROGRAMME EXEMPLE';
+      }
+
+      // Reset UI “coller JSON” et erreur
+      const err = document.getElementById('onboarding-error');
+      if (err) { err.textContent = ''; err.style.display = 'none'; }
+      const textarea = document.getElementById('program-paste');
+      if (textarea) textarea.value = '';
+      const details = document.querySelector('.paste-details');
+      if (details) details.open = false;
+    }
+
+    function hideOnboarding() {
+      document.getElementById('screen-onboarding').style.display = 'none';
+      document.querySelector('.bottom-nav').style.display       = '';
+    }
+
+    function validateProgram(data) {
+      const errors = [];
+      const add = (msg) => errors.push(msg);
+
+      if (!data || typeof data !== 'object') {
+        add('Le JSON doit être un objet.');
+        return { ok: false, errors };
+      }
+
+      // meta.units
+      const units = data?.meta?.units;
+      if (!units || (units !== 'kg' && units !== 'lbs')) {
+        add('meta.units manquant ou invalide (attendu "kg" ou "lbs").');
+      }
+
+      // sessions non vide
+      if (!data.sessions || typeof data.sessions !== 'object' || Array.isArray(data.sessions)) {
+        add('sessions doit être un objet.');
+      } else if (Object.keys(data.sessions).length === 0) {
+        add('sessions ne peut pas être vide.');
+      }
+
+      // schedule non vide
+      if (!data.schedule || typeof data.schedule !== 'object' || Array.isArray(data.schedule)) {
+        add('schedule doit être un objet.');
+      } else if (Object.keys(data.schedule).length === 0) {
+        add('schedule ne peut pas être vide.');
+      }
+
+      // schedule -> sessions
+      if (data.schedule && data.sessions && typeof data.schedule === 'object' && typeof data.sessions === 'object') {
+        Object.entries(data.schedule).forEach(([day, sessionKey]) => {
+          if (sessionKey == null || sessionKey === '') return;
+          if (!data.sessions[sessionKey]) add(`schedule["${day}"] = "${sessionKey}" mais cette session n'existe pas dans sessions.`);
+        });
+      }
+
+      // exercices : id/name/sets et unicité des ids
+      const idSet = new Set();
+      if (data.sessions && typeof data.sessions === 'object' && !Array.isArray(data.sessions)) {
+        Object.entries(data.sessions).forEach(([sKey, sVal]) => {
+          const exercises = sVal?.exercises;
+          if (exercises == null) return;
+          if (!Array.isArray(exercises)) {
+            add(`sessions["${sKey}"].exercises doit être un tableau.`);
+            return;
+          }
+          exercises.forEach((ex, idx) => {
+            if (!ex || typeof ex !== 'object') {
+              add(`sessions["${sKey}"].exercises[${idx}] doit être un objet.`);
+              return;
+            }
+            if (!ex.id || typeof ex.id !== 'string') add(`Exercice sans id (sessions["${sKey}"].exercises[${idx}]).`);
+            if (!ex.name || typeof ex.name !== 'string') add(`Exercice sans name (sessions["${sKey}"].exercises[${idx}]).`);
+            if (typeof ex.sets !== 'number' || !Number.isFinite(ex.sets) || ex.sets <= 0) {
+              add(`Exercice "${ex.id || ex.name || '?'}" : sets doit être un nombre > 0.`);
+            }
+            if (ex.id && typeof ex.id === 'string') {
+              if (idSet.has(ex.id)) add(`id d'exercice dupliqué : "${ex.id}".`);
+              idSet.add(ex.id);
+            }
+          });
+        });
+      }
+
+      return { ok: errors.length === 0, errors };
+    }
+
+    function storeProgram(data) {
+      localStorage.setItem('program', JSON.stringify(data));
+    }
+
+    function getAllExerciseIds(program) {
+      const ids = new Set();
+      if (!program?.sessions || typeof program.sessions !== 'object') return ids;
+      Object.values(program.sessions).forEach(s => {
+        (s?.exercises || []).forEach(ex => {
+          if (ex?.id && typeof ex.id === 'string') ids.add(ex.id);
+        });
+      });
+      return ids;
+    }
+
+    function warnIfExerciseIdsChange(nextProgram) {
+      const prev = readStoredProgram();
+      if (!prev) return true;
+
+      const prevIds = getAllExerciseIds(prev);
+      const nextIds = getAllExerciseIds(nextProgram);
+      if (prevIds.size === 0 || nextIds.size === 0) return true;
+
+      const removed = [...prevIds].filter(id => !nextIds.has(id));
+      if (!removed.length) return true;
+
+      const preview = removed.slice(0, 10).map(id => `- ${id}`).join('\n');
+      const more = removed.length > 10 ? `\n… +${removed.length - 10} autres` : '';
+      return confirm(
+        'Attention : ce nouveau programme supprime / change des IDs d’exercices.\n' +
+        'Les poids mémorisés pour ces IDs deviendront orphelins.\n\n' +
+        'IDs impactés :\n' + preview + more + '\n\n' +
+        'Continuer quand même ?'
+      );
+    }
+
+    function applyProgramAndStart(data) {
+      PROGRAM = data;
+      hideOnboarding();
+      setOnboardingMode('start'); // reset pour la prochaine ouverture
+      showScreen('workout');
+      // bandeaux dates (workout / stats / settings)
+      document.getElementById('hdr-label').textContent       = PROGRAM.meta.label;
+      document.getElementById('hdr-date').textContent        = fmtDate(AUJOURD_HUI);
+      document.getElementById('stats-hdr-date').textContent  = fmtDate(AUJOURD_HUI);
+      document.getElementById('settings-hdr-date').textContent = fmtDate(AUJOURD_HUI);
+      render(JOUR_COURANT);
+      renderSettingsSummary();
+    }
 
     // Date ISO (YYYY-MM-DD) du dayIndex dans la semaine courante
     function dateForDay(dayIndex) {
@@ -1521,12 +2122,21 @@
       finishBtn.addEventListener('click', () => {
         if (finishBtn.disabled) return;
 
-        // Guard d'abord : empêche le double-clic
+        // 0) Calcul complet/incomplet + confirmation si incomplet
+        const allDone = totalSets(session) > 0 && doneSets(session.key) >= totalSets(session);
+        if (!allDone) {
+          const ok = confirm(
+            'La séance n’est pas complète.\n' +
+            'Enregistrer quand même ? (elle comptera comme “incomplète” dans les Stats)'
+          );
+          if (!ok) return;
+        }
+
+        // Guard : empêche le double-clic
         finishBtn.classList.add('is-logged');
         finishBtn.disabled = true;
 
-        // 1. Log (etatSeries encore à jour, avant tout reset)
-        const allDone = totalSets(session) > 0 && doneSets(session.key) >= totalSets(session);
+        // 1) Log (etatSeries encore à jour, avant tout reset)
         logSession(allDone);
 
         // 2. Reset persistence + mémoire
@@ -2032,15 +2642,40 @@
       });
     }
 
+    /* ── Navigation entre écrans (doit exister AVANT boot) ─────────── */
+
+    function showScreen(name) {
+      document.getElementById('screen-workout').style.display  = name === 'workout'  ? '' : 'none';
+      document.getElementById('screen-stats').style.display    = name === 'stats'    ? '' : 'none';
+      document.getElementById('screen-settings').style.display = name === 'settings' ? '' : 'none';
+      document.getElementById('nav-workout')?.classList.toggle('is-active', name === 'workout');
+      document.getElementById('nav-stats')?.classList.toggle('is-active',   name === 'stats');
+      document.getElementById('nav-settings')?.classList.toggle('is-active',name === 'settings');
+      window.scrollTo(0, 0); // remet le scroll en haut à chaque changement d'écran
+
+      // Ces fonctions sont définies plus bas (script dashboard).
+      if (name === 'stats' && typeof renderDashboard === 'function') renderDashboard();
+      if (name === 'settings' && typeof renderSettingsSummary === 'function') renderSettingsSummary();
+    }
+
     /* ── Initialisation ────────────────────────────────────────────── */
 
-    // Date du jour dans les deux bandeau (workout et stats), toujours aujourd'hui
-    document.getElementById('hdr-label').textContent       = PROGRAM.meta.label;
-    document.getElementById('hdr-date').textContent        = fmtDate(AUJOURD_HUI);
-    document.getElementById('stats-hdr-date').textContent  = fmtDate(AUJOURD_HUI);
-
-    // Premier rendu sur le jour courant
-    render(JOUR_COURANT);
+    // Démarrage multi-user : PROGRAM vient du localStorage
+    (function boot() {
+      const stored = readStoredProgram();
+      if (!stored) {
+        setOnboardingMode('start');
+        showOnboarding();
+        return;
+      }
+      const v = validateProgram(stored);
+      if (!v.ok) {
+        setOnboardingMode('start');
+        showOnboarding('Programme invalide :\n' + v.errors.join('\n'));
+        return;
+      }
+      applyProgramAndStart(stored);
+    })();
   </script>
 
   <!-- Chart.js via CDN (courbes de progression) -->
@@ -2055,21 +2690,13 @@
   <script>
     /* ── Navigation entre écrans ─────────────────────────────────── */
 
-    function showScreen(name) {
-      document.getElementById('screen-workout').style.display = name === 'workout' ? '' : 'none';
-      document.getElementById('screen-stats').style.display   = name === 'stats'   ? '' : 'none';
-      document.getElementById('nav-workout').classList.toggle('is-active', name === 'workout');
-      document.getElementById('nav-stats').classList.toggle('is-active',   name === 'stats');
-      window.scrollTo(0, 0); // remet le scroll en haut à chaque changement d'écran
-      if (name === 'stats') renderDashboard();
-    }
-
     function switchStatsView(view) {
       document.querySelectorAll('.stats-tab').forEach(t =>
         t.classList.toggle('is-active', t.dataset.view === view)
       );
       document.getElementById('view-summary').style.display  = view === 'summary'  ? '' : 'none';
       document.getElementById('view-exercise').style.display = view === 'exercise' ? '' : 'none';
+      if (view === 'exercise') renderExerciseView();
     }
 
     /* ── Lecture des logs ────────────────────────────────────────── */
@@ -2131,6 +2758,7 @@
       let vol = 0;
       getAllLogs().forEach(log => {
         if (log.date < mondayStr || log.date > sundayStr) return;
+        if (!log.completed) return; // volume semaine = séances terminées
         (log.exercises || []).forEach(ex => {
           if (ex.reps && ex.weight && ex.sets) vol += ex.sets * ex.reps * ex.weight;
         });
@@ -2145,37 +2773,104 @@
       return logs.length ? logs[logs.length - 1] : null;
     }
 
+    function getLastCompletedSession() {
+      const logs = getAllLogs();
+      for (let i = logs.length - 1; i >= 0; i--) {
+        if (logs[i]?.completed) return logs[i];
+      }
+      return null;
+    }
+
+    function weekRangeISO(weekOffset) {
+      const ref = new Date(AUJOURD_HUI);
+      const dow  = ref.getDay() === 0 ? 7 : ref.getDay(); // 1=lun…7=dim
+      ref.setDate(ref.getDate() - (dow - 1) - weekOffset * 7);
+      const monday = new Date(ref);
+      const mondayStr = monday.toISOString().slice(0, 10);
+      ref.setDate(ref.getDate() + 6);
+      const sundayStr = ref.toISOString().slice(0, 10);
+      return { mondayStr, sundayStr };
+    }
+
+    // Assiduité sur une semaine : séances prévues (planning) vs séances terminées (logs)
+    function getWeekAdherence(weekOffset) {
+      const { mondayStr, sundayStr } = weekRangeISO(weekOffset);
+
+      // Séances prévues cette semaine (selon planning)
+      let planned = 0;
+      const d = new Date(mondayStr + 'T12:00:00');
+      for (let i = 0; i < 7; i++) {
+        const dayIdx = d.getDay();
+        if (PROGRAM?.schedule?.[dayIdx] != null) planned++;
+        d.setDate(d.getDate() + 1);
+      }
+
+      // Séances terminées dans cette semaine
+      let done = 0;
+      getAllLogs().forEach(log => {
+        if (!log?.completed) return;
+        if (log.date < mondayStr || log.date > sundayStr) return;
+        done++;
+      });
+
+      return { planned, done, mondayStr, sundayStr };
+    }
+
     /* ── Historique par exercice ─────────────────────────────────── */
 
     function getExerciseHistory(exId) {
       const history = [];
       getAllLogs().forEach(log => {
+        if (!log.completed) return;
         const ex = (log.exercises || []).find(e => e.id === exId);
         if (ex && ex.weight > 0) history.push({ date: log.date, ...ex });
       });
       return history; // trié par date croissante (getAllLogs est trié)
     }
 
-    // Retourne { id → nom } pour tous les exercices présents dans les logs
+    // Retourne { id → nom } pour les exercices présents dans les logs (séances terminées)
     function getAllLoggedExercises() {
+      const programNames = {};
+      if (PROGRAM?.sessions) {
+        Object.values(PROGRAM.sessions).forEach(s =>
+          (s.exercises || []).forEach(e => { if (e?.id) programNames[e.id] = e.name; })
+        );
+      }
       const map = {};
-      // Noms canoniques depuis PROGRAM (prioritaires)
-      Object.values(PROGRAM.sessions).forEach(s =>
-        (s.exercises || []).forEach(e => { map[e.id] = e.name; })
-      );
-      // Fallback pour les exercices supprimés du programme
-      getAllLogs().forEach(log =>
-        (log.exercises || []).forEach(ex => { if (!map[ex.id]) map[ex.id] = ex.id; })
-      );
+      getAllLogs().forEach(log => {
+        if (!log.completed) return;
+        (log.exercises || []).forEach(ex => {
+          if (!ex?.id) return;
+          map[ex.id] = programNames[ex.id] || ex.id;
+        });
+      });
       return map;
+    }
+
+    // Métadonnées programme (scheme, load) pour un id d'exercice
+    function getExerciseMeta(exId) {
+      if (!PROGRAM?.sessions) return null;
+      for (const s of Object.values(PROGRAM.sessions)) {
+        const ex = (s.exercises || []).find(e => e.id === exId);
+        if (ex) return ex;
+      }
+      return null;
+    }
+
+    function fmtExerciseVolume(sets, reps, weight) {
+      if (!weight || !sets) return null;
+      if (!reps) return null;
+      return Math.round(sets * reps * weight);
     }
 
     /* ── Formatage ───────────────────────────────────────────────── */
 
     function fmtVolume(v) {
-      if (v === 0) return '0 kg';
-      if (v >= 10000) return (v / 1000).toFixed(1) + ' t';
-      return v.toLocaleString('fr-FR') + ' kg';
+      const units = PROGRAM?.meta?.units || 'kg';
+      if (v === 0) return `0 ${units}`;
+      // Tonnes uniquement si kg (sinon ça n'a pas de sens en lbs)
+      if (units === 'kg' && v >= 10000) return (v / 1000).toFixed(1) + ' t';
+      return v.toLocaleString('fr-FR') + ` ${units}`;
     }
 
     // Convertit "2026-06-02" → "LUN 2 JUN"
@@ -2190,10 +2885,11 @@
       return `${MOIS_ABBR[d.getMonth()]} ${String(d.getFullYear()).slice(2)}`;
     }
 
-    // Retourne les N derniers mois avec le nombre de séances (toutes, pas seulement complètes)
+    // Retourne les N derniers mois avec le nombre de séances (terminées)
     function getMonthlyFrequency(nbMois = 6) {
       const counts = {};
       getAllLogs().forEach(log => {
+        if (!log.completed) return;
         const key = log.date.slice(0, 7); // "2026-05"
         counts[key] = (counts[key] || 0) + 1;
       });
@@ -2283,7 +2979,8 @@
       const streak  = getStreak();
       const curVol  = getWeekVolume(0);
       const prevVol = getWeekVolume(1);
-      const last    = getLastSession();
+      const last    = getLastCompletedSession() || getLastSession();
+      const adh     = getWeekAdherence(0);
 
       // Streak
       document.getElementById('stat-streak').textContent =
@@ -2312,11 +3009,23 @@
         document.getElementById('stat-last-date').textContent = 'Aucune séance enregistrée';
       }
 
-      // Sélecteur exercice (conserve la sélection courante si possible)
+      // Assiduité semaine
+      document.getElementById('stat-adherence').textContent = `${adh.done} / ${adh.planned}`;
+      document.getElementById('stat-adherence-sub').textContent =
+        adh.planned === 0
+          ? 'Aucune séance prévue cette semaine'
+          : `Séances terminées (du ${fmtDateStr(adh.mondayStr)} au ${fmtDateStr(adh.sundayStr)})`;
+
+      // Sélecteur exercice (liste à jour)
       populateExerciseSelect();
 
       // Graphe fréquence mensuelle
       renderMonthlyChart();
+
+      // Si l'onglet Par exercice est visible, rafraîchir la vue
+      if (document.getElementById('view-exercise').style.display !== 'none') {
+        renderExerciseView();
+      }
     }
 
     function populateExerciseSelect() {
@@ -2325,57 +3034,131 @@
       const exMap = getAllLoggedExercises();
 
       sel.innerHTML = '<option value="">— Choisir un exercice —</option>';
-      Object.entries(exMap).sort((a, b) => a[1].localeCompare(b[1])).forEach(([id, name]) => {
+      Object.entries(exMap).sort((a, b) => a[1].localeCompare(b[1], 'fr')).forEach(([id, name]) => {
         const opt = document.createElement('option');
         opt.value = id;
         opt.textContent = name;
         sel.appendChild(opt);
       });
 
-      if (prev && exMap[prev]) { sel.value = prev; onExerciseSelect(prev); }
+      if (prev && exMap[prev]) sel.value = prev;
     }
 
     /* ── Vue par exercice ────────────────────────────────────────── */
 
     let weightChart = null;
 
+    function renderExerciseView() {
+      if (!PROGRAM) return;
+
+      const exMap       = getAllLoggedExercises();
+      const ids         = Object.keys(exMap);
+      const sel         = document.getElementById('exercise-select');
+      const emptyGlobal = document.getElementById('exercise-empty-global');
+      const content     = document.getElementById('exercise-content');
+
+      populateExerciseSelect();
+
+      if (!ids.length) {
+        emptyGlobal.style.display = '';
+        content.style.display     = 'none';
+        sel.style.display         = 'none';
+        return;
+      }
+
+      emptyGlobal.style.display = 'none';
+      content.style.display     = 'flex';
+      sel.style.display         = '';
+
+      if (!sel.value || !exMap[sel.value]) {
+        sel.value = ids[0];
+      }
+      onExerciseSelect(sel.value);
+    }
+
     function onExerciseSelect(exId) {
+      const units       = PROGRAM?.meta?.units || 'kg';
       const historyList = document.getElementById('history-list');
-      const prCard      = document.getElementById('pr-card');
-      const chartWrap   = document.getElementById('chart-wrap');
+      const statsBlock  = document.getElementById('exercise-stats-block');
       const noHistory   = document.getElementById('no-history');
+      const nameEl      = document.getElementById('exercise-name-display');
+      const schemeEl    = document.getElementById('exercise-scheme-display');
+      const histLabel   = document.getElementById('history-section-label');
 
-      historyList.innerHTML   = '';
-      prCard.style.display    = 'none';
-      chartWrap.style.display = 'none';
-      noHistory.style.display = 'none';
+      historyList.innerHTML = '';
+      statsBlock.style.display = 'none';
+      noHistory.style.display  = 'none';
+      histLabel.style.display  = 'none';
 
-      if (!exId) return;
+      if (!exId) {
+        nameEl.textContent = '—';
+        schemeEl.textContent = '';
+        return;
+      }
+
+      const exMap  = getAllLoggedExercises();
+      const meta   = getExerciseMeta(exId);
+      nameEl.textContent = exMap[exId] || meta?.name || exId;
+      schemeEl.textContent = meta?.scheme
+        ? `${meta.scheme}${meta.load ? ' · sugg. ' + meta.load : ''}`
+        : (meta?.load ? `sugg. ${meta.load}` : '');
 
       const history = getExerciseHistory(exId);
-      if (!history.length) { noHistory.style.display = ''; return; }
+      if (!history.length) {
+        noHistory.style.display = '';
+        return;
+      }
 
-      // Record personnel
-      const pr     = Math.max(...history.map(h => h.weight));
-      const prEntry = [...history].reverse().find(h => h.weight === pr);
-      document.getElementById('stat-pr').textContent      = `${pr} ${PROGRAM.meta.units}`;
-      document.getElementById('stat-pr-date').textContent = prEntry ? fmtDateStr(prEntry.date) : '';
-      prCard.style.display = '';
+      statsBlock.style.display = 'flex';
+      histLabel.style.display  = '';
 
-      // Chart
-      chartWrap.style.display = '';
+      const pr        = Math.max(...history.map(h => h.weight));
+      const prEntry   = [...history].reverse().find(h => h.weight === pr);
+      const last      = history[history.length - 1];
+      const first     = history[0];
+      const delta     = last.weight - first.weight;
+
+      document.getElementById('stat-pr').textContent =
+        `${pr} ${units}`;
+      document.getElementById('stat-pr-date').textContent =
+        prEntry ? fmtDateStr(prEntry.date) : '';
+
+      document.getElementById('stat-ex-last').textContent =
+        `${last.weight} ${units}`;
+      document.getElementById('stat-ex-last-date').textContent =
+        fmtDateStr(last.date);
+
+      const progCard = document.getElementById('stat-ex-progress-card');
+      const progBig  = document.getElementById('stat-ex-progress');
+      const progSub  = document.getElementById('stat-ex-progress-sub');
+
+      if (history.length >= 2) {
+        progCard.style.display = '';
+        const sign = delta > 0 ? '+' : '';
+        progBig.textContent = `${sign}${delta} ${units}`;
+        progBig.style.color = delta > 0 ? 'var(--gold)' : (delta < 0 ? 'var(--rust)' : 'var(--text-dim)');
+        progSub.textContent =
+          `Depuis ${fmtDateStr(first.date)} (${first.weight} ${units}) · ${history.length} séance${history.length > 1 ? 's' : ''}`;
+      } else {
+        progCard.style.display = 'none';
+      }
+
       renderWeightChart(history, pr);
 
-      // Historique texte (8 dernières entrées, plus récent en premier)
-      [...history].reverse().slice(0, 8).forEach(h => {
-        const vol  = (h.reps && h.sets && h.weight) ? h.sets * h.reps * h.weight : null;
+      // Historique complet (plus récent en premier)
+      [...history].reverse().forEach(h => {
+        const vol    = fmtExerciseVolume(h.sets, h.reps, h.weight);
+        const detail = h.reps != null && h.sets
+          ? `${h.sets}×${h.reps}`
+          : (h.sets ? `${h.sets} séries` : '');
         const item = document.createElement('div');
         item.className = 'history-item' + (h.weight === pr ? ' is-pr' : '');
         item.innerHTML =
           `<span class="history-date">${fmtDateStr(h.date)}</span>` +
-          `<span class="history-weight">${h.weight} ${PROGRAM.meta.units}` +
+          (detail ? `<span class="history-detail">${detail}</span>` : '') +
+          `<span class="history-weight">${h.weight} ${units}` +
           (h.weight === pr ? ' 🏆' : '') + `</span>` +
-          (vol ? `<span class="history-vol">${vol.toLocaleString('fr-FR')} kg vol.</span>` : '');
+          (vol != null ? `<span class="history-vol">${vol.toLocaleString('fr-FR')} ${units} vol.</span>` : '');
         historyList.appendChild(item);
       });
     }
@@ -2386,8 +3169,13 @@
 
       // Recrée le canvas (Chart.js exige un canvas neuf après destroy)
       const wrap = document.getElementById('chart-wrap');
-      wrap.innerHTML = '<canvas id="chart-weight"></canvas>';
-      const ctx = document.getElementById('chart-weight').getContext('2d');
+      const oldCanvas = wrap.querySelector('canvas');
+      if (oldCanvas) oldCanvas.remove();
+      const canvas = document.createElement('canvas');
+      canvas.id = 'chart-weight';
+      wrap.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+      const units = PROGRAM?.meta?.units || 'kg';
 
       const labels  = history.map(h => fmtDateStr(h.date));
       const weights = history.map(h => h.weight);
@@ -2420,7 +3208,14 @@
               bodyColor: '#f5f5f5',
               borderColor: '#2a2a2a',
               borderWidth: 1,
-              callbacks: { label: ctx => `${ctx.raw} ${PROGRAM.meta.units}` },
+              callbacks: {
+                label: ctx => {
+                  const h = history[ctx.dataIndex];
+                  const parts = [`${ctx.raw} ${units}`];
+                  if (h?.sets && h?.reps) parts.push(`${h.sets}×${h.reps}`);
+                  return parts.join(' · ');
+                },
+              },
             },
           },
           scales: {
@@ -2432,7 +3227,7 @@
               ticks: {
                 color: '#8a8a8a',
                 font:  { size: 10 },
-                callback: v => `${v} ${PROGRAM.meta.units}`,
+                callback: v => `${v} ${units}`,
               },
               grid: { color: '#1e1e1e' },
               beginAtZero: false,
@@ -2447,13 +3242,13 @@
     function exportData() {
       const logs = getAllLogs();
       const blob = new Blob(
-        [JSON.stringify({ exportedAt: new Date().toISOString(), version: 1, logs }, null, 2)],
+        [JSON.stringify({ exportedAt: new Date().toISOString(), version: 2, kind: 'logs-only', logs }, null, 2)],
         { type: 'application/json' }
       );
       const url = URL.createObjectURL(blob);
       const a   = document.createElement('a');
       a.href     = url;
-      a.download = `training-${AUJOURD_HUI.toISOString().slice(0, 10)}.json`;
+      a.download = `training-logs-${AUJOURD_HUI.toISOString().slice(0, 10)}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -2486,6 +3281,110 @@
 
     /* ── Câblage des événements ──────────────────────────────────── */
 
+    /* ── Paramètres (multi-user) ─────────────────────────────────── */
+
+    function computeProgramSummary() {
+      const scheduleKeys = Object.keys(PROGRAM?.schedule || {});
+      const daysPlanned  = scheduleKeys.filter(k => PROGRAM.schedule[k] != null && PROGRAM.schedule[k] !== '').length;
+      let exercises = 0;
+      Object.values(PROGRAM?.sessions || {}).forEach(s => {
+        if (Array.isArray(s.exercises)) exercises += s.exercises.length;
+      });
+      return { daysPlanned, exercises };
+    }
+
+    function renderSettingsSummary() {
+      if (!PROGRAM) return;
+      const { daysPlanned, exercises } = computeProgramSummary();
+      document.getElementById('settings-prog-label').textContent = PROGRAM?.meta?.label || '—';
+      document.getElementById('settings-prog-sub').textContent =
+        `${Object.keys(PROGRAM.sessions || {}).length} séance${Object.keys(PROGRAM.sessions || {}).length > 1 ? 's' : ''} · ` +
+        `${PROGRAM.meta.units || ''}`;
+      document.getElementById('settings-days').textContent      = String(daysPlanned);
+      document.getElementById('settings-exercises').textContent = String(exercises);
+    }
+
+    function exportAllData() {
+      const program = readStoredProgram();
+      const weights = {};
+      const logs    = {};
+      const layouts = {};
+      const tracks  = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!k) continue;
+        if (k.startsWith('weight:')) weights[k] = localStorage.getItem(k);
+        if (k.startsWith('log:'))    logs[k]    = localStorage.getItem(k);
+        if (k.startsWith('layout:')) layouts[k] = localStorage.getItem(k);
+        if (k.startsWith('track:'))  tracks[k]  = localStorage.getItem(k);
+      }
+      const payload = { exportedAt: new Date().toISOString(), version: 1, program, weights, logs, layouts, tracks };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url;
+      a.download = `training-backup-${new Date().toISOString().slice(0,10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function importBackup(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const raw = JSON.parse(e.target.result);
+          const dataProgram = raw.program;
+          const v = validateProgram(dataProgram);
+          if (!v.ok) {
+            alert('Programme invalide dans la sauvegarde :\n' + v.errors.join('\n'));
+            return;
+          }
+
+          // Conserve le reste, puis restaure program + weights + logs
+          storeProgram(dataProgram);
+
+          const weights = raw.weights || {};
+          const logs    = raw.logs || {};
+          const layouts = raw.layouts || {};
+          const tracks  = raw.tracks || {};
+          Object.entries(weights).forEach(([k, val]) => {
+            if (k.startsWith('weight:')) localStorage.setItem(k, String(val ?? ''));
+          });
+          Object.entries(logs).forEach(([k, val]) => {
+            if (k.startsWith('log:')) localStorage.setItem(k, String(val ?? ''));
+          });
+          Object.entries(layouts).forEach(([k, val]) => {
+            if (k.startsWith('layout:')) localStorage.setItem(k, String(val ?? ''));
+          });
+          Object.entries(tracks).forEach(([k, val]) => {
+            if (k.startsWith('track:')) localStorage.setItem(k, String(val ?? ''));
+          });
+
+          alert('Sauvegarde importée.');
+          applyProgramAndStart(dataProgram);
+          showScreen('workout');
+        } catch (_) {
+          alert('Fichier invalide ou corrompu.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function resetAllData() {
+      if (!confirm('Réinitialiser toutes les données ?\nCette action est irréversible.')) return;
+      localStorage.clear();
+      PROGRAM = null;
+      showOnboarding();
+    }
+
+    function openReplaceProgramFlow() {
+      showOnboarding();
+      setOnboardingMode('replace');
+    }
+
     function clearHistory() {
       if (!confirm('Effacer tout l\'historique d\'entraînement ?\nCette action est irréversible.')) return;
       const keys = [];
@@ -2497,8 +3396,9 @@
       renderDashboard();
     }
 
-    document.getElementById('nav-workout').addEventListener('click', () => showScreen('workout'));
-    document.getElementById('nav-stats').addEventListener('click',   () => showScreen('stats'));
+    document.getElementById('nav-workout').addEventListener('click',  () => showScreen('workout'));
+    document.getElementById('nav-stats').addEventListener('click',    () => showScreen('stats'));
+    document.getElementById('nav-settings').addEventListener('click', () => showScreen('settings'));
     document.getElementById('btn-export').addEventListener('click',  exportData);
     document.getElementById('input-import').addEventListener('change', e => importData(e.target.files[0]));
     document.getElementById('btn-clear-history').addEventListener('click', clearHistory);
@@ -2508,6 +3408,63 @@
     document.getElementById('exercise-select').addEventListener('change', e =>
       onExerciseSelect(e.target.value)
     );
+
+    // Onboarding
+    document.getElementById('btn-import-file').addEventListener('click', () =>
+      document.getElementById('input-program-file').click()
+    );
+
+    document.getElementById('input-program-file').addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const r = new FileReader();
+      r.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          const v = validateProgram(data);
+          if (!v.ok) { showOnboarding('Programme invalide :\n' + v.errors.join('\n')); return; }
+          if (!warnIfExerciseIdsChange(data)) return;
+          storeProgram(data);
+          applyProgramAndStart(data);
+        } catch (_) {
+          showOnboarding('Impossible de lire ce fichier. Assure-toi que c\'est du JSON valide.');
+        }
+      };
+      r.readAsText(file);
+      e.target.value = '';
+    });
+
+    document.getElementById('btn-validate-paste').addEventListener('click', () => {
+      const txt = document.getElementById('program-paste').value.trim();
+      if (!txt) { showOnboarding('Colle du JSON dans la zone de texte, puis valide.'); return; }
+      try {
+        const data = JSON.parse(txt);
+        const v = validateProgram(data);
+        if (!v.ok) { showOnboarding('Programme invalide :\n' + v.errors.join('\n')); return; }
+        if (!warnIfExerciseIdsChange(data)) return;
+        storeProgram(data);
+        applyProgramAndStart(data);
+      } catch (_) {
+        showOnboarding('JSON invalide. Vérifie les virgules, guillemets et accolades.');
+      }
+    });
+
+    document.getElementById('btn-load-example').addEventListener('click', () => {
+      const v = validateProgram(EXAMPLE_PROGRAM);
+      if (!v.ok) { showOnboarding('Programme exemple invalide (bug) :\n' + v.errors.join('\n')); return; }
+      if (!warnIfExerciseIdsChange(EXAMPLE_PROGRAM)) return;
+      storeProgram(EXAMPLE_PROGRAM);
+      applyProgramAndStart(EXAMPLE_PROGRAM);
+    });
+
+    // Paramètres
+    document.getElementById('btn-replace-program').addEventListener('click', openReplaceProgramFlow);
+    document.getElementById('btn-export-all').addEventListener('click', exportAllData);
+    document.getElementById('input-import-backup').addEventListener('change', e => {
+      importBackup(e.target.files?.[0]);
+      e.target.value = '';
+    });
+    document.getElementById('btn-reset-all').addEventListener('click', resetAllData);
   </script>
 
   <!-- Enregistrement du service worker (hors-ligne) -->

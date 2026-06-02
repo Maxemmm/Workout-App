@@ -1,0 +1,288 @@
+{
+  "meta": {
+    "label": "PROGRAMME SALLE",
+    "units": "kg",
+    "restDefaultSec": 90,
+    "repsInReserve": "1 à 2 reps en réserve"
+  },
+
+  "sessions": {
+
+    "full-body": {
+      "type": "lift",
+      "name": "FULL BODY",
+      "accent": "gold",
+      "subtitle": "JAMBES · PECS · DOS · ÉPAULES",
+      "note": null,
+      "warmup": [
+        "Vélo ou tapis 5 à 7 min (léger)",
+        "Mobilité épaules et hanches",
+        "1 série légère sur presse et développé"
+      ],
+      "exercises": [
+        {
+          "id": "presse-cuisses",
+          "name": "Presse à cuisses",
+          "scheme": "4×8",
+          "sets": 4,
+          "load": "100 à 120 kg",
+          "restSec": 120,
+          "cue": null,
+          "alternatives": []
+        },
+        {
+          "id": "developpe-machine",
+          "name": "Développé machine",
+          "scheme": "4×8",
+          "sets": 4,
+          "load": "30 à 40 kg",
+          "restSec": 120,
+          "cue": null,
+          "alternatives": ["Développé haltères incliné"]
+        },
+        {
+          "id": "tirage-horizontal",
+          "name": "Tirage horizontal",
+          "scheme": "4×10",
+          "sets": 4,
+          "load": "35 à 45 kg",
+          "restSec": 90,
+          "cue": null,
+          "alternatives": ["Rowing machine RH06"]
+        },
+        {
+          "id": "leg-curl-lb",
+          "name": "Leg curl",
+          "scheme": "3×12",
+          "sets": 3,
+          "load": "25 à 35 kg",
+          "restSec": 90,
+          "cue": null,
+          "alternatives": []
+        },
+        {
+          "id": "elevations-laterales-lb",
+          "name": "Élévations latérales",
+          "scheme": "3×12",
+          "sets": 3,
+          "load": "6 à 8 kg",
+          "restSec": 60,
+          "cue": null,
+          "alternatives": []
+        },
+        {
+          "id": "gainage-lb",
+          "name": "Gainage",
+          "scheme": "3×45 sec",
+          "sets": 3,
+          "load": "Poids du corps",
+          "restSec": 60,
+          "cue": null,
+          "alternatives": []
+        }
+      ],
+      "cardio": {
+        "label": "Marche inclinée",
+        "detail": "15 à 20 min — inclinaison 5 à 10 % — vitesse 5 à 6,5 km/h"
+      },
+      "bonus": null,
+      "tips": null
+    },
+
+    "haut-du-corps": {
+      "type": "lift",
+      "name": "HAUT DU CORPS",
+      "accent": "rust",
+      "subtitle": "PECS · DOS · BRAS · ÉPAULES",
+      "note": null,
+      "warmup": [
+        "Vélo ou rameur 5 min",
+        "Mobilité épaules",
+        "1 série légère développé incliné (6 à 8 kg)"
+      ],
+      "exercises": [
+        {
+          "id": "developpe-incline-halteres",
+          "name": "Développé incliné haltères",
+          "scheme": "3×10",
+          "sets": 3,
+          "load": "10 kg",
+          "restSec": 90,
+          "cue": null,
+          "alternatives": []
+        },
+        {
+          "id": "tirage-vertical",
+          "name": "Tirage vertical",
+          "scheme": "3×10",
+          "sets": 3,
+          "load": "30 kg",
+          "restSec": 90,
+          "cue": null,
+          "alternatives": []
+        },
+        {
+          "id": "rowing-unilateral",
+          "name": "Rowing unilatéral",
+          "scheme": "3×10",
+          "sets": 3,
+          "load": "14 à 20 kg",
+          "restSec": 90,
+          "cue": null,
+          "alternatives": ["Rowing machine RH06 — 45 kg"]
+        },
+        {
+          "id": "dips-assistes",
+          "name": "Dips assistés",
+          "scheme": "3×MAX",
+          "sets": 3,
+          "load": "Assistance 21",
+          "restSec": 90,
+          "cue": null,
+          "alternatives": []
+        },
+        {
+          "id": "curl-machine-rh15",
+          "name": "Curl machine RH15",
+          "scheme": "3×12",
+          "sets": 3,
+          "load": "20 kg",
+          "restSec": 60,
+          "cue": null,
+          "alternatives": []
+        },
+        {
+          "id": "triceps-corde",
+          "name": "Triceps corde",
+          "scheme": "3×12",
+          "sets": 3,
+          "load": "20 à 30 kg",
+          "restSec": 60,
+          "cue": null,
+          "alternatives": []
+        }
+      ],
+      "cardio": {
+        "label": "Vélo fractionné",
+        "detail": "15 à 20 min — 30 sec rapide / 1 min lent"
+      },
+      "bonus": null,
+      "tips": null
+    },
+
+    "bas-du-corps": {
+      "type": "lift",
+      "name": "BAS DU CORPS",
+      "accent": "rust",
+      "subtitle": "QUADS · ISCHIOS · MOLLETS · CORE",
+      "note": null,
+      "warmup": [
+        "Vélo 5 à 7 min",
+        "Mobilité hanches et genoux",
+        "1 série légère presse"
+      ],
+      "exercises": [
+        {
+          "id": "presse-cuisses-vend",
+          "name": "Presse à cuisses",
+          "scheme": "4×8",
+          "sets": 4,
+          "load": "100 à 120 kg",
+          "restSec": 120,
+          "cue": null,
+          "alternatives": []
+        },
+        {
+          "id": "fentes-marchees",
+          "name": "Fentes marchées",
+          "scheme": "3×12",
+          "sets": 3,
+          "load": "10 à 14 kg",
+          "restSec": 90,
+          "cue": null,
+          "alternatives": []
+        },
+        {
+          "id": "leg-curl-vend",
+          "name": "Leg curl",
+          "scheme": "3×12",
+          "sets": 3,
+          "load": "25 à 35 kg",
+          "restSec": 90,
+          "cue": null,
+          "alternatives": []
+        },
+        {
+          "id": "mollets-machine",
+          "name": "Mollets machine",
+          "scheme": "3×15",
+          "sets": 3,
+          "load": "60 à 80 kg",
+          "restSec": 90,
+          "cue": null,
+          "alternatives": []
+        },
+        {
+          "id": "gainage-vend",
+          "name": "Gainage",
+          "scheme": "3×45 sec",
+          "sets": 3,
+          "load": "Poids du corps",
+          "restSec": 60,
+          "cue": null,
+          "alternatives": []
+        }
+      ],
+      "cardio": {
+        "label": "Vélo",
+        "detail": "15 à 20 min — intensité modérée"
+      },
+      "bonus": null,
+      "tips": null
+    },
+
+    "repos": {
+      "type": "rest",
+      "name": "REPOS",
+      "accent": "gray",
+      "subtitle": "RÉCUPÈRE. MANGE. DORS.",
+      "note": null,
+      "warmup": null,
+      "exercises": [],
+      "cardio": null,
+      "bonus": null,
+      "tips": [
+        {
+          "title": "Le sommeil est de l'entraînement",
+          "body": "7 à 9 h — c'est là que l'hormone de croissance culmine et que le muscle se construit vraiment.",
+          "accent": "gold"
+        },
+        {
+          "title": "Protéines",
+          "body": "Ne pas baisser l'apport les jours de repos. Le muscle se répare en continu.",
+          "accent": "gold"
+        },
+        {
+          "title": "Prépare la prochaine séance",
+          "body": "Vérifie tes charges de la dernière fois. Vise +1 rep ou +2,5 kg sur au moins un exercice.",
+          "accent": "rust"
+        }
+      ]
+    }
+
+  },
+
+  "schedule": {
+    "1": "full-body",
+    "3": "haut-du-corps",
+    "5": "bas-du-corps"
+  },
+
+  "rules": [
+    "Garder 1 à 2 répétitions en réserve",
+    "Si trop facile, augmenter légèrement la charge",
+    "Si trop difficile, diminuer légèrement la charge",
+    "Priorité à l'exécution propre",
+    "Progression chaque semaine si possible"
+  ]
+}

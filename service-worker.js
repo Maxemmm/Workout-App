@@ -1,12 +1,11 @@
 // service-worker.js — cache offline minimal
 // Incrémenter CACHE_NAME à chaque déploiement pour invalider l'ancien cache.
 
-const CACHE_NAME = 'training-v10';
+const CACHE_NAME = 'training-v11';
 
 const PRECACHE = [
   './',
   './index.html',
-  './program.js',
   './manifest.json',
 ];
 
