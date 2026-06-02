@@ -15,6 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
 
   <style>
     /* ============================================================
@@ -401,6 +402,12 @@
       white-space: nowrap;
     }
     .btn-swap:active { border-color: var(--accent); color: var(--accent); }
+    .btn-swap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-swap .material-icons-round { font-size: 16px; }
 
     /* Consigne d'exécution (champ cue) */
     .exercise-cue {
@@ -809,7 +816,69 @@
       font-family: inherit;
     }
     .nav-btn.is-active { color: var(--gold); }
-    .nav-icon { font-size: 20px; line-height: 1; }
+    .nav-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .nav-icon .material-icons-round { font-size: 22px; }
+
+    /* Material Icons */
+    .material-icons-round {
+      font-family: 'Material Icons Round';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 20px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-smoothing: antialiased;
+      vertical-align: middle;
+    }
+    .mi-inline { font-size: 1.05em; margin-right: 4px; }
+    .mi-sm { font-size: 16px; }
+    .mi-label { font-size: 14px; vertical-align: -2px; margin-left: 4px; }
+    .mi-streak { font-size: 22px; color: var(--rust); vertical-align: -3px; margin-left: 4px; }
+    .mi-pr { font-size: 16px; color: var(--gold); vertical-align: -2px; margin-left: 2px; }
+
+    .btn-with-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-with-icon .material-icons-round { font-size: 18px; }
+
+    .tips-hero-icon .material-icons-round {
+      font-size: 52px;
+      color: var(--text-dim);
+    }
+    .app-mark .material-icons-round {
+      font-size: 26px;
+    }
+    .feature-dot .material-icons-round {
+      font-size: 16px;
+      color: var(--gold);
+    }
+    .drag-handle .material-icons-round {
+      font-size: 20px;
+      color: inherit;
+    }
+    .rest-bar .material-icons-round {
+      font-size: 16px;
+      margin-right: 4px;
+      vertical-align: -3px;
+    }
+    .finish-label .material-icons-round {
+      font-size: 18px;
+      margin-right: 6px;
+      vertical-align: -3px;
+    }
     .nav-label {
       font-size: 9px;
       font-weight: 700;
@@ -930,6 +999,36 @@
     }
     .btn-action-stats:hover,
     .btn-action-stats:active { border-color: var(--gold); color: var(--gold); }
+
+    /* Bouton d'action dans une carte (ex. remplacer le programme) */
+    .btn-in-card {
+      width: 100%;
+      margin-top: 14px;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-card-soft);
+      color: var(--text-dim);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      font-family: inherit;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-in-card:hover,
+    .btn-in-card:active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(212,162,60,0.06);
+    }
+    .btn-in-card .material-icons-round { font-size: 18px; }
 
     .btn-action-danger {
       width: 100%;
@@ -1165,6 +1264,10 @@
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       transition: transform 0.18s ease, opacity 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
     .btn-primary:active { opacity: 0.72; transform: scale(0.99); }
 
@@ -1184,6 +1287,10 @@
       cursor: pointer;
       -webkit-tap-highlight-color: transparent;
       transition: transform 0.18s ease, opacity 0.18s ease, border-color 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
     .btn-secondary:active { opacity: 0.78; transform: scale(0.99); }
     .btn-secondary:hover { border-color: rgba(212,162,60,0.35); }
@@ -1293,7 +1400,7 @@
       <div class="onboarding-wrap">
         <div class="onboarding-hero">
           <div class="onboarding-brand">
-            <div class="app-mark">🏋️</div>
+            <div class="app-mark"><span class="material-icons-round" aria-hidden="true">fitness_center</span></div>
             <div>
               <div class="panel-title">TRAINING</div>
               <div class="panel-subtitle">
@@ -1305,15 +1412,15 @@
 
           <div class="onboarding-features">
             <div class="feature-pill">
-              <div class="feature-dot">✓</div>
+              <div class="feature-dot"><span class="material-icons-round" aria-hidden="true">check_circle</span></div>
               <div><b>Séance du jour</b> + suivi des séries + minuteur de repos.</div>
             </div>
             <div class="feature-pill">
-              <div class="feature-dot">✓</div>
+              <div class="feature-dot"><span class="material-icons-round" aria-hidden="true">check_circle</span></div>
               <div><b>Poids mémorisés</b> par exercice, progression dans le temps.</div>
             </div>
             <div class="feature-pill">
-              <div class="feature-dot">✓</div>
+              <div class="feature-dot"><span class="material-icons-round" aria-hidden="true">check_circle</span></div>
               <div><b>100% local</b> : tout vit sur ton appareil (localStorage).</div>
             </div>
           </div>
@@ -1326,10 +1433,16 @@
           </div>
 
           <div class="panel-actions">
-            <button id="btn-import-file" class="btn-primary">IMPORTER UN FICHIER JSON</button>
+            <button id="btn-import-file" class="btn-primary" type="button">
+              <span class="material-icons-round" aria-hidden="true">upload_file</span>
+              <span id="btn-import-file-label">IMPORTER UN FICHIER JSON</span>
+            </button>
             <input type="file" id="input-program-file" accept=".json,application/json" style="display:none" />
 
-            <button id="btn-load-example" class="btn-secondary">CHARGER LE PROGRAMME EXEMPLE</button>
+            <button id="btn-load-example" class="btn-secondary" type="button">
+              <span class="material-icons-round" aria-hidden="true">description</span>
+              <span id="btn-load-example-label">CHARGER LE PROGRAMME EXEMPLE</span>
+            </button>
           </div>
 
           <details class="paste-details">
@@ -1455,18 +1568,6 @@
         <canvas id="chart-monthly"></canvas>
       </div>
 
-      <div class="stats-actions">
-        <button id="btn-export" class="btn-action-stats">⬇ EXPORTER LOGS</button>
-        <label class="btn-action-stats" for="input-import">⬆ IMPORTER LOGS</label>
-        <input type="file" id="input-import" accept=".json" style="display:none" />
-      </div>
-      <div class="stat-sub" style="margin-top:-6px">
-        Export/import ici = historique (logs) uniquement. Pour une sauvegarde complète (programme + poids + ordre/swap), utilise ⚙️.
-      </div>
-      <button id="btn-clear-history" class="btn-action-stats btn-action-danger">
-        🗑 EFFACER L'HISTORIQUE
-      </button>
-
     </div><!-- fin view-summary -->
 
     <!-- Vue par exercice -->
@@ -1496,7 +1597,7 @@
 
           <div class="stat-row">
             <div class="stat-card">
-              <div class="stat-label">RECORD 🏆</div>
+              <div class="stat-label">RECORD<span class="material-icons-round mi-label" aria-hidden="true">emoji_events</span></div>
               <div class="stat-big" id="stat-pr">—</div>
               <div class="stat-sub" id="stat-pr-date"></div>
             </div>
@@ -1546,6 +1647,10 @@
         <div class="stat-label">PROGRAMME ACTUEL</div>
         <div class="stat-big" id="settings-prog-label">—</div>
         <div class="stat-sub" id="settings-prog-sub">—</div>
+        <button id="btn-replace-program" class="btn-in-card" type="button">
+          <span class="material-icons-round" aria-hidden="true">swap_horiz</span>
+          <span>REMPLACER LE PROGRAMME</span>
+        </button>
       </div>
 
       <div class="stat-card">
@@ -1556,16 +1661,27 @@
         </div>
       </div>
 
+      <div class="section-label">Sauvegarde complète</div>
+      <p class="stat-sub" style="margin:0 0 4px">Programme, poids, logs, ordre et swaps.</p>
       <div class="stats-actions">
-        <button id="btn-replace-program" class="btn-action-stats">⇄ REMPLACER</button>
-        <button id="btn-export-all" class="btn-action-stats">⬇ EXPORTER</button>
+        <button id="btn-export-all" class="btn-action-stats btn-with-icon" type="button">
+          <span class="material-icons-round" aria-hidden="true">download</span>
+          <span>EXPORTER</span>
+        </button>
+        <label class="btn-action-stats btn-with-icon" for="input-import-backup">
+          <span class="material-icons-round" aria-hidden="true">upload</span>
+          <span>IMPORTER</span>
+        </label>
       </div>
-
-      <label class="btn-action-stats" for="input-import-backup">⬆ IMPORTER SAUVEGARDE</label>
       <input type="file" id="input-import-backup" accept=".json,application/json" style="display:none" />
 
-      <button id="btn-reset-all" class="btn-action-stats btn-action-danger">
-        🗑 RÉINITIALISER TOUT
+      <div class="section-label" style="margin-top:4px">Historique</div>
+      <p class="stat-sub" style="margin:0 0 4px">Inclus dans la sauvegarde complète. Pas d’option séparée.</p>
+
+      <div class="section-label" style="margin-top:4px">Zone de danger</div>
+      <button id="btn-reset-all" class="btn-action-stats btn-action-danger btn-with-icon" type="button">
+        <span class="material-icons-round" aria-hidden="true">delete_forever</span>
+        <span>RÉINITIALISER TOUT</span>
       </button>
     </div>
   </div><!-- fin screen-settings -->
@@ -1575,15 +1691,15 @@
   ══════════════════════════════════════════════════════════ -->
   <nav class="bottom-nav" aria-label="Navigation principale">
     <button id="nav-workout" class="nav-btn is-active">
-      <span class="nav-icon">🏋️</span>
+      <span class="nav-icon"><span class="material-icons-round" aria-hidden="true">fitness_center</span></span>
       <span class="nav-label">SÉANCE</span>
     </button>
     <button id="nav-stats" class="nav-btn">
-      <span class="nav-icon">📈</span>
+      <span class="nav-icon"><span class="material-icons-round" aria-hidden="true">show_chart</span></span>
       <span class="nav-label">STATS</span>
     </button>
     <button id="nav-settings" class="nav-btn">
-      <span class="nav-icon">⚙️</span>
+      <span class="nav-icon"><span class="material-icons-round" aria-hidden="true">settings</span></span>
       <span class="nav-label">RÉGLAGES</span>
     </button>
   </nav>
@@ -1619,11 +1735,17 @@
       gray: 'var(--text-dim)',
     };
 
-    /* Icônes selon type de séance */
+    /* Icônes Material selon type de séance */
     const TYPE_ICON = {
-      cardio: '🚴',
-      rest:   '🌿',
+      cardio: 'directions_bike',
+      rest:   'spa',
     };
+    const TYPE_ICON_DEFAULT = 'hotel';
+
+    function mi(name, extraClass = '') {
+      const cls = extraClass ? `material-icons-round ${extraClass}` : 'material-icons-round';
+      return `<span class="${cls}" aria-hidden="true">${name}</span>`;
+    }
 
     /* ── Séance repos implicite (jours non définis dans schedule) ──── */
     const REPOS_IMPLICITE = {
@@ -1690,19 +1812,19 @@
 
       const title = document.getElementById('onboarding-card-title');
       const sub   = document.getElementById('onboarding-card-subtitle');
-      const btnPrimary = document.getElementById('btn-import-file');
-      const btnExample = document.getElementById('btn-load-example');
+      const btnPrimaryLabel = document.getElementById('btn-import-file-label');
+      const btnExampleLabel = document.getElementById('btn-load-example-label');
 
       if (onboardingMode === 'replace') {
         if (title) title.textContent = 'REMPLACER';
         if (sub) sub.innerHTML = 'Importer un nouveau programme (JSON).<br/>Tes logs, poids et réglages (ordre/swap) seront conservés.';
-        if (btnPrimary) btnPrimary.textContent = 'IMPORTER UN NOUVEAU JSON';
-        if (btnExample) btnExample.textContent = 'CHARGER L’EXEMPLE (TEST)';
+        if (btnPrimaryLabel) btnPrimaryLabel.textContent = 'IMPORTER UN NOUVEAU JSON';
+        if (btnExampleLabel) btnExampleLabel.textContent = 'CHARGER L’EXEMPLE (TEST)';
       } else {
         if (title) title.textContent = 'DÉMARRER';
         if (sub) sub.innerHTML = 'Aucun programme trouvé sur cet appareil. Choisis une méthode d’import.';
-        if (btnPrimary) btnPrimary.textContent = 'IMPORTER UN FICHIER JSON';
-        if (btnExample) btnExample.textContent = 'CHARGER LE PROGRAMME EXEMPLE';
+        if (btnPrimaryLabel) btnPrimaryLabel.textContent = 'IMPORTER UN FICHIER JSON';
+        if (btnExampleLabel) btnExampleLabel.textContent = 'CHARGER LE PROGRAMME EXEMPLE';
       }
 
       // Reset UI “coller JSON” et erreur
@@ -2034,7 +2156,7 @@
       if (finishBtnEl && !finishBtnEl.classList.contains('is-logged')) {
         const allDone = total > 0 && done >= total;
         finishBtnEl.classList.toggle('is-all-done', allDone);
-        setFinishButtonMainText(finishBtnEl, allDone ? '✓ TERMINER LA SÉANCE' : 'TERMINER LA SÉANCE');
+        setFinishButtonMainText(finishBtnEl, 'TERMINER LA SÉANCE', allDone);
       }
     }
 
@@ -2115,8 +2237,8 @@
       finishBtn.classList.toggle('is-all-done', initAllDone);
       finishBtn.innerHTML =
         `<span class="finish-label finish-label-main"></span>` +
-        `<span class="finish-label finish-label-success">✓ SÉANCE ENREGISTRÉE</span>`;
-      setFinishButtonMainText(finishBtn, initAllDone ? '✓ TERMINER LA SÉANCE' : 'TERMINER LA SÉANCE');
+        `<span class="finish-label finish-label-success">${mi('check')} SÉANCE ENREGISTRÉE</span>`;
+      setFinishButtonMainText(finishBtn, 'TERMINER LA SÉANCE', initAllDone);
       finishBtnEl = finishBtn;
 
       finishBtn.addEventListener('click', () => {
@@ -2192,7 +2314,7 @@
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       if (timerBarEl) {
         timerBarEl.classList.remove('is-running', 'is-urgent', 'is-done');
-        timerBarEl.textContent = `⏱ REPOS ${fmtRest(timerRestSec).toUpperCase()}`;
+        timerBarEl.innerHTML = restBarHtml(' REPOS ', fmtRest(timerRestSec).toUpperCase());
         timerBarEl = null;
       }
     }
@@ -2214,7 +2336,7 @@
         }
         timerBarEl.classList.add('is-running');
         timerBarEl.classList.toggle('is-urgent', remaining <= 10);
-        timerBarEl.textContent = `⏱ ${fmtCountdown(remaining)}`;
+        timerBarEl.innerHTML = restBarHtml(' ', fmtCountdown(remaining));
         remaining--;
       }
 
@@ -2233,11 +2355,11 @@
 
       barEl.classList.remove('is-running', 'is-urgent');
       barEl.classList.add('is-done');
-      barEl.textContent = '✓ C\'EST PARTI !';
+      barEl.innerHTML = `${mi('check')} C'EST PARTI !`;
 
       setTimeout(() => {
         barEl.classList.remove('is-done');
-        barEl.textContent = `⏱ REPOS ${fmtRest(timerRestSec).toUpperCase()}`;
+        barEl.innerHTML = restBarHtml(' REPOS ', fmtRest(timerRestSec).toUpperCase());
       }, 2500);
     }
 
@@ -2293,10 +2415,16 @@
 
     /* ── Animation du bouton "Terminer la séance" ───────────────────── */
 
-    function setFinishButtonMainText(btn, text) {
+    function setFinishButtonMainText(btn, text, withCheck = false) {
       const el = btn?.querySelector?.('.finish-label-main');
-      if (el) el.textContent = text;
-      else if (btn) btn.textContent = text; // fallback sécurité
+      if (!el) return;
+      const label = String(text).replace(/^✓\s*/, '');
+      if (withCheck) el.innerHTML = `${mi('check')} ${label}`;
+      else el.textContent = label;
+    }
+
+    function restBarHtml(prefix, suffix) {
+      return `${mi('timer')}${prefix}${suffix}`;
     }
 
     function runFinishButtonAnimation(btn) {
@@ -2549,14 +2677,14 @@
 
       card.innerHTML =
         // Poignée de drag (toujours présente, inactive si 1 seul exercice)
-        `<div class="drag-handle" aria-label="Déplacer">⠿</div>` +
+        `<div class="drag-handle" aria-label="Déplacer">${mi('drag_indicator')}</div>` +
         `<div class="card-body">` +
           `<div class="exercise-header">` +
             `<div class="exercise-name">${ex._displayName ?? ex.name}</div>` +
             `<div class="exercise-scheme">${ex.scheme}</div>` +
           `</div>` +
           (ex.cue ? `<div class="exercise-cue">${ex.cue}</div>` : '') +
-          (hasAlts ? `<button class="btn-swap">⇄ ${nextLabel}</button>` : '') +
+          (hasAlts ? `<button class="btn-swap" type="button">${mi('swap_horiz')}${nextLabel}</button>` : '') +
           (showWeight
             ? `<div class="weight-row">` +
                 `<span class="weight-label">Poids</span>` +
@@ -2573,7 +2701,7 @@
               `<div class="set-circle${done ? ' is-checked' : ''}" data-idx="${i}">${i + 1}</div>`
             ).join('') +
           `</div>` +
-          `<div class="rest-bar" title="Appuyer pour annuler">⏱ REPOS ${restText.toUpperCase()}</div>` +
+          `<div class="rest-bar" title="Appuyer pour annuler">${restBarHtml(' REPOS ', restText.toUpperCase())}</div>` +
         `</div>`;
 
       // Drag
@@ -2620,13 +2748,13 @@
     /* ── Rendu d'un écran repos / cardio (tips) ────────────────────── */
 
     function renderTips(session, container) {
-      const icon = TYPE_ICON[session.type] || '💤';
+      const iconName = TYPE_ICON[session.type] || TYPE_ICON_DEFAULT;
 
       // Hero
       const hero = document.createElement('div');
       hero.className = 'tips-hero';
       hero.innerHTML =
-        `<div class="tips-hero-icon">${icon}</div>` +
+        `<div class="tips-hero-icon"><span class="material-icons-round" aria-hidden="true">${iconName}</span></div>` +
         `<div class="tips-hero-name">${session.name}</div>` +
         `<div class="tips-hero-sub">${session.subtitle || ''}</div>`;
       container.appendChild(hero);
@@ -2983,8 +3111,8 @@
       const adh     = getWeekAdherence(0);
 
       // Streak
-      document.getElementById('stat-streak').textContent =
-        streak > 0 ? `${streak} 🔥` : '0';
+      document.getElementById('stat-streak').innerHTML =
+        streak > 0 ? `${streak} ${mi('local_fire_department', 'mi-streak')}` : '0';
       document.getElementById('stat-streak-sub').textContent =
         streak <= 1 ? 'séance consécutive' : 'séances consécutives';
 
@@ -3157,7 +3285,7 @@
           `<span class="history-date">${fmtDateStr(h.date)}</span>` +
           (detail ? `<span class="history-detail">${detail}</span>` : '') +
           `<span class="history-weight">${h.weight} ${units}` +
-          (h.weight === pr ? ' 🏆' : '') + `</span>` +
+          (h.weight === pr ? ` ${mi('emoji_events', 'mi-pr')}` : '') + `</span>` +
           (vol != null ? `<span class="history-vol">${vol.toLocaleString('fr-FR')} ${units} vol.</span>` : '');
         historyList.appendChild(item);
       });
@@ -3235,48 +3363,6 @@
           },
         },
       });
-    }
-
-    /* ── Export / Import ─────────────────────────────────────────── */
-
-    function exportData() {
-      const logs = getAllLogs();
-      const blob = new Blob(
-        [JSON.stringify({ exportedAt: new Date().toISOString(), version: 2, kind: 'logs-only', logs }, null, 2)],
-        { type: 'application/json' }
-      );
-      const url = URL.createObjectURL(blob);
-      const a   = document.createElement('a');
-      a.href     = url;
-      a.download = `training-logs-${AUJOURD_HUI.toISOString().slice(0, 10)}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-
-    function importData(file) {
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        try {
-          const raw  = JSON.parse(e.target.result);
-          const logs = raw.logs || (Array.isArray(raw) ? raw : []);
-          let count  = 0;
-          logs.forEach(log => {
-            if (log?.date && log?.session) {
-              localStorage.setItem(`log:${log.date}`, JSON.stringify(log));
-              count++;
-            }
-          });
-          document.getElementById('input-import').value = '';
-          alert(`${count} séance${count > 1 ? 's' : ''} importée${count > 1 ? 's' : ''}.`);
-          renderDashboard();
-        } catch (_) {
-          alert('Fichier invalide ou corrompu.');
-        }
-      };
-      reader.readAsText(file);
     }
 
     /* ── Câblage des événements ──────────────────────────────────── */
@@ -3385,23 +3471,10 @@
       setOnboardingMode('replace');
     }
 
-    function clearHistory() {
-      if (!confirm('Effacer tout l\'historique d\'entraînement ?\nCette action est irréversible.')) return;
-      const keys = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && k.startsWith('log:')) keys.push(k);
-      }
-      keys.forEach(k => localStorage.removeItem(k));
-      renderDashboard();
-    }
-
     document.getElementById('nav-workout').addEventListener('click',  () => showScreen('workout'));
     document.getElementById('nav-stats').addEventListener('click',    () => showScreen('stats'));
     document.getElementById('nav-settings').addEventListener('click', () => showScreen('settings'));
-    document.getElementById('btn-export').addEventListener('click',  exportData);
-    document.getElementById('input-import').addEventListener('change', e => importData(e.target.files[0]));
-    document.getElementById('btn-clear-history').addEventListener('click', clearHistory);
+    // (multi-user) Export/import logs-only supprimé de l'UI (sauvegarde complète uniquement)
     document.querySelectorAll('.stats-tab').forEach(btn =>
       btn.addEventListener('click', () => switchStatsView(btn.dataset.view))
     );
