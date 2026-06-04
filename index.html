@@ -13,6 +13,27 @@
   <link rel="icon" type="image/svg+xml" href="icon.svg" />
   <title>Training</title>
 
+  <!-- Applique le thème avant le rendu pour éviter le flash blanc/noir -->
+  <script>
+    /* Applique le thème avant le premier rendu (évite le flash) */
+    (function(){
+      var t = localStorage.getItem('theme');
+      document.documentElement.dataset.theme = t || 'dark';
+    })();
+
+    /* Fonction globale accessible depuis tous les modules */
+    function toggleTheme() {
+      var current = document.documentElement.dataset.theme || 'dark';
+      var next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.classList.add('theme-transitioning');
+      document.documentElement.dataset.theme = next;
+      localStorage.setItem('theme', next);
+      setTimeout(function() {
+        document.documentElement.classList.remove('theme-transitioning');
+      }, 350);
+    }
+  </script>
+
   <!-- Chart.js 4.4.1 via CDNJS (fichier statique, SRI garanti) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
           integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD"
@@ -88,6 +109,50 @@
       /* --- Tab bar --- */
       --tab-height:      56px;
       --safe-bottom:     env(safe-area-inset-bottom, 0px);
+    }
+
+    /* ============================================================
+       1b. THÈME LIGHT — surcharge des tokens couleur
+    ============================================================ */
+    [data-theme="light"] {
+      /* Fonds — crème chaud */
+      --bg:              #f4f1ec;
+      --bg-card:         #ffffff;
+      --bg-card-soft:    #ede9e2;
+      --bg-elevated:     #e5e0d8;
+
+      /* Texte */
+      --text:            #1c1a17;
+      --text-dim:        #6b6560;
+      --text-faint:      #b5aea5;
+
+      /* Accents légèrement assombris pour contraste sur fond clair */
+      --gold:            #a07010;
+      --gold-dim:        #c9a852;
+      --rust:            #b54518;
+      --blue:            #2e6fa8;
+      --green-done:      #1e6b3a;
+      --red-timer:       #c02828;
+      --red-danger:      #a01818;
+
+      /* Bordures */
+      --border:          #ddd8d0;
+      --border-active:   #a07010;
+
+      /* Ombres plus légères */
+      --shadow-card:     0 2px 12px rgba(0,0,0,.07);
+      --shadow-elevated: 0 8px 32px rgba(0,0,0,.14);
+    }
+
+    /* --- Transition douce lors du changement de thème --- */
+    .theme-transitioning *,
+    .theme-transitioning *::before,
+    .theme-transitioning *::after {
+      transition:
+        background-color 250ms ease,
+        color 250ms ease,
+        border-color 250ms ease,
+        box-shadow 250ms ease !important;
     }
 
     /* ============================================================
@@ -1677,6 +1742,32 @@
       margin-bottom: var(--space-sm);
     }
 
+    .today-header__right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    /* Bouton soleil / lune */
+    .btn-theme {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: var(--bg-card-soft);
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+    .btn-theme:hover { border-color: var(--text-dim); color: var(--text); }
+
+    /* Icônes toggle : soleil = dark→light ; lune = light→dark */
+    .btn-theme .icon-moon { display: none; }
+    [data-theme="light"] .btn-theme .icon-sun  { display: none; }
+    [data-theme="light"] .btn-theme .icon-moon { display: block; }
+
     .today-header__label {
       font-size: 11px;
       font-weight: 500;
@@ -2923,9 +3014,28 @@
       const top = mkEl('div', 'today-header__top');
       const lbl = mkEl('p', 'today-header__label');
       lbl.textContent = program.meta?.label || 'PROGRAMME';
+
       const dateEl = mkEl('p', 'today-header__date');
       dateEl.textContent = fmtDate(new Date());
-      top.append(lbl, dateEl);
+
+      const themeBtn = mkEl('button', 'btn-theme');
+      themeBtn.setAttribute('aria-label', 'Changer de thème');
+      themeBtn.innerHTML =
+        `<svg class="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg class="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>`;
+      themeBtn.addEventListener('click', toggleTheme);
+
+      const right = mkEl('div', 'today-header__right');
+      right.append(dateEl, themeBtn);
+      top.append(lbl, right);
 
       const word = mkEl('p', 'today-word');
       word.textContent = 'TODAY';
@@ -4210,6 +4320,9 @@
     }
 
     /* ──────────────────────────────────────────────────────
+       THÈME — dark / light
+    ────────────────────────────────────────────────────── */
+    /* ──────────────────────────────────────────────────────
        INIT
     ────────────────────────────────────────────────────── */
     function init() {
@@ -4472,7 +4585,7 @@
 
       /* Icône flamme Material Icons Round — même taille que .stat-value (38px) */
       const flameIcon = streak > 0
-        ? `<span class="material-icons-round" style="color:#d23a3a;font-size:38px;line-height:1;display:block;">local_fire_department</span>`
+        ? `<span class="material-icons-round" style="color:var(--red-timer);font-size:38px;line-height:1;display:block;">local_fire_department</span>`
         : null;
 
       /* Volume semaine */
