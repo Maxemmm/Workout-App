@@ -766,15 +766,15 @@
       inset: 0;
       overflow-y: auto;
       overflow-x: hidden;
-      /* Scroll rebond iOS */
       -webkit-overflow-scrolling: touch;
-      /* Le transform est géré exclusivement en JS (inline style)
-         pour éviter tout conflit de classes transitoires */
-      will-change: transform;
-      transition: transform var(--duration-normal) var(--ease-out);
-      /* Padding top pour le notch */
+      /* GPU : délègue transform + opacity au compositing layer */
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      /* Transition gérée en JS (inline style) — valeur CSS = fallback initial */
+      transition: transform var(--duration-normal) var(--ease-out),
+                  opacity   var(--duration-normal) ease;
       padding-top: env(safe-area-inset-top, 0px);
-      /* Écrans non-actifs non interactifs */
       pointer-events: none;
     }
 
@@ -2414,7 +2414,10 @@
     (function () {
       'use strict';
 
-      const DURATION_MS = 250; // correspond à --duration-normal
+      /* Durée en ms — à synchroniser avec --duration-normal si on change l'une */
+      const DURATION_MS = 300;
+      /* Easing "out-expo" : départ rapide, décélération forte en fin — feel natif iOS */
+      const EASE_SLIDE  = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
       const tabButtons = Array.from(
         document.querySelectorAll('#tabBar .tab-bar__item')
@@ -2427,14 +2430,17 @@
       let isAnimating = false;
 
       /* ---------------------------------------------------------
-         setTransform(screen, value, animated)
-         Applique un transform avec ou sans transition CSS.
+         applyState(screen, translateX, opacity, animated)
+         Applique transform + opacity avec ou sans transition.
+         L'écran ENTRANT fade de 0→1 (mat érialisati on progressive).
+         L'écran SORTANT garde opacity 1 (spatial memory préservée).
       ---------------------------------------------------------- */
-      function setTransform(screen, value, animated) {
+      function applyState(screen, translateX, opacity, animated) {
         screen.style.transition = animated
-          ? 'transform var(--duration-normal) var(--ease-out)'
+          ? `transform ${DURATION_MS}ms ${EASE_SLIDE}, opacity ${DURATION_MS}ms ease`
           : 'none';
-        screen.style.transform = value;
+        screen.style.transform = translateX;
+        screen.style.opacity   = opacity;
       }
 
       /* ---------------------------------------------------------
@@ -2444,23 +2450,23 @@
         if (newIndex === activeIndex || isAnimating) return;
         isAnimating = true;
 
-        const prevIndex = activeIndex;
-        const goingRight = newIndex > prevIndex; // direction de navigation
+        const prevIndex  = activeIndex;
+        const goingRight = newIndex > prevIndex;
 
         const prevScreen = screens[prevIndex];
         const nextScreen = screens[newIndex];
 
-        /* 1. Positionne l'écran entrant du bon côté, sans transition */
-        setTransform(nextScreen, goingRight ? 'translateX(100%)' : 'translateX(-100%)', false);
+        /* 1. Position initiale de l'écran entrant (instantané, sans anim) */
+        applyState(nextScreen, goingRight ? 'translateX(100%)' : 'translateX(-100%)', 0, false);
 
-        /* 2. Force un reflow pour figer la position initiale */
-        nextScreen.getBoundingClientRect();
+        /* 2. Reflow : force le navigateur à enregistrer la position avant d'animer */
+        void nextScreen.offsetWidth;
 
-        /* 3. Lance les deux animations simultanément */
-        setTransform(prevScreen, goingRight ? 'translateX(-100%)' : 'translateX(100%)', true);
-        setTransform(nextScreen, 'translateX(0)', true);
+        /* 3. Lance les deux animations en même temps */
+        applyState(prevScreen, goingRight ? 'translateX(-100%)' : 'translateX(100%)', 1, true);
+        applyState(nextScreen, 'translateX(0)', 1, true);
 
-        /* 4. Bascule la classe --active (pointer-events) */
+        /* 4. Bascule pointer-events via la classe active */
         prevScreen.classList.remove('screen--active');
         nextScreen.classList.add('screen--active');
 
@@ -2472,32 +2478,28 @@
 
         activeIndex = newIndex;
 
-        /* Rafraîchit Today quand on revient sur l'onglet (nouveau jour possible) */
-        if (newIndex === 0) setTimeout(() => { if (typeof Today !== 'undefined') Today.refresh(); }, 270);
-        if (newIndex === 1) setTimeout(() => { if (typeof Plan  !== 'undefined') Plan.refresh();  }, 270);
+        /* 6. Refresh des modules après la fin de l'animation (timeout aligné sur DURATION_MS) */
+        const afterAnim = DURATION_MS + 20;
+        if (newIndex === 0) setTimeout(() => { if (typeof Today !== 'undefined') Today.refresh(); }, afterAnim);
+        if (newIndex === 1) setTimeout(() => { if (typeof Plan  !== 'undefined') Plan.refresh();  }, afterAnim);
 
-        /* 6. Débloque une fois la transition terminée */
-        setTimeout(() => { isAnimating = false; }, DURATION_MS + 20);
+        /* 7. Débloque isAnimating */
+        setTimeout(() => { isAnimating = false; }, afterAnim);
       }
 
-      /* --- Écouteurs --- */
+      /* --- Écouteurs des boutons de la tab bar --- */
       tabButtons.forEach((btn) => {
         btn.addEventListener('click', () => {
           switchTab(parseInt(btn.dataset.tab, 10));
         });
       });
 
-      /* --- Initialisation sans animation ---
-           index 0 (Today) : visible
-           index 1-3       : en attente à droite  */
+      /* --- Initialisation sans animation
+             index 0 (Today) : visible, opaque
+             index 1-3       : hors-champ à droite, transparent     --- */
       screens.forEach((s, i) => {
-        setTransform(s, i === 0 ? 'translateX(0)' : 'translateX(100%)', false);
+        applyState(s, i === 0 ? 'translateX(0)' : 'translateX(100%)', i === 0 ? 1 : 0, false);
         if (i === 0) s.classList.add('screen--active');
-      });
-
-      /* Ré-active les transitions après le premier rendu */
-      requestAnimationFrame(() => {
-        screens.forEach((s) => { s.style.transition = ''; });
       });
 
     })();
@@ -3417,10 +3419,16 @@
     /* ── État ────────────────────────────────────────────── */
     let programs     = [];
     let draft        = null;
-    let editorStep   = 1;
-    let editSessKey  = null;  // null = nouvelle séance
-    let editExoId    = null;  // null = nouvel exercice
-    let editorAnim   = false;
+    let editorStep     = 1;
+    let editSessKey    = null;  // null = nouvelle séance
+    let editExoId      = null;  // null = nouvel exercice
+    let editorAnim     = false;
+    // Étape cible quand l'utilisateur appuie sur Retour depuis l'étape 4 :
+    // 1 = vient de l'étape 1 (aucune séance lors du premier passage)
+    // 2 = vient de l'étape 2 (ajout / modification depuis la liste)
+    let step4ReturnTo  = 2;
+    // Vrai si l'utilisateur avait 0 séance en quittant l'étape 1
+    let startedEmpty   = false;
     let importFromOnboarding = false;
 
     /* ──────────────────────────────────────────────────────
@@ -3530,9 +3538,24 @@
     document.getElementById('editorCancel').addEventListener('click', () => closeEditor(true));
 
     document.getElementById('editorBack').addEventListener('click', () => {
-      if (editorStep > 1) goToEditorStep(editorStep - 1);
-      else closeEditor(true);
+      if (editorStep === 4) {
+        // Retour contextuel : étape 1 si aucune séance créée, étape 2 sinon
+        goToEditorStep(step4ReturnTo);
+      } else if (editorStep > 1) {
+        goToEditorStep(editorStep - 1);
+      } else {
+        closeEditor(true);
+      }
     });
+
+    // HTML step → numéro d'étape affiché selon le contexte
+    function computeDisplayStep(htmlStep) {
+      if (htmlStep === 1) return 1;
+      if (htmlStep === 3) return 4;
+      if (htmlStep === 4) return Object.keys(draft.sessions).length === 0 ? 2 : 3;
+      if (htmlStep === 2) return startedEmpty ? 3 : 2;
+      return htmlStep;
+    }
 
     function goToEditorStep(newStep, animated = true) {
       if (editorAnim) return;
@@ -3540,11 +3563,12 @@
       editorStep = newStep;
 
       /* Barre de progression */
-      $edStepLabel.textContent = `Étape ${newStep} / 4`;
+      const displayStep = computeDisplayStep(newStep);
+      $edStepLabel.textContent = `Étape ${displayStep} / 4`;
       $edDots.forEach((d, i) => {
         d.classList.remove('editor-dot--active', 'editor-dot--done');
-        if (i + 1 < newStep)       d.classList.add('editor-dot--done');
-        else if (i + 1 === newStep) d.classList.add('editor-dot--active');
+        if (i + 1 < displayStep)       d.classList.add('editor-dot--done');
+        else if (i + 1 === displayStep) d.classList.add('editor-dot--active');
       });
 
       if (!animated) {
@@ -3561,7 +3585,7 @@
       }
 
       editorAnim = true;
-      const dir  = newStep > prevStep ? 1 : -1;
+      const dir  = displayStep > computeDisplayStep(prevStep) ? 1 : -1;
       const prev = $edSteps[prevStep - 1];
       const next = $edSteps[newStep - 1];
 
@@ -3612,7 +3636,18 @@
       if (!draft.meta.label) {
         flashError($progName); return;
       }
-      goToEditorStep(2);
+      const hasSessions = Object.keys(draft.sessions).length > 0;
+      startedEmpty = !hasSessions;
+      if (hasSessions) {
+        // Des séances existent déjà : passer par la liste (étape 2)
+        goToEditorStep(2);
+      } else {
+        // Aucune séance : aller directement créer la première (étape 4)
+        step4ReturnTo = 1;
+        editSessKey   = null;
+        populateStep4(null);
+        goToEditorStep(4);
+      }
     });
 
     /* ── ÉTAPE 3 — Planning (populé quand step 3 est actif) ── */
@@ -3700,7 +3735,8 @@
         btnEdit.className = 'btn btn--secondary btn--sm';
         btnEdit.textContent = 'Modifier';
         btnEdit.addEventListener('click', () => {
-          editSessKey = key;
+          step4ReturnTo = 2;
+          editSessKey   = key;
           populateStep4(key);
           goToEditorStep(4);
         });
@@ -3727,7 +3763,8 @@
     }
 
     document.getElementById('btnAddSession').addEventListener('click', () => {
-      editSessKey = null;
+      step4ReturnTo = 2;
+      editSessKey   = null;
       populateStep4(null);
       goToEditorStep(4);
     });
