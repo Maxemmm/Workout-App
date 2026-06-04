@@ -21,6 +21,371 @@
       document.documentElement.dataset.theme = t || 'dark';
     })();
 
+    /* ── Internationalisation ──────────────────────────── */
+    var TRANSLATIONS = {
+      fr: {
+        days_long:  ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'],
+        days_short: ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'],
+        months_short: ['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'],
+        months_long:  ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'],
+
+        nav_today: 'Today', nav_plan: 'Plan', nav_stats: 'Stats', nav_profile: 'Profil',
+
+        today_word: 'TODAY', today_rest_label: 'REPOS',
+        today_no_program_title: 'PAS DE PROGRAMME',
+        today_no_program_sub: "Crée ton premier programme pour commencer à t'entraîner.",
+        today_create_program: 'CRÉER MON PROGRAMME',
+        today_rest_sub: "Récupère, mange, dors.<br/>L'entraînement reprend demain.",
+        today_warmup: 'Échauffement', today_cardio: 'Cardio', today_bonus: 'Bonus',
+        today_sets_done: 'Séries faites',
+        today_finish_session: 'TERMINER LA SÉANCE',
+        today_session_saved: '✓ SÉANCE ENREGISTRÉE',
+        today_session_saved_toast: 'Séance enregistrée ✓',
+        today_weight: 'Poids',
+        timer_rest: 'REPOS', timer_done: 'TERMINÉ',
+
+        plan_title: 'PLAN', plan_this_week: 'Cette semaine', plan_my_programs: 'Mes programmes',
+        plan_no_active: 'Aucun programme actif.', plan_create_program: 'CRÉER MON PROGRAMME',
+        plan_rest: 'Repos', plan_today_badge: "Aujourd'hui",
+        plan_exercise: 'exercice', plan_exercises: 'exercices',
+        plan_day: 'jour', plan_days: 'jours',
+        plan_add_session: 'AJOUTER UNE SÉANCE',
+        plan_no_programs: 'Aucun programme créé.',
+        plan_activate: 'Activer', plan_edit: 'Modifier',
+        plan_duplicate: 'Dupliquer', plan_delete: 'Supprimer',
+        plan_create_new: 'CRÉER UN NOUVEAU PROGRAMME',
+        plan_duplicated: 'Programme dupliqué ✓', plan_deleted: 'Programme supprimé',
+
+        editor_step: 'Étape', editor_step_of: '/',
+        editor_no_sessions: 'Aucune séance — créez-en une ci-dessous.',
+        session_type_lift: 'Musculation', session_type_cardio: 'Cardio',
+        session_type_rest: 'Repos', session_type_mixed: 'Mixte', session_type_unknown: 'Inconnu',
+        session_type_mixed_opt: 'Mixte (musculation + cardio)', session_type_rest_opt: 'Repos / récupération',
+        editor_no_name: 'Sans nom',
+        editor_edit_session: 'Modifier la séance', editor_new_session: 'Nouvelle séance',
+        editor_edit_short: 'Édit.',
+        editor_warmup_ph: 'Ex. Vélo 5 min', editor_alt_ph: 'Ex. Développé haltères',
+        editor_edit_exo: "Modifier l'exercice", editor_new_exo: 'Nouvel exercice',
+        editor_tip_title_ph: 'Titre', editor_tip_body_ph: 'Contenu',
+        editor_err_name: 'Le nom du programme est requis.',
+        editor_err_session: 'Au moins une séance est requise.',
+        editor_err_schedule: 'Au moins un jour doit être planifié.',
+        editor_saved: 'Programme enregistré ✓',
+        editor_imported: 'Programme importé ✓',
+        editor_import_err: 'JSON invalide — vérifiez la syntaxe.',
+
+        stats_title: 'STATS',
+        stats_streak: 'Jours de suite', stats_week_vol: 'Volume semaine',
+        stats_last_session: 'Dernière séance',
+        stats_progress_title: 'Progression par exercice',
+        stats_no_data: 'Aucune donnée. Enregistre ta première séance pour voir ta progression ici.',
+        stats_chart_load: 'Charge', stats_pr: 'Record personnel',
+        stats_chart_error: 'Graphique indisponible (Chart.js non chargé).',
+        stats_no_weight: "Aucune charge enregistrée pour cet exercice (poids du corps, ou poids non saisi à la fin de séance).",
+        stats_monthly_title: 'Séances par mois',
+        stats_no_sessions: 'Aucune séance enregistrée.',
+        stats_sessions_label: 'Séances',
+
+        profile_title: 'PROFIL',
+        profile_my_program: 'Mon programme', profile_active_program: 'Programme actif',
+        profile_no_active: 'Aucun programme actif', profile_manage: 'Gérer mes programmes',
+        profile_data: 'Données',
+        profile_export: 'Exporter mes données',
+        profile_export_meta: 'Télécharger un fichier JSON (programme + logs + poids)',
+        profile_import: 'Importer une sauvegarde',
+        profile_import_meta: 'Restaurer un fichier JSON exporté précédemment',
+        profile_reset_today: 'Réinitialiser la séance du jour',
+        profile_danger: 'Zone de danger',
+        profile_delete_logs: 'Supprimer tous mes logs',
+        profile_delete_logs_meta: "Efface l'historique des séances",
+        profile_reset_app: "Réinitialiser l'application",
+        profile_reset_app_meta: 'Efface toutes les données',
+        profile_about: 'À propos',
+        profile_format: 'Format de programme',
+        profile_format_meta: 'Compatible JSON (voir program.example.json)',
+        profile_version: 'Training · v2.0',
+        profile_language: 'Langue', profile_language_meta: 'Français / English',
+        profile_reset_today_toast: 'Séance du jour réinitialisée',
+        profile_logs_deleted: 'Logs supprimés',
+        profile_export_toast: 'Export téléchargé ✓',
+        profile_confirm_logs: "Supprimer tous les logs de séances ?\nCette action est irréversible.",
+        profile_confirm_reset: "Réinitialiser complètement l'application ?\nToutes les données seront définitivement effacées. Cette action est irréversible.",
+
+        /* Onboarding */
+        onboarding_tagline: 'Entraîne-toi avec intention.',
+        onboarding_create: 'CRÉER MON PROGRAMME',
+        onboarding_import: 'Importer un programme (JSON)',
+
+        /* Éditeur — étape 1 */
+        editor_step1_title: 'Votre programme',
+        editor_step1_sub: 'Donnez un nom à votre programme.',
+        editor_prog_name_label: 'Nom du programme',
+        editor_prog_name_ph: 'Ex. Programme Salle',
+        editor_prog_units_label: 'Unité de poids',
+        step_next: 'SUIVANT',
+
+        /* Éditeur — étape 2 */
+        editor_step2_title: 'Séances',
+        editor_step2_sub: 'Créez les séances de votre programme.',
+        editor_add_session_btn: 'CRÉER UNE SÉANCE',
+        editor_configure_planning: 'CONFIGURER LE PLANNING',
+
+        /* Éditeur — étape 3 */
+        editor_step3_title: 'Planning',
+        editor_step3_sub: 'Associez vos séances à chaque jour de la semaine.',
+        editor_save_program_btn: 'ENREGISTRER LE PROGRAMME',
+
+        /* Éditeur — étape 4 */
+        editor_sess_name_label: 'Nom de la séance',
+        editor_sess_name_ph: 'Ex. FULL BODY',
+        editor_sess_type_label: 'Type',
+        editor_sess_subtitle_label: 'Sous-titre (optionnel)',
+        editor_sess_subtitle_ph: 'Ex. PECS · DOS · BRAS',
+        editor_sess_accent_label: 'Couleur accent',
+        editor_warmup_section: 'Échauffement',
+        editor_exercises_section: 'Exercices',
+        editor_cardio_section: 'Cardio de fin (optionnel)',
+        editor_tips_section: 'Conseils',
+        editor_cardio_label_ph: 'Ex. Marche inclinée',
+        editor_cardio_detail_ph: 'Ex. 15 min — inclinaison 5%',
+        editor_add_warmup: 'Ajouter une note',
+        editor_add_exercise: 'AJOUTER UN EXERCICE',
+        editor_add_tip: 'Ajouter un conseil',
+        editor_save_session_btn: 'TERMINER LA SÉANCE',
+
+        /* Modal exercice */
+        exo_name_label: "Nom de l'exercice",
+        exo_name_ph: 'Ex. Presse à cuisses',
+        exo_sets_label: 'Séries',
+        exo_scheme_label: 'Schéma reps',
+        exo_scheme_ph: 'Ex. 8, 8-12, MAX, 45 sec',
+        exo_load_label: 'Charge suggérée',
+        exo_load_ph: 'Ex. 100 à 120 kg',
+        exo_rest_label: 'Repos (sec)',
+        exo_cue_label: 'Consigne (optionnel)',
+        exo_cue_ph: 'Ex. Contrôler la descente 3 sec',
+        exo_alt_label: 'Alternatives (optionnel)',
+        exo_add_alt: 'Ajouter une alternative',
+        exo_save: "ENREGISTRER L'EXERCICE",
+        exo_cancel: 'Annuler',
+
+        /* Modal fin de séance */
+        modal_finish_title: 'Terminer la séance ?',
+        modal_finish_body: 'La séance sera enregistrée dans vos logs. Vous pouvez terminer même si toutes les séries ne sont pas cochées.',
+        modal_finish_confirm: 'OUI, TERMINER',
+        modal_finish_cancel: 'Continuer la séance',
+
+        /* Overlay import */
+        import_body: 'Collez le JSON de votre programme, ou choisissez un fichier .json.',
+        import_file_btn: 'Choisir un fichier .json',
+        import_confirm_btn: 'IMPORTER CE PROGRAMME',
+
+        /* Couleurs accent */
+        accent_gold: 'Or', accent_rust: 'Rouille', accent_blue: 'Bleu', accent_gray: 'Gris',
+
+        /* Confirms JS */
+        plan_confirm_delete: 'Supprimer "%s" ?\nCette action est irréversible.',
+        editor_confirm_delete_session: 'Supprimer "%s" ?',
+        editor_alert_prefix: "Impossible d'enregistrer :\n\n",
+      },
+      en: {
+        days_long:  ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+        days_short: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+        months_short: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+        months_long:  ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+
+        nav_today: 'Today', nav_plan: 'Plan', nav_stats: 'Stats', nav_profile: 'Profile',
+
+        today_word: 'TODAY', today_rest_label: 'REST',
+        today_no_program_title: 'NO PROGRAM',
+        today_no_program_sub: 'Create your first program to start training.',
+        today_create_program: 'CREATE MY PROGRAM',
+        today_rest_sub: 'Rest, eat, sleep.<br/>Training resumes tomorrow.',
+        today_warmup: 'Warm-up', today_cardio: 'Cardio', today_bonus: 'Bonus',
+        today_sets_done: 'Sets done',
+        today_finish_session: 'FINISH SESSION',
+        today_session_saved: '✓ SESSION SAVED',
+        today_session_saved_toast: 'Session saved ✓',
+        today_weight: 'Weight',
+        timer_rest: 'REST', timer_done: 'DONE',
+
+        plan_title: 'PLAN', plan_this_week: 'This week', plan_my_programs: 'My programs',
+        plan_no_active: 'No active program.', plan_create_program: 'CREATE MY PROGRAM',
+        plan_rest: 'Rest', plan_today_badge: 'Today',
+        plan_exercise: 'exercise', plan_exercises: 'exercises',
+        plan_day: 'day', plan_days: 'days',
+        plan_add_session: 'ADD A SESSION',
+        plan_no_programs: 'No programs yet.',
+        plan_activate: 'Activate', plan_edit: 'Edit',
+        plan_duplicate: 'Duplicate', plan_delete: 'Delete',
+        plan_create_new: 'CREATE A NEW PROGRAM',
+        plan_duplicated: 'Program duplicated ✓', plan_deleted: 'Program deleted',
+
+        editor_step: 'Step', editor_step_of: '/',
+        editor_no_sessions: 'No sessions — create one below.',
+        session_type_lift: 'Strength', session_type_cardio: 'Cardio',
+        session_type_rest: 'Rest', session_type_mixed: 'Mixed', session_type_unknown: 'Unknown',
+        session_type_mixed_opt: 'Mixed (strength + cardio)', session_type_rest_opt: 'Rest / recovery',
+        editor_no_name: 'Untitled',
+        editor_edit_session: 'Edit session', editor_new_session: 'New session',
+        editor_edit_short: 'Edit',
+        editor_warmup_ph: 'E.g. Bike 5 min', editor_alt_ph: 'E.g. Dumbbell press',
+        editor_edit_exo: 'Edit exercise', editor_new_exo: 'New exercise',
+        editor_tip_title_ph: 'Title', editor_tip_body_ph: 'Content',
+        editor_err_name: 'Program name is required.',
+        editor_err_session: 'At least one session is required.',
+        editor_err_schedule: 'At least one day must be scheduled.',
+        editor_saved: 'Program saved ✓',
+        editor_imported: 'Program imported ✓',
+        editor_import_err: 'Invalid JSON — check the syntax.',
+
+        stats_title: 'STATS',
+        stats_streak: 'Day streak', stats_week_vol: 'Week volume',
+        stats_last_session: 'Last session',
+        stats_progress_title: 'Progress by exercise',
+        stats_no_data: 'No data yet. Log your first session to see your progress here.',
+        stats_chart_load: 'Load', stats_pr: 'Personal record',
+        stats_chart_error: 'Chart unavailable (Chart.js not loaded).',
+        stats_no_weight: 'No weight recorded for this exercise (bodyweight, or weight not entered at end of session).',
+        stats_monthly_title: 'Sessions per month',
+        stats_no_sessions: 'No sessions recorded.',
+        stats_sessions_label: 'Sessions',
+
+        profile_title: 'PROFILE',
+        profile_my_program: 'My program', profile_active_program: 'Active program',
+        profile_no_active: 'No active program', profile_manage: 'Manage my programs',
+        profile_data: 'Data',
+        profile_export: 'Export my data',
+        profile_export_meta: 'Download a JSON file (program + logs + weights)',
+        profile_import: 'Import a backup',
+        profile_import_meta: 'Restore a previously exported JSON file',
+        profile_reset_today: "Reset today's session",
+        profile_danger: 'Danger zone',
+        profile_delete_logs: 'Delete all my logs',
+        profile_delete_logs_meta: 'Clears session history',
+        profile_reset_app: 'Reset application',
+        profile_reset_app_meta: 'Clears all data',
+        profile_about: 'About',
+        profile_format: 'Program format',
+        profile_format_meta: 'JSON compatible (see program.example.json)',
+        profile_version: 'Training · v2.0',
+        profile_language: 'Language', profile_language_meta: 'Français / English',
+        profile_reset_today_toast: "Today's session reset",
+        profile_logs_deleted: 'Logs deleted',
+        profile_export_toast: 'Export downloaded ✓',
+        profile_confirm_logs: 'Delete all session logs?\nThis action is irreversible.',
+        profile_confirm_reset: 'Completely reset the application?\nAll data will be permanently erased. This action is irreversible.',
+
+        /* Onboarding */
+        onboarding_tagline: 'Train with intention.',
+        onboarding_create: 'CREATE MY PROGRAM',
+        onboarding_import: 'Import a program (JSON)',
+
+        /* Editor — step 1 */
+        editor_step1_title: 'Your program',
+        editor_step1_sub: 'Give your program a name.',
+        editor_prog_name_label: 'Program name',
+        editor_prog_name_ph: 'E.g. Gym Program',
+        editor_prog_units_label: 'Weight unit',
+        step_next: 'NEXT',
+
+        /* Editor — step 2 */
+        editor_step2_title: 'Sessions',
+        editor_step2_sub: 'Create your program sessions.',
+        editor_add_session_btn: 'CREATE A SESSION',
+        editor_configure_planning: 'CONFIGURE SCHEDULE',
+
+        /* Editor — step 3 */
+        editor_step3_title: 'Schedule',
+        editor_step3_sub: 'Assign sessions to each day of the week.',
+        editor_save_program_btn: 'SAVE PROGRAM',
+
+        /* Editor — step 4 */
+        editor_sess_name_label: 'Session name',
+        editor_sess_name_ph: 'E.g. FULL BODY',
+        editor_sess_type_label: 'Type',
+        editor_sess_subtitle_label: 'Subtitle (optional)',
+        editor_sess_subtitle_ph: 'E.g. CHEST · BACK · ARMS',
+        editor_sess_accent_label: 'Accent color',
+        editor_warmup_section: 'Warm-up',
+        editor_exercises_section: 'Exercises',
+        editor_cardio_section: 'End cardio (optional)',
+        editor_tips_section: 'Tips',
+        editor_cardio_label_ph: 'E.g. Incline walk',
+        editor_cardio_detail_ph: 'E.g. 15 min — 5% incline',
+        editor_add_warmup: 'Add a note',
+        editor_add_exercise: 'ADD AN EXERCISE',
+        editor_add_tip: 'Add a tip',
+        editor_save_session_btn: 'SAVE SESSION',
+
+        /* Exercise modal */
+        exo_name_label: 'Exercise name',
+        exo_name_ph: 'E.g. Leg press',
+        exo_sets_label: 'Sets',
+        exo_scheme_label: 'Rep scheme',
+        exo_scheme_ph: 'E.g. 8, 8-12, MAX, 45 sec',
+        exo_load_label: 'Suggested load',
+        exo_load_ph: 'E.g. 100 to 120 kg',
+        exo_rest_label: 'Rest (sec)',
+        exo_cue_label: 'Cue (optional)',
+        exo_cue_ph: 'E.g. Control the descent 3 sec',
+        exo_alt_label: 'Alternatives (optional)',
+        exo_add_alt: 'Add an alternative',
+        exo_save: 'SAVE EXERCISE',
+        exo_cancel: 'Cancel',
+
+        /* Finish modal */
+        modal_finish_title: 'Finish session?',
+        modal_finish_body: 'The session will be saved to your logs. You can finish even if not all sets are checked.',
+        modal_finish_confirm: 'YES, FINISH',
+        modal_finish_cancel: 'Continue session',
+
+        /* Import overlay */
+        import_body: 'Paste your program JSON, or choose a .json file.',
+        import_file_btn: 'Choose a .json file',
+        import_confirm_btn: 'IMPORT THIS PROGRAM',
+
+        /* Accent colors */
+        accent_gold: 'Gold', accent_rust: 'Rust', accent_blue: 'Blue', accent_gray: 'Gray',
+
+        /* JS confirms */
+        plan_confirm_delete: 'Delete "%s"?\nThis action is irreversible.',
+        editor_confirm_delete_session: 'Delete "%s"?',
+        editor_alert_prefix: 'Cannot save:\n\n',
+      }
+    };
+
+    function t(key) {
+      var l = localStorage.getItem('lang') || 'fr';
+      var dict = TRANSLATIONS[l] || TRANSLATIONS['fr'];
+      return dict[key] !== undefined ? dict[key] : (TRANSLATIONS['fr'][key] || key);
+    }
+
+    function currentLang() { return localStorage.getItem('lang') || 'fr'; }
+
+    /* Met à jour tous les éléments statiques traduits (sans re-rendre les modules) */
+    function applyLang() {
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        el.textContent = t(el.dataset.i18n);
+      });
+      document.querySelectorAll('[data-i18n-ph]').forEach(function(el) {
+        el.placeholder = t(el.dataset.i18nPh);
+      });
+      /* Bouton langue sur l'onboarding */
+      var lbl = document.getElementById('onboardingLangLabel');
+      if (lbl) lbl.textContent = currentLang().toUpperCase();
+    }
+
+    function setLang(lang) {
+      localStorage.setItem('lang', lang);
+      applyLang();
+      /* Re-rendre tous les modules */
+      if (typeof Plan   !== 'undefined') Plan.refresh();
+      if (typeof Today  !== 'undefined') Today.refresh();
+      if (typeof Stats  !== 'undefined') Stats.refresh();
+      if (typeof Profil !== 'undefined') Profil.refresh();
+    }
+
     /* Fonction globale accessible depuis tous les modules */
     function toggleTheme() {
       var current = document.documentElement.dataset.theme || 'dark';
@@ -964,6 +1329,33 @@
       margin-top: var(--space-sm);
     }
 
+    /* Bouton langue sur l'écran d'accueil */
+    .onboarding__lang-btn {
+      position: absolute;
+      top: calc(env(safe-area-inset-top, 0px) + var(--space-md));
+      right: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      color: var(--text-dim);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 1;
+    }
+    .onboarding__lang-btn:hover { border-color: rgba(255,255,255,.35); color: var(--text); }
+    [data-theme="light"] .onboarding__lang-btn {
+      border-color: rgba(0,0,0,.12);
+      background: rgba(0,0,0,.05);
+    }
+    [data-theme="light"] .onboarding__lang-btn:hover { border-color: rgba(0,0,0,.25); }
+
     .onboarding__ctas {
       display: flex;
       flex-direction: column;
@@ -1748,6 +2140,45 @@
       gap: var(--space-sm);
     }
 
+    /* Pills de langue (Profil) */
+    .lang-pills {
+      display: flex;
+      gap: 4px;
+    }
+    .lang-pill {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      padding: 5px 10px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      background: var(--bg-card-soft);
+    }
+    .lang-pill--active {
+      background: var(--gold);
+      color: #000;
+      border-color: var(--gold);
+    }
+
+    /* Bouton FR|EN dans le header Today */
+    .btn-lang {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 30px;
+      padding: 0 9px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: var(--bg-card-soft);
+      color: var(--text-dim);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      flex-shrink: 0;
+    }
+    .btn-lang:hover { border-color: var(--text-dim); color: var(--text); }
+
     /* Bouton soleil / lune */
     .btn-theme {
       display: flex;
@@ -2133,7 +2564,7 @@
         <path d="M6 4v2M18 4v2M3 9h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
         <path d="M8 14l3 3 5-5"/>
       </svg>
-      <span class="tab-bar__label">Today</span>
+      <span class="tab-bar__label" data-i18n="nav_today">Today</span>
     </button>
 
     <!-- Plan -->
@@ -2146,7 +2577,7 @@
         <line x1="8" y1="2" x2="8" y2="6"/>
         <line x1="3" y1="10" x2="21" y2="10"/>
       </svg>
-      <span class="tab-bar__label">Plan</span>
+      <span class="tab-bar__label" data-i18n="nav_plan">Plan</span>
     </button>
 
     <!-- Stats -->
@@ -2156,7 +2587,7 @@
       <svg class="tab-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
       </svg>
-      <span class="tab-bar__label">Stats</span>
+      <span class="tab-bar__label" data-i18n="nav_stats">Stats</span>
     </button>
 
     <!-- Profil -->
@@ -2167,7 +2598,7 @@
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
         <circle cx="12" cy="7" r="4"/>
       </svg>
-      <span class="tab-bar__label">Profil</span>
+      <span class="tab-bar__label" data-i18n="nav_profile">Profil</span>
     </button>
 
   </nav>
@@ -2177,14 +2608,21 @@
   ============================================================ -->
   <div id="overlayOnboarding" class="overlay-full onboarding is-hidden" aria-label="Bienvenue">
     <div class="onboarding__bg" aria-hidden="true"></div>
+
+    <!-- Bouton langue — coin supérieur droit -->
+    <button class="onboarding__lang-btn" id="btnOnboardingLang" aria-label="Change language">
+      <span class="material-icons-round" style="font-size:18px;">translate</span>
+      <span id="onboardingLangLabel">FR</span>
+    </button>
+
     <div class="onboarding__content">
       <div class="anim-onboarding-logo">
         <p class="onboarding__name">TRAIN<span>ING</span></p>
-        <p class="onboarding__tagline">Entraîne-toi avec intention.</p>
+        <p class="onboarding__tagline" data-i18n="onboarding_tagline">Entraîne-toi avec intention.</p>
       </div>
       <div class="onboarding__ctas anim-onboarding-ctas">
-        <button class="btn btn--primary btn--full" id="btnCreate">CRÉER MON PROGRAMME</button>
-        <button class="btn btn--secondary btn--full" id="btnImport">Importer un programme (JSON)</button>
+        <button class="btn btn--primary btn--full" id="btnCreate" data-i18n="onboarding_create">CRÉER MON PROGRAMME</button>
+        <button class="btn btn--secondary btn--full" id="btnImport" data-i18n="onboarding_import">Importer un programme (JSON)</button>
       </div>
     </div>
   </div>
@@ -2218,15 +2656,15 @@
 
       <!-- ── ÉTAPE 1 — Métadonnées ─────────────────────────── -->
       <div class="editor-step" id="editorStep1">
-        <h2 class="editor-step__title">Votre programme</h2>
-        <p class="editor-step__subtitle">Donnez un nom à votre programme.</p>
+        <h2 class="editor-step__title" data-i18n="editor_step1_title">Votre programme</h2>
+        <p class="editor-step__subtitle" data-i18n="editor_step1_sub">Donnez un nom à votre programme.</p>
         <div class="stack stack--lg">
           <div class="input-wrapper">
-            <label class="input-label" for="progName">Nom du programme</label>
-            <input class="input" type="text" id="progName" placeholder="Ex. Programme Salle" maxlength="40" autocomplete="off" />
+            <label class="input-label" for="progName" data-i18n="editor_prog_name_label">Nom du programme</label>
+            <input class="input" type="text" id="progName" placeholder="Ex. Programme Salle" data-i18n-ph="editor_prog_name_ph" maxlength="40" autocomplete="off" />
           </div>
           <div class="input-wrapper">
-            <label class="input-label" for="progUnits">Unité de poids</label>
+            <label class="input-label" for="progUnits" data-i18n="editor_prog_units_label">Unité de poids</label>
             <select class="select" id="progUnits">
               <option value="kg">kg</option>
               <option value="lbs">lbs</option>
@@ -2235,7 +2673,7 @@
         </div>
         <div style="margin-top: var(--space-2xl);">
           <button class="btn btn--primary btn--full" id="step1Next">
-            SUIVANT
+            <span data-i18n="step_next">SUIVANT</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
         </div>
@@ -2243,18 +2681,18 @@
 
       <!-- ── ÉTAPE 2 — Séances ────────────────────────────── -->
       <div class="editor-step" id="editorStep2">
-        <h2 class="editor-step__title">Séances</h2>
-        <p class="editor-step__subtitle">Créez les séances de votre programme.</p>
+        <h2 class="editor-step__title" data-i18n="editor_step2_title">Séances</h2>
+        <p class="editor-step__subtitle" data-i18n="editor_step2_sub">Créez les séances de votre programme.</p>
         <div id="sessionsList" class="stack"></div>
         <div style="margin-top: var(--space-lg);">
           <button class="btn btn--secondary btn--full" id="btnAddSession">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            CRÉER UNE SÉANCE
+            <span data-i18n="editor_add_session_btn">CRÉER UNE SÉANCE</span>
           </button>
         </div>
         <div style="margin-top: var(--space-sm);">
           <button class="btn btn--primary btn--full" id="step2Next">
-            CONFIGURER LE PLANNING
+            <span data-i18n="editor_configure_planning">CONFIGURER LE PLANNING</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </button>
         </div>
@@ -2262,11 +2700,11 @@
 
       <!-- ── ÉTAPE 3 — Planning ─────────────────────────────── -->
       <div class="editor-step" id="editorStep3">
-        <h2 class="editor-step__title">Planning</h2>
-        <p class="editor-step__subtitle">Associez vos séances à chaque jour de la semaine.</p>
+        <h2 class="editor-step__title" data-i18n="editor_step3_title">Planning</h2>
+        <p class="editor-step__subtitle" data-i18n="editor_step3_sub">Associez vos séances à chaque jour de la semaine.</p>
         <div id="scheduleRows" class="stack stack--sm"></div>
         <div style="margin-top: var(--space-xl);">
-          <button class="btn btn--primary btn--full" id="step3Save">ENREGISTRER LE PROGRAMME</button>
+          <button class="btn btn--primary btn--full" id="step3Save" data-i18n="editor_save_program_btn">ENREGISTRER LE PROGRAMME</button>
         </div>
       </div>
 
@@ -2277,47 +2715,47 @@
         <div class="stack stack--lg">
 
           <div class="input-wrapper">
-            <label class="input-label" for="sessName">Nom de la séance</label>
-            <input class="input" type="text" id="sessName" placeholder="Ex. FULL BODY" maxlength="30" autocomplete="off" />
+            <label class="input-label" for="sessName" data-i18n="editor_sess_name_label">Nom de la séance</label>
+            <input class="input" type="text" id="sessName" placeholder="Ex. FULL BODY" data-i18n-ph="editor_sess_name_ph" maxlength="30" autocomplete="off" />
           </div>
 
           <div class="input-wrapper">
-            <label class="input-label" for="sessType">Type</label>
+            <label class="input-label" for="sessType" data-i18n="editor_sess_type_label">Type</label>
             <select class="select" id="sessType">
-              <option value="lift">Musculation</option>
-              <option value="mixed">Mixte (musculation + cardio)</option>
-              <option value="cardio">Cardio</option>
-              <option value="rest">Repos / récupération</option>
+              <option value="lift"   data-i18n="session_type_lift">Musculation</option>
+              <option value="mixed"  data-i18n="session_type_mixed_opt">Mixte (musculation + cardio)</option>
+              <option value="cardio" data-i18n="session_type_cardio">Cardio</option>
+              <option value="rest"   data-i18n="session_type_rest_opt">Repos / récupération</option>
             </select>
           </div>
 
           <div class="input-wrapper">
-            <label class="input-label" for="sessSubtitle">Sous-titre (optionnel)</label>
-            <input class="input" type="text" id="sessSubtitle" placeholder="Ex. PECS · DOS · BRAS" maxlength="60" />
+            <label class="input-label" for="sessSubtitle" data-i18n="editor_sess_subtitle_label">Sous-titre (optionnel)</label>
+            <input class="input" type="text" id="sessSubtitle" placeholder="Ex. PECS · DOS · BRAS" data-i18n-ph="editor_sess_subtitle_ph" maxlength="60" />
           </div>
 
           <div class="input-wrapper">
-            <label class="input-label">Couleur accent</label>
+            <label class="input-label" data-i18n="editor_sess_accent_label">Couleur accent</label>
             <div class="accent-picker" id="accentPicker">
               <label class="accent-option">
                 <input type="radio" name="sessAccent" value="gold" checked />
                 <span class="accent-dot" style="background: var(--gold);"></span>
-                <span class="accent-option__label">Or</span>
+                <span class="accent-option__label" data-i18n="accent_gold">Or</span>
               </label>
               <label class="accent-option">
                 <input type="radio" name="sessAccent" value="rust" />
                 <span class="accent-dot" style="background: var(--rust);"></span>
-                <span class="accent-option__label">Rouille</span>
+                <span class="accent-option__label" data-i18n="accent_rust">Rouille</span>
               </label>
               <label class="accent-option">
                 <input type="radio" name="sessAccent" value="blue" />
                 <span class="accent-dot" style="background: var(--blue);"></span>
-                <span class="accent-option__label">Bleu</span>
+                <span class="accent-option__label" data-i18n="accent_blue">Bleu</span>
               </label>
               <label class="accent-option">
                 <input type="radio" name="sessAccent" value="gray" />
                 <span class="accent-dot" style="background: var(--text-faint);"></span>
-                <span class="accent-option__label">Gris</span>
+                <span class="accent-option__label" data-i18n="accent_gray">Gris</span>
               </label>
             </div>
           </div>
@@ -2326,28 +2764,28 @@
           <div id="liftSections">
 
             <div class="editor-section">
-              <p class="editor-section__label">Échauffement</p>
+              <p class="editor-section__label" data-i18n="editor_warmup_section">Échauffement</p>
               <div class="dynamic-list" id="warmupList"></div>
               <button class="btn btn--ghost btn--sm" id="btnAddWarmup" style="padding-left: 0; margin-top: var(--space-sm);">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Ajouter une note
+                <span data-i18n="editor_add_warmup">Ajouter une note</span>
               </button>
             </div>
 
             <div class="editor-section">
-              <p class="editor-section__label">Exercices</p>
+              <p class="editor-section__label" data-i18n="editor_exercises_section">Exercices</p>
               <div id="exercisesList" class="stack stack--sm"></div>
               <button class="btn btn--secondary btn--full" id="btnAddExercise" style="margin-top: var(--space-sm);">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                AJOUTER UN EXERCICE
+                <span data-i18n="editor_add_exercise">AJOUTER UN EXERCICE</span>
               </button>
             </div>
 
             <div class="editor-section">
-              <p class="editor-section__label">Cardio de fin (optionnel)</p>
+              <p class="editor-section__label" data-i18n="editor_cardio_section">Cardio de fin (optionnel)</p>
               <div class="stack stack--sm">
-                <input class="input" type="text" id="cardioLabel" placeholder="Ex. Marche inclinée" />
-                <input class="input" type="text" id="cardioDetail" placeholder="Ex. 15 min — inclinaison 5%" />
+                <input class="input" type="text" id="cardioLabel" placeholder="Ex. Marche inclinée" data-i18n-ph="editor_cardio_label_ph" />
+                <input class="input" type="text" id="cardioDetail" placeholder="Ex. 15 min — inclinaison 5%" data-i18n-ph="editor_cardio_detail_ph" />
               </div>
             </div>
 
@@ -2356,11 +2794,11 @@
           <!-- Sections cardio / repos : conseils -->
           <div id="tipsSections" class="is-hidden">
             <div class="editor-section">
-              <p class="editor-section__label">Conseils</p>
+              <p class="editor-section__label" data-i18n="editor_tips_section">Conseils</p>
               <div id="tipsList" class="stack stack--sm"></div>
               <button class="btn btn--ghost btn--sm" id="btnAddTip" style="padding-left: 0; margin-top: var(--space-sm);">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Ajouter un conseil
+                <span data-i18n="editor_add_tip">Ajouter un conseil</span>
               </button>
             </div>
           </div>
@@ -2369,8 +2807,8 @@
 
         <!-- Boutons bas étape 4 -->
         <div class="stack" style="margin-top: var(--space-2xl);">
-          <button class="btn btn--primary btn--full" id="step4SaveSession">TERMINER LA SÉANCE</button>
-          <button class="btn btn--secondary btn--full" id="step4SaveProgram">ENREGISTRER LE PROGRAMME</button>
+          <button class="btn btn--primary btn--full" id="step4SaveSession" data-i18n="editor_save_session_btn">TERMINER LA SÉANCE</button>
+          <button class="btn btn--secondary btn--full" id="step4SaveProgram" data-i18n="editor_save_program_btn">ENREGISTRER LE PROGRAMME</button>
         </div>
 
       </div><!-- fin step4 -->
@@ -2388,50 +2826,50 @@
       <div class="stack stack--lg">
 
         <div class="input-wrapper">
-          <label class="input-label" for="exoName">Nom de l'exercice</label>
-          <input class="input" type="text" id="exoName" placeholder="Ex. Presse à cuisses" autocomplete="off" />
+          <label class="input-label" for="exoName" data-i18n="exo_name_label">Nom de l'exercice</label>
+          <input class="input" type="text" id="exoName" placeholder="Ex. Presse à cuisses" data-i18n-ph="exo_name_ph" autocomplete="off" />
         </div>
 
         <div class="row row--gap">
           <div class="input-wrapper" style="flex: 1;">
-            <label class="input-label" for="exoSets">Séries</label>
+            <label class="input-label" for="exoSets" data-i18n="exo_sets_label">Séries</label>
             <input class="input" type="number" id="exoSets" placeholder="4" min="1" max="20" />
           </div>
           <div class="input-wrapper" style="flex: 2;">
-            <label class="input-label" for="exoScheme">Schéma reps</label>
-            <input class="input" type="text" id="exoScheme" placeholder="Ex. 8, 8-12, MAX, 45 sec" />
+            <label class="input-label" for="exoScheme" data-i18n="exo_scheme_label">Schéma reps</label>
+            <input class="input" type="text" id="exoScheme" placeholder="Ex. 8, 8-12, MAX, 45 sec" data-i18n-ph="exo_scheme_ph" />
           </div>
         </div>
 
         <div class="row row--gap">
           <div class="input-wrapper" style="flex: 2;">
-            <label class="input-label" for="exoLoad">Charge suggérée</label>
-            <input class="input" type="text" id="exoLoad" placeholder="Ex. 100 à 120 kg" />
+            <label class="input-label" for="exoLoad" data-i18n="exo_load_label">Charge suggérée</label>
+            <input class="input" type="text" id="exoLoad" placeholder="Ex. 100 à 120 kg" data-i18n-ph="exo_load_ph" />
           </div>
           <div class="input-wrapper" style="flex: 1;">
-            <label class="input-label" for="exoRest">Repos (sec)</label>
+            <label class="input-label" for="exoRest" data-i18n="exo_rest_label">Repos (sec)</label>
             <input class="input" type="number" id="exoRest" placeholder="90" min="0" max="600" />
           </div>
         </div>
 
         <div class="input-wrapper">
-          <label class="input-label" for="exoCue">Consigne (optionnel)</label>
-          <input class="input" type="text" id="exoCue" placeholder="Ex. Contrôler la descente 3 sec" />
+          <label class="input-label" for="exoCue" data-i18n="exo_cue_label">Consigne (optionnel)</label>
+          <input class="input" type="text" id="exoCue" placeholder="Ex. Contrôler la descente 3 sec" data-i18n-ph="exo_cue_ph" />
         </div>
 
         <div class="input-wrapper">
-          <label class="input-label">Alternatives (optionnel)</label>
+          <label class="input-label" data-i18n="exo_alt_label">Alternatives (optionnel)</label>
           <div class="dynamic-list" id="altList"></div>
           <button class="btn btn--ghost btn--sm" id="btnAddAlt" style="padding-left: 0; margin-top: var(--space-sm);">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Ajouter une alternative
+            <span data-i18n="exo_add_alt">Ajouter une alternative</span>
           </button>
         </div>
 
       </div>
       <div class="stack" style="margin-top: var(--space-2xl);">
-        <button class="btn btn--primary btn--full" id="btnSaveExercise">ENREGISTRER L'EXERCICE</button>
-        <button class="btn btn--ghost btn--full" id="btnCancelExercise">Annuler</button>
+        <button class="btn btn--primary btn--full" id="btnSaveExercise" data-i18n="exo_save">ENREGISTRER L'EXERCICE</button>
+        <button class="btn btn--ghost btn--full" id="btnCancelExercise" data-i18n="exo_cancel">Annuler</button>
       </div>
     </div>
   </div>
@@ -2442,13 +2880,13 @@
   <div id="modalFinish" class="modal-overlay is-hidden" aria-label="Terminer la séance">
     <div class="modal-sheet">
       <div class="modal-sheet__handle"></div>
-      <h3 class="modal-sheet__title">Terminer la séance ?</h3>
-      <p style="color:var(--text-dim);font-size:14px;line-height:1.5;margin-bottom:var(--space-xl)">
+      <h3 class="modal-sheet__title" data-i18n="modal_finish_title">Terminer la séance ?</h3>
+      <p style="color:var(--text-dim);font-size:14px;line-height:1.5;margin-bottom:var(--space-xl)" data-i18n="modal_finish_body">
         La séance sera enregistrée dans vos logs. Vous pouvez terminer même si toutes les séries ne sont pas cochées.
       </p>
       <div class="stack">
-        <button class="btn btn--primary btn--full" id="btnFinishConfirm">OUI, TERMINER</button>
-        <button class="btn btn--ghost btn--full" id="btnFinishCancel">Continuer la séance</button>
+        <button class="btn btn--primary btn--full" id="btnFinishConfirm" data-i18n="modal_finish_confirm">OUI, TERMINER</button>
+        <button class="btn btn--ghost btn--full" id="btnFinishCancel" data-i18n="modal_finish_cancel">Continuer la séance</button>
       </div>
     </div>
   </div>
@@ -2466,21 +2904,21 @@
       </div>
     </div>
     <div class="import-body">
-      <p class="t-body" style="color: var(--text-dim);">
-        Collez le JSON de votre programme, ou choisissez un fichier <code>.json</code>.
+      <p class="t-body" style="color: var(--text-dim);" data-i18n="import_body">
+        Collez le JSON de votre programme, ou choisissez un fichier .json.
       </p>
       <label style="cursor: pointer; display: block;">
         <input type="file" id="importFile" accept=".json" style="display: none;" />
         <span class="btn btn--secondary btn--full" style="display: flex; cursor: pointer;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Choisir un fichier .json
+          <span data-i18n="import_file_btn">Choisir un fichier .json</span>
         </span>
       </label>
       <textarea class="import-textarea" id="importTextarea"
                 placeholder='{"meta": {"label": "MON PROGRAMME", "units": "kg"}, ...}'
                 spellcheck="false" rows="8"></textarea>
       <div class="import-error is-hidden" id="importError"></div>
-      <button class="btn btn--primary btn--full" id="btnImportConfirm">IMPORTER CE PROGRAMME</button>
+      <button class="btn btn--primary btn--full" id="btnImportConfirm" data-i18n="import_confirm_btn">IMPORTER CE PROGRAMME</button>
     </div>
   </div>
 
@@ -2608,7 +3046,6 @@
     const LS_PROGRAMS = 'programs';
     const LS_ACTIVE   = 'activeProgram';
 
-    const DAY_SHORT  = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
     const WEEK_ORDER = [1,2,3,4,5,6,0];
     const ACCENT_VAR = { gold:'--gold', rust:'--rust', blue:'--blue', gray:'--text-faint' };
 
@@ -2636,7 +3073,7 @@
 
       /* En-tête */
       const hdr = mkEl('div', 'plan-header');
-      const word = mkEl('p', 'plan-word'); word.textContent = 'PLAN';
+      const word = mkEl('p', 'plan-word'); word.textContent = t('plan_title');
       hdr.appendChild(word);
       $screen.appendChild(hdr);
 
@@ -2645,11 +3082,11 @@
       const seg = mkEl('div', 'segmented');
 
       const btnWeek = mkEl('button', 'segmented__btn');
-      btnWeek.textContent = 'Cette semaine';
+      btnWeek.textContent = t('plan_this_week');
       if (view === 'week') btnWeek.classList.add('segmented__btn--active');
 
       const btnProgs = mkEl('button', 'segmented__btn');
-      btnProgs.textContent = 'Mes programmes';
+      btnProgs.textContent = t('plan_my_programs');
       if (view === 'programs') btnProgs.classList.add('segmented__btn--active');
 
       btnWeek.addEventListener('click', () => { view = 'week'; render(); });
@@ -2671,10 +3108,10 @@
       if (!prog) {
         const p = mkEl('p', 't-body');
         p.style.cssText = 'color:var(--text-dim);text-align:center;padding:var(--space-2xl) 0;';
-        p.textContent = 'Aucun programme actif.';
+        p.textContent = t('plan_no_active');
         body.appendChild(p);
         const btn = mkEl('button', 'btn btn--primary btn--full');
-        btn.textContent = 'CRÉER MON PROGRAMME';
+        btn.textContent = t('plan_create_program');
         btn.style.marginTop = 'var(--space-md)';
         btn.addEventListener('click', () => App.openEditor(null));
         body.appendChild(btn);
@@ -2693,7 +3130,7 @@
         if (isToday) card.classList.add('week-day-card--today');
 
         const dayName = mkEl('span', 'week-day__name');
-        dayName.textContent = DAY_SHORT[dayIdx];
+        dayName.textContent = t('days_short')[dayIdx];
         dayName.style.color = isToday ? 'var(--gold)' : '';
 
         const dot = mkEl('span', 'week-day__dot');
@@ -2701,13 +3138,13 @@
 
         const info = mkEl('div', 'week-day__info');
         const sessName = mkEl('p', 'week-day__session');
-        sessName.textContent = sess ? sess.name : 'Repos';
+        sessName.textContent = sess ? sess.name : t('plan_rest');
         if (sess) sessName.style.color = `var(${accentV})`;
         info.appendChild(sessName);
 
         if (sess && exoCount > 0) {
           const meta = mkEl('p', 'week-day__meta');
-          meta.textContent = `${exoCount} exercice${exoCount > 1 ? 's' : ''}`;
+          meta.textContent = `${exoCount} ${exoCount > 1 ? t('plan_exercises') : t('plan_exercise')}`;
           info.appendChild(meta);
         }
 
@@ -2715,7 +3152,7 @@
 
         if (isToday) {
           const badge = mkEl('span', 'week-day__badge');
-          badge.textContent = 'Aujourd\'hui';
+          badge.textContent = t('plan_today_badge');
           card.appendChild(badge);
         }
 
@@ -2728,7 +3165,7 @@
       addBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        AJOUTER UNE SÉANCE`;
+        ${t('plan_add_session')}`;
       addBtn.addEventListener('click', () => {
         /* Ouvre l'éditeur sur le programme actif directement à l'étape 2 (séances) */
         App.openEditor(prog.id);
@@ -2744,7 +3181,7 @@
       if (!programs.length) {
         const p = mkEl('p', 't-body');
         p.style.cssText = 'color:var(--text-dim);text-align:center;padding:var(--space-2xl) 0;';
-        p.textContent = 'Aucun programme créé.';
+        p.textContent = t('plan_no_programs');
         body.appendChild(p);
       }
 
@@ -2769,7 +3206,7 @@
 
         /* Méta */
         const meta = mkEl('p', 'prog-card__meta');
-        meta.textContent = `${daysCount} jour${daysCount > 1?'s':''} · ${exoTotal} exercice${exoTotal > 1?'s':''}`;
+        meta.textContent = `${daysCount} ${daysCount > 1 ? t('plan_days') : t('plan_day')} · ${exoTotal} ${exoTotal > 1 ? t('plan_exercises') : t('plan_exercise')}`;
         card.appendChild(meta);
 
         /* Actions */
@@ -2777,25 +3214,25 @@
 
         if (!isActive) {
           const btnAct = mkEl('button', 'btn btn--primary btn--sm');
-          btnAct.textContent = 'Activer';
+          btnAct.textContent = t('plan_activate');
           btnAct.addEventListener('click', () => activateProgram(prog.id));
           actions.appendChild(btnAct);
         }
 
         const btnEdit = mkEl('button', 'btn btn--secondary btn--sm');
-        btnEdit.textContent = 'Modifier';
+        btnEdit.textContent = t('plan_edit');
         btnEdit.addEventListener('click', () => App.openEditor(prog.id));
         actions.appendChild(btnEdit);
 
         const btnDup = mkEl('button', 'btn btn--secondary btn--sm');
-        btnDup.textContent = 'Dupliquer';
+        btnDup.textContent = t('plan_duplicate');
         btnDup.addEventListener('click', () => duplicateProgram(prog.id));
         actions.appendChild(btnDup);
 
         if (programs.length > 1) {
           const btnDel = mkEl('button', 'btn btn--ghost btn--sm');
           btnDel.style.color = 'var(--red-danger)';
-          btnDel.textContent = 'Supprimer';
+          btnDel.textContent = t('plan_delete');
           btnDel.addEventListener('click', () => deleteProgram(prog.id, prog.meta?.label));
           actions.appendChild(btnDel);
         }
@@ -2810,7 +3247,7 @@
       btnNew.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        CRÉER UN NOUVEAU PROGRAMME`;
+        ${t('plan_create_new')}`;
       btnNew.addEventListener('click', () => App.openEditor(null));
       body.appendChild(btnNew);
     }
@@ -2831,12 +3268,12 @@
       copy.meta   = { ...copy.meta, label: (copy.meta?.label || '') + ' (copie)' };
       progs.push(copy);
       localStorage.setItem(LS_PROGRAMS, JSON.stringify(progs));
-      App.showToast('Programme dupliqué ✓');
+      App.showToast(t('plan_duplicated'));
       render();
     }
 
     function deleteProgram(id, label) {
-      if (!confirm(`Supprimer "${label || 'ce programme'}" ?\nCette action est irréversible.`)) return;
+      if (!confirm(t('plan_confirm_delete').replace('%s', label || ''))) return;
       let progs = getPrograms();
       progs = progs.filter(p => p.id !== id);
       localStorage.setItem(LS_PROGRAMS, JSON.stringify(progs));
@@ -2845,7 +3282,7 @@
         localStorage.setItem(LS_ACTIVE, progs[0].id);
         Today.refresh();
       }
-      App.showToast('Programme supprimé');
+      App.showToast(t('plan_deleted'));
       render();
     }
 
@@ -2884,8 +3321,6 @@
     const LS_PROGRAMS = 'programs';
     const LS_ACTIVE   = 'activeProgram';
 
-    const DAY_SHORT   = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
-    const MONTH_SHORT = ['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'];
     const WEEK_ORDER  = [1,2,3,4,5,6,0]; // Lun → Dim
     const ACCENT_VAR  = { gold:'--gold', rust:'--rust', blue:'--blue', gray:'--text-faint' };
 
@@ -2997,12 +3432,12 @@
       icon.innerHTML = '<path d="M6 4v2M18 4v2M3 9h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M8 14l3 3 5-5"/>';
 
       const title = mkEl('p', 'rest-screen__title');
-      title.textContent = 'PAS DE PROGRAMME';
+      title.textContent = t('today_no_program_title');
       const sub = mkEl('p', 'rest-screen__sub');
-      sub.textContent = 'Crée ton premier programme pour commencer à t\'entraîner.';
+      sub.textContent = t('today_no_program_sub');
       const btn = mkEl('button', 'btn btn--primary');
       btn.style.marginTop = 'var(--space-sm)';
-      btn.textContent = 'CRÉER MON PROGRAMME';
+      btn.textContent = t('today_create_program');
       btn.addEventListener('click', () => App.openEditor(null));
       div.append(icon, title, sub, btn);
       $screen.appendChild(div);
@@ -3038,7 +3473,7 @@
       top.append(lbl, right);
 
       const word = mkEl('p', 'today-word');
-      word.textContent = 'TODAY';
+      word.textContent = t('today_word');
       hdr.append(top, word);
 
       if (session) {
@@ -3053,7 +3488,7 @@
         }
       } else {
         const restName = mkEl('p', 'today-session-name');
-        restName.textContent = 'REPOS';
+        restName.textContent = t('today_rest_label');
         restName.style.color = 'var(--text-faint)';
         hdr.appendChild(restName);
       }
@@ -3067,7 +3502,7 @@
 
       WEEK_ORDER.forEach(dayIdx => {
         const btn = mkEl('button', 'day-tab');
-        btn.textContent = DAY_SHORT[dayIdx];
+        btn.textContent = t('days_short')[dayIdx];
         if (dayIdx === TODAY)   btn.classList.add('day-tab--today');
         if (dayIdx === viewDay) btn.classList.add('day-tab--active');
         if (!program?.schedule?.[dayIdx]) btn.style.opacity = '.4';
@@ -3093,7 +3528,7 @@
 
       const wrap = mkEl('div', 'today-progress');
       const row  = mkEl('div', 'row row--between');
-      const lbl  = mkEl('p', 't-label'); lbl.textContent = 'Séries faites';
+      const lbl  = mkEl('p', 't-label'); lbl.textContent = t('today_sets_done');
       const cnt  = mkEl('p', 't-label');
       cnt.id = 'todayProgressCount';
       cnt.style.color = 'var(--text)';
@@ -3125,7 +3560,7 @@
       if (session.warmup?.length) {
         const wu = mkEl('div', 'warmup-section');
         const wt = mkEl('p', 'warmup-section__title');
-        wt.textContent = 'Échauffement';
+        wt.textContent = t('today_warmup');
         wu.appendChild(wt);
         session.warmup.forEach(item => {
           const li = mkEl('p', 'warmup-section__item');
@@ -3184,7 +3619,7 @@
       const saved  = localStorage.getItem(weightKey(exo.id));
 
       const wRow   = mkEl('div', 'exo-today__weight');
-      const wLbl   = mkEl('span', 'exo-today__weight-label'); wLbl.textContent = 'Poids';
+      const wLbl   = mkEl('span', 'exo-today__weight-label'); wLbl.textContent = t('today_weight');
 
       const stepper = mkEl('div', 'weight-stepper');
 
@@ -3244,7 +3679,7 @@
       rBar.dataset.restSec = restSec;
       rBar.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
       const rTxt = mkEl('span', 'rest-bar__text');
-      rTxt.textContent = ` REST ${restSec}S`;
+      rTxt.textContent = ` ${t('timer_rest')} ${restSec}S`;
       rBar.appendChild(rTxt);
       rBar.addEventListener('click', () => { if (timerExoIdx === exoIdx) stopTimer(); });
       card.appendChild(rBar);
@@ -3275,8 +3710,8 @@
             <path d="M3 17h18M3 12h18M9 7h6"/>
             <path d="M5 21H19M7 17l1-5h8l1 5"/>
           </svg>
-          <p class="rest-screen__title">REPOS</p>
-          <p class="rest-screen__sub">Récupère, mange, dors.<br/>L'entraînement reprend demain.</p>`;
+          <p class="rest-screen__title">${t('today_rest_label')}</p>
+          <p class="rest-screen__sub">${t('today_rest_sub')}</p>`;
         $screen.appendChild(rest);
       }
     }
@@ -3286,7 +3721,7 @@
       const footer = mkEl('div', 'today-footer');
       const btn    = mkEl('button', 'btn btn--primary btn--full');
       btn.id = 'btnFinishSession';
-      btn.textContent = 'TERMINER LA SÉANCE';
+      btn.textContent = t('today_finish_session');
       const track = loadTrack(sessKey);
       btn.style.display = countDone(track, session.exercises || []) > 0 ? '' : 'none';
 
@@ -3296,12 +3731,12 @@
         // 1. Passage immédiat à l'état "terminé" — la transition CSS (0.45s)
         //    gère le fondu doré → vert de façon fluide et cohérente
         btn.classList.add('btn--done');
-        btn.textContent = '✓ SÉANCE ENREGISTRÉE';
+        btn.textContent = t('today_session_saved');
 
         // 2. Persistance : sauvegarde le log et efface le tracking
         saveSessionLog(sessKey);
         localStorage.removeItem(trackKey(sessKey));
-        App.showToast('Séance enregistrée ✓');
+        App.showToast(t('today_session_saved_toast'));
 
         // 3. Re-render une fois l'animation terminée (le bouton disparaît naturellement)
         setTimeout(() => {
@@ -3377,7 +3812,7 @@
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
       if ($timerBar) {
         const $txt = $timerBar.querySelector('.rest-bar__text');
-        if ($txt) $txt.textContent = ` REST ${$timerBar.dataset.restSec || 90}S`;
+        if ($txt) $txt.textContent = ` ${t('timer_rest')} ${$timerBar.dataset.restSec || 90}S`;
         $timerBar.classList.remove('rest-bar--active', 'rest-bar--critical');
         $timerBar = null;
       }
@@ -3390,7 +3825,7 @@
       if (!$txt) return;
       const m   = String(Math.floor(timerRemaining / 60)).padStart(2,'0');
       const s   = String(timerRemaining % 60).padStart(2,'0');
-      $txt.textContent = ` REPOS · ${m}:${s}`;
+      $txt.textContent = ` ${t('timer_rest')} · ${m}:${s}`;
       $timerBar.classList.add('rest-bar--active');
       $timerBar.classList.toggle('rest-bar--critical', timerRemaining <= 10);
     }
@@ -3452,7 +3887,7 @@
       return exos.reduce((t, e, i) => t + (track[i] || []).filter(Boolean).length, 0);
     }
     function fmtDate(d) {
-      return `${DAY_SHORT[d.getDay()]}, ${d.getDate()} ${MONTH_SHORT[d.getMonth()]}`;
+      return `${t('days_short')[d.getDay()]}, ${d.getDate()} ${t('months_short')[d.getMonth()]}`;
     }
 
     /* Formate le schéma sous la forme "3 × 12"
@@ -3481,7 +3916,7 @@
           localStorage.removeItem(trackKey(result.key));
         }
         document.getElementById('modalFinish')?.classList.add('is-hidden');
-        App.showToast('Séance enregistrée ✓');
+        App.showToast(t('today_session_saved_toast'));
         render(); /* Re-rend Today avec séries remises à zéro */
         if (typeof Stats !== 'undefined') Stats.refresh();
       });
@@ -3524,12 +3959,13 @@
     const LS_DRAFT     = 'program-draft';
 
     /* ── Noms des jours (alignés sur Date.getDay()) ─────── */
-    const DAYS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+    /* Les noms de jours sont fournis par t('days_long') */
 
     /* ── État ────────────────────────────────────────────── */
     let programs     = [];
     let draft        = null;
     let editorStep     = 1;
+    let prevDisplayStep = 1;   // display step affiché à l'étape précédente
     let editSessKey    = null;  // null = nouvelle séance
     let editExoId      = null;  // null = nouvel exercice
     let editorAnim     = false;
@@ -3617,6 +4053,11 @@
       openImport(true);
     });
 
+    /* Bouton langue sur l'écran d'accueil — applyLang() gère la synchro */
+    document.getElementById('btnOnboardingLang').addEventListener('click', () => {
+      setLang(currentLang() === 'fr' ? 'en' : 'fr');
+    });
+
     /* ──────────────────────────────────────────────────────
        ÉDITEUR — navigation entre étapes
     ────────────────────────────────────────────────────── */
@@ -3631,6 +4072,7 @@
         const prog = programs.find(p => p.id === programId);
         if (prog) { draft = JSON.parse(JSON.stringify(prog)); persistDraft(); }
       }
+      prevDisplayStep = 1;
       $editor.classList.remove('is-hidden');
       goToEditorStep(1, false);
     }
@@ -3670,11 +4112,13 @@
     function goToEditorStep(newStep, animated = true) {
       if (editorAnim) return;
       const prevStep = editorStep;
+      const oldDisplayStep = prevDisplayStep; // capturé avant toute mutation d'état
       editorStep = newStep;
 
       /* Barre de progression */
       const displayStep = computeDisplayStep(newStep);
-      $edStepLabel.textContent = `Étape ${displayStep} / 4`;
+      prevDisplayStep = displayStep; // mise à jour pour la prochaine transition
+      $edStepLabel.textContent = `${t('editor_step')} ${displayStep} ${t('editor_step_of')} 4`;
       $edDots.forEach((d, i) => {
         d.classList.remove('editor-dot--active', 'editor-dot--done');
         if (i + 1 < displayStep)       d.classList.add('editor-dot--done');
@@ -3695,7 +4139,11 @@
       }
 
       editorAnim = true;
-      const dir  = displayStep > computeDisplayStep(prevStep) ? 1 : -1;
+      // Direction basée sur les display steps mémorisés, pas recalculés
+      // Tie-break sur les HTML steps si les display steps sont identiques
+      const dir = displayStep !== oldDisplayStep
+        ? (displayStep > oldDisplayStep ? 1 : -1)
+        : (newStep > prevStep ? 1 : -1);
       const prev = $edSteps[prevStep - 1];
       const next = $edSteps[newStep - 1];
 
@@ -3770,7 +4218,7 @@
       const WEEK_ORDER = [1, 2, 3, 4, 5, 6, 0];
 
       WEEK_ORDER.forEach(dayIdx => {
-        const dayName = DAYS[dayIdx];
+        const dayName = t('days_long')[dayIdx];
         const row = document.createElement('div');
         row.className = 'schedule-row';
 
@@ -3815,7 +4263,7 @@
         const p = document.createElement('p');
         p.className = 't-body';
         p.style.cssText = 'color:var(--text-dim);text-align:center;padding:var(--space-xl) 0;';
-        p.textContent   = 'Aucune séance — créez-en une ci-dessous.';
+        p.textContent   = t('editor_no_sessions');
         $list.appendChild(p);
       }
 
@@ -3823,7 +4271,7 @@
         const sess      = draft.sessions[key];
         const exoCount  = (sess.exercises || []).length;
         /* Fallback sur 'Inconnu' (jamais sess.type brut) pour éviter l'injection HTML */
-        const typeLabel = { lift:'Musculation', cardio:'Cardio', rest:'Repos', mixed:'Mixte' }[sess.type] || 'Inconnu';
+        const typeLabel = { lift:t('session_type_lift'), cardio:t('session_type_cardio'), rest:t('session_type_rest'), mixed:t('session_type_mixed') }[sess.type] || t('session_type_unknown');
         const accentVar = { gold:'--gold', rust:'--rust', blue:'--blue', gray:'--text-faint' }[sess.accent] || '--gold';
 
         const card = document.createElement('div');
@@ -3835,8 +4283,8 @@
 
         const info = document.createElement('div');
         info.className = 'session-card__info';
-        info.innerHTML = `<p class="session-card__name">${esc(sess.name || 'Sans nom')}</p>
-          <p class="session-card__meta">${typeLabel} · ${exoCount} exercice${exoCount > 1 ? 's' : ''}</p>`;
+        info.innerHTML = `<p class="session-card__name">${esc(sess.name || t('editor_no_name'))}</p>
+          <p class="session-card__meta">${typeLabel} · ${exoCount} ${exoCount > 1 ? t('plan_exercises') : t('plan_exercise')}</p>`;
 
         const actions = document.createElement('div');
         actions.className = 'session-card__actions';
@@ -3852,11 +4300,12 @@
         });
 
         const btnDel = document.createElement('button');
-        btnDel.className = 'btn btn--ghost btn--sm';
+        btnDel.className = 'btn btn--secondary btn--sm';
         btnDel.style.color = 'var(--red-danger)';
-        btnDel.innerHTML = '&times;';
+        btnDel.style.borderColor = 'var(--red-danger)';
+        btnDel.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
         btnDel.addEventListener('click', () => {
-          if (!confirm(`Supprimer "${sess.name || 'cette séance'}" ?`)) return;
+          if (!confirm(t('editor_confirm_delete_session').replace('%s', sess.name || ''))) return;
           delete draft.sessions[key];
           Object.keys(draft.schedule).forEach(d => {
             if (draft.schedule[d] === key) delete draft.schedule[d];
@@ -3896,7 +4345,7 @@
 
     function populateStep4(sessKey) {
       document.getElementById('step4Title').textContent =
-        sessKey ? 'Modifier la séance' : 'Nouvelle séance';
+        sessKey ? t('editor_edit_session') : t('editor_new_session');
 
       const sess = (sessKey && draft.sessions[sessKey]) || {
         type:'lift', name:'', accent:'gold', subtitle:'',
@@ -3958,7 +4407,7 @@
           const s = readSessionForm();
           s.warmup.splice(i, 1);
           renderWarmup(s.warmup);
-        }, 'Ex. Vélo 5 min'));
+        }, t('editor_warmup_ph')));
       });
     }
 
@@ -3979,7 +4428,7 @@
         const info = document.createElement('div');
         info.className = 'exo-card__info';
         /* Toutes les valeurs sont échappées — le programme peut venir d'un import JSON */
-        info.innerHTML = `<p class="exo-card__name">${esc(exo.name||'Sans nom')}</p>
+        info.innerHTML = `<p class="exo-card__name">${esc(exo.name||t('editor_no_name'))}</p>
           <p class="exo-card__meta">${esc(String(exo.sets||'?'))}×${esc(String(exo.scheme||'?'))} · ${esc(String(exo.restSec||'?'))} sec</p>`;
 
         const actions = document.createElement('div');
@@ -3987,7 +4436,7 @@
 
         const bE = document.createElement('button');
         bE.className = 'btn btn--secondary btn--sm';
-        bE.textContent = 'Édit.';
+        bE.textContent = t('editor_edit_short');
         bE.addEventListener('click', () => openExerciseModal(exo.id));
 
         const bD = document.createElement('button');
@@ -4018,15 +4467,15 @@
         const fields = document.createElement('div');
         fields.className = 'tip-card__fields';
 
-        const t = document.createElement('input');
-        t.className = 'input input--sm'; t.placeholder = 'Titre';
-        t.value = tip.title || '';
+        const tInp = document.createElement('input');
+        tInp.className = 'input input--sm'; tInp.placeholder = t('editor_tip_title_ph');
+        tInp.value = tip.title || '';
 
-        const b = document.createElement('input');
-        b.className = 'input input--sm'; b.placeholder = 'Contenu';
-        b.value = tip.body || '';
+        const bInp = document.createElement('input');
+        bInp.className = 'input input--sm'; bInp.placeholder = t('editor_tip_body_ph');
+        bInp.value = tip.body || '';
 
-        fields.append(t, b);
+        fields.append(tInp, bInp);
 
         const btn = document.createElement('button');
         btn.className = 'dynamic-item__remove';
@@ -4092,7 +4541,7 @@
     function openExerciseModal(exoId) {
       editExoId = exoId;
       document.getElementById('exerciseModalTitle').textContent =
-        exoId ? "Modifier l'exercice" : "Nouvel exercice";
+        exoId ? t('editor_edit_exo') : t('editor_new_exo');
 
       const sessKey = editSessKey || '_tmp_';
       const exo = exoId
@@ -4118,7 +4567,7 @@
           const cur = Array.from($altList.querySelectorAll('input')).map(e => e.value.trim());
           cur.splice(i, 1);
           renderAltList(cur.filter(Boolean));
-        }, 'Ex. Développé haltères'));
+        }, t('editor_alt_ph')));
       });
     }
 
@@ -4172,11 +4621,11 @@
     ────────────────────────────────────────────────────── */
     function validateProgram(data) {
       const errs = [];
-      if (!data?.meta?.label)  errs.push('Le nom du programme est requis.');
+      if (!data?.meta?.label)  errs.push(t('editor_err_name'));
       const keys = Object.keys(data?.sessions || {});
-      if (!keys.length)        errs.push('Au moins une séance est requise.');
+      if (!keys.length)        errs.push(t('editor_err_session'));
       if (!Object.keys(data?.schedule || {}).length)
-                               errs.push('Au moins un jour doit être planifié.');
+                               errs.push(t('editor_err_schedule'));
       Object.values(data?.schedule || {}).forEach(k => {
         if (!data.sessions[k]) errs.push(`Séance "${k}" planifiée mais introuvable.`);
       });
@@ -4196,7 +4645,7 @@
       delete draft.sessions['_tmp_'];
 
       const errs = validateProgram(draft);
-      if (errs.length) { alert('Impossible d\'enregistrer :\n\n' + errs.join('\n')); return; }
+      if (errs.length) { alert(t('editor_alert_prefix') + errs.join('\n')); return; }
 
       if (!draft.id) draft.id = 'prog-' + Date.now();
 
@@ -4212,7 +4661,7 @@
       closeEditor(false);
       Today.refresh();
       Plan.refresh();
-      showToast('Programme enregistré ✓');
+      showToast(t('editor_saved'));
     }
 
     /* ──────────────────────────────────────────────────────
@@ -4251,7 +4700,7 @@
 
       let data;
       try { data = JSON.parse(document.getElementById('importTextarea').value.trim()); }
-      catch { showImportError('JSON invalide — vérifiez la syntaxe.'); return; }
+      catch { showImportError(t('editor_import_err')); return; }
 
       const errs = validateProgram(data);
       if (errs.length) { showImportError(errs.join('\n')); return; }
@@ -4268,7 +4717,7 @@
       closeImport();
       Today.refresh();
       Plan.refresh();
-      showToast('Programme importé ✓');
+      showToast(t('editor_imported'));
     });
 
     function showImportError(msg) {
@@ -4328,6 +4777,8 @@
     function init() {
       loadPrograms();
       checkOnboarding();
+      /* Synchronise les éléments statiques avec la langue stockée dès le chargement */
+      applyLang();
     }
 
     init();
@@ -4353,7 +4804,7 @@
     let monthChart   = null;
     let selectedExoId = null;
 
-    const MONTH_NAMES = ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'];
+    /* Les noms de mois sont fournis par t('months_long') */
 
     /* ── Helpers ─────────────────────────────────────────── */
     function mkEl(tag, cls) {
@@ -4522,7 +4973,7 @@
 
     function fmtShortDate(dateStr) {
       const [, m, d] = dateStr.split('-');
-      return `${parseInt(d)} ${MONTH_NAMES[parseInt(m) - 1]}`;
+      return `${parseInt(d)} ${t('months_long')[parseInt(m) - 1]}`;
     }
 
     /* ── Séances par mois ─────────────────────────────────── */
@@ -4539,7 +4990,7 @@
 
     function fmtMonth(str) {
       const [y, m] = str.split('-');
-      return `${MONTH_NAMES[parseInt(m) - 1]} '${y.slice(2)}`;
+      return `${t('months_long')[parseInt(m) - 1]} '${y.slice(2)}`;
     }
 
     /* ── RENDU PRINCIPAL ──────────────────────────────────── */
@@ -4552,7 +5003,7 @@
 
       /* En-tête */
       const hdr = mkEl('div', 'screen-header');
-      const word = mkEl('p', 'screen-word'); word.textContent = 'STATS';
+      const word = mkEl('p', 'screen-word'); word.textContent = t('stats_title');
       hdr.appendChild(word);
       $screen.appendChild(hdr);
 
@@ -4592,8 +5043,8 @@
       const weekVol = getWeekVolume(logs);
 
       summary.append(
-        makeStatCard(streak,              'Jours de suite', flameIcon),
-        makeStatCard(fmtVolume(weekVol),  'Volume semaine',  null),
+        makeStatCard(streak,              t('stats_streak'),   flameIcon),
+        makeStatCard(fmtVolume(weekVol),  t('stats_week_vol'), null),
       );
       body.appendChild(summary);
 
@@ -4601,7 +5052,7 @@
       const lastLog  = getLastLog(logs);
       const lastCard = mkEl('div', 'stat-card');
 
-      const lastLbl = mkEl('span', 'stat-label'); lastLbl.textContent = 'Dernière séance';
+      const lastLbl = mkEl('span', 'stat-label'); lastLbl.textContent = t('stats_last_session');
       lastCard.appendChild(lastLbl);
 
       if (lastLog) {
@@ -4625,14 +5076,14 @@
       exoSec.style.cssText = 'display:flex;flex-direction:column;gap:var(--space-sm);margin-top:var(--space-sm);';
 
       const exoTitle = mkEl('p', 'stats-section__title');
-      exoTitle.textContent = 'Progression par exercice';
+      exoTitle.textContent = t('stats_progress_title');
       exoSec.appendChild(exoTitle);
 
       const exos = getExercises(logs);
 
       if (!exos.length) {
         const empty = mkEl('p', 'stats-empty');
-        empty.textContent = 'Aucune donnée. Enregistre ta première séance pour voir ta progression ici.';
+        empty.textContent = t('stats_no_data');
         exoSec.appendChild(empty);
       } else {
         /* Sélecteur */
@@ -4688,7 +5139,7 @@
             <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
           </svg>
           <div style="flex:1;min-width:0;">
-            <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:2px;">Record personnel</p>
+            <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:2px;">${t('stats_pr')}</p>
             <p id="statsPrValue" style="font-family:var(--font-display);font-weight:800;font-size:28px;color:var(--text);line-height:1;"></p>
           </div>`;
         exoSec.appendChild(prCard);
@@ -4715,14 +5166,14 @@
 
           if (typeof Chart === 'undefined') {
             clearCanvas();
-            chartEmpty.textContent = 'Graphique indisponible (Chart.js non chargé).';
+            chartEmpty.textContent = t('stats_chart_error');
             chartEmpty.style.display = 'block';
             return;
           }
 
           if (!data.length) {
             clearCanvas();
-            chartEmpty.textContent = 'Aucune charge enregistrée pour cet exercice (poids du corps, ou poids non saisi à la fin de séance).';
+            chartEmpty.textContent = t('stats_no_weight');
             chartEmpty.style.display = 'block';
             return;
           }
@@ -4738,7 +5189,7 @@
                 return `${p[2]}/${p[1]}`;
               }),
               datasets: [{
-                label: 'Charge',
+                label: t('stats_chart_load'),
                 data:               data.map(d => d.weight),
                 borderColor:        '#d4a23c',
                 backgroundColor:    'rgba(212,162,60,0.08)',
@@ -4780,14 +5231,14 @@
       monthSec.style.cssText = 'display:flex;flex-direction:column;gap:var(--space-sm);margin-top:var(--space-sm);';
 
       const monthTitle = mkEl('p', 'stats-section__title');
-      monthTitle.textContent = 'Séances par mois';
+      monthTitle.textContent = t('stats_monthly_title');
       monthSec.appendChild(monthTitle);
 
       const monthData = getSessionsByMonth(logs);
 
       if (!monthData.length) {
         const empty = mkEl('p', 'stats-empty');
-        empty.textContent = 'Aucune séance enregistrée.';
+        empty.textContent = t('stats_no_sessions');
         monthSec.appendChild(empty);
       } else {
         const cWrap  = mkEl('div', 'chart-wrap');
@@ -4806,7 +5257,7 @@
             data: {
               labels: monthData.map(([m]) => fmtMonth(m)),
               datasets: [{
-                label: 'Séances',
+                label: t('stats_sessions_label'),
                 data:            monthData.map(([, c]) => c),
                 backgroundColor: 'rgba(212,162,60,0.55)',
                 borderColor:     '#d4a23c',
@@ -4896,57 +5347,62 @@
 
       /* En-tête */
       const hdr  = mkEl('div', 'screen-header');
-      const word = mkEl('p',   'screen-word'); word.textContent = 'PROFIL';
+      const word = mkEl('p',   'screen-word'); word.textContent = t('profile_title');
       hdr.appendChild(word);
       $screen.appendChild(hdr);
 
       const body = mkEl('div', 'profil-body');
 
       /* ── MON PROGRAMME ─────────────────────────────────── */
-      body.appendChild(buildSection('Mon programme', [
-        buildRow('Programme actif', getActiveProgramMeta(), true, () => {
+      body.appendChild(buildSection(t('profile_my_program'), [
+        buildRow(t('profile_active_program'), getActiveProgramMeta(), true, () => {
           document.querySelector('[data-target="screen-plan"]')?.click();
           Plan.navigateTo('week');
         }),
-        buildRow('Gérer mes programmes', null, true, () => {
+        buildRow(t('profile_manage'), null, true, () => {
           document.querySelector('[data-target="screen-plan"]')?.click();
           Plan.navigateTo('programs');
         }),
       ]));
 
       /* ── DONNÉES ───────────────────────────────────────── */
-      body.appendChild(buildSection('Données', [
-        buildRow('Exporter mes données', 'Télécharger un fichier JSON (programme + logs + poids)', true, () => {
+      body.appendChild(buildSection(t('profile_data'), [
+        buildRow(t('profile_export'), t('profile_export_meta'), true, () => {
           Stats.exportData();
-          App.showToast('Export téléchargé ✓');
+          App.showToast(t('profile_export_toast'));
         }),
-        buildRow('Importer une sauvegarde', 'Restaurer un fichier JSON exporté précédemment', true, () => {
+        buildRow(t('profile_import'), t('profile_import_meta'), true, () => {
           App.openImport(false);
         }),
-        buildRow('Réinitialiser la séance du jour', null, false, resetToday),
+        buildRow(t('profile_reset_today'), null, false, resetToday),
+      ]));
+
+      /* ── LANGUE ────────────────────────────────────────── */
+      body.appendChild(buildSection(t('profile_language'), [
+        buildLangRow(),
       ]));
 
       /* ── ZONE DE DANGER ────────────────────────────────── */
-      body.appendChild(buildSection('Zone de danger', [
-        buildRow('Supprimer tous mes logs', 'Efface l\'historique des séances', false, () => {
-          if (!confirm('Supprimer tous les logs de séances ?\nCette action est irréversible.')) return;
+      body.appendChild(buildSection(t('profile_danger'), [
+        buildRow(t('profile_delete_logs'), t('profile_delete_logs_meta'), false, () => {
+          if (!confirm(t('profile_confirm_logs'))) return;
           deleteLogs();
         }, true),
-        buildRow('Réinitialiser l\'application', 'Efface toutes les données', false, () => {
-          if (!confirm('Réinitialiser complètement l\'application ?\nToutes les données seront définitivement effacées. Cette action est irréversible.')) return;
+        buildRow(t('profile_reset_app'), t('profile_reset_app_meta'), false, () => {
+          if (!confirm(t('profile_confirm_reset'))) return;
           localStorage.clear();
           location.reload();
         }, true),
       ]));
 
       /* ── À PROPOS ──────────────────────────────────────── */
-      body.appendChild(buildSection('À propos', [
-        buildRow('Format de programme', 'Compatible JSON (voir program.example.json)', false, null),
+      body.appendChild(buildSection(t('profile_about'), [
+        buildRow(t('profile_format'), t('profile_format_meta'), false, null),
       ]));
 
       /* Version */
       const ver = mkEl('p', 'settings-version');
-      ver.textContent = 'Training · v2.0';
+      ver.textContent = t('profile_version');
       body.appendChild(ver);
 
       $screen.appendChild(body);
@@ -4958,22 +5414,41 @@
         const id  = localStorage.getItem(LS_ACTIVE);
         const all = JSON.parse(localStorage.getItem(LS_PROGRAMS) || '[]');
         const p   = all.find(x => x.id === id);
-        if (!p) return 'Aucun programme actif';
+        if (!p) return t('profile_no_active');
         const days = Object.keys(p.schedule  || {}).length;
         const exos = Object.values(p.sessions || {})
-          .reduce((t, s) => t + (s.exercises || []).length, 0);
-        return `${p.meta?.label || 'Programme'} · ${days} jour${days>1?'s':''} · ${exos} exercice${exos>1?'s':''}`;
-      } catch { return 'Aucun programme actif'; }
+          .reduce((sum, s) => sum + (s.exercises || []).length, 0);
+        return `${p.meta?.label || ''} · ${days} ${days>1?t('plan_days'):t('plan_day')} · ${exos} ${exos>1?t('plan_exercises'):t('plan_exercise')}`;
+      } catch { return t('profile_no_active'); }
     }
 
     /* ── Constructeurs UI ─────────────────────────────────── */
     function buildSection(title, rows) {
-      const sec = mkEl('div', 'settings-section');
-      const t   = mkEl('p',   'settings-section__title');
-      t.textContent = title;
-      sec.appendChild(t);
+      const sec      = mkEl('div', 'settings-section');
+      const titleEl  = mkEl('p',   'settings-section__title');
+      titleEl.textContent = title;
+      sec.appendChild(titleEl);
       rows.forEach(r => sec.appendChild(r));
       return sec;
+    }
+
+    function buildLangRow() {
+      const row = mkEl('div', 'settings-row');
+      const left = mkEl('div', 'settings-row__left');
+      const lbl  = mkEl('p',  'settings-row__label');
+      lbl.textContent = t('profile_language_meta');
+      left.appendChild(lbl);
+      row.appendChild(left);
+
+      const pills = mkEl('div', 'lang-pills');
+      ['fr', 'en'].forEach(code => {
+        const btn = mkEl('button', `lang-pill${currentLang() === code ? ' lang-pill--active' : ''}`);
+        btn.textContent = code.toUpperCase();
+        btn.addEventListener('click', () => setLang(code));
+        pills.appendChild(btn);
+      });
+      row.appendChild(pills);
+      return row;
     }
 
     function buildRow(label, meta, hasChevron, onClick, isDanger) {
@@ -5013,7 +5488,7 @@
       }
       keys.forEach(k => localStorage.removeItem(k));
       Today.refresh();
-      App.showToast('Séance du jour réinitialisée');
+      App.showToast(t('profile_reset_today_toast'));
     }
 
     function deleteLogs() {
@@ -5024,7 +5499,7 @@
       }
       keys.forEach(k => localStorage.removeItem(k));
       Stats.refresh();
-      App.showToast('Logs supprimés');
+      App.showToast(t('profile_logs_deleted'));
     }
 
     /* ── Init & API publique ─────────────────────────────── */
