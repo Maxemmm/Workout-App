@@ -239,16 +239,17 @@
       font-size: 14px;
       text-transform: uppercase;
       letter-spacing: .06em;
-      transition: transform var(--duration-fast) var(--ease-out),
-                  opacity var(--duration-fast) var(--ease-out);
-      /* Cible tactile minimum */
+      transition: transform  var(--duration-fast) var(--ease-out),
+                  opacity    var(--duration-fast) var(--ease-out),
+                  background 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                  color      0.45s cubic-bezier(0.4, 0, 0.2, 1);
       min-height: 44px;
       cursor: pointer;
       user-select: none;
     }
 
-    /* Effet tap */
-    .btn:active {
+    /* Effet tap — uniquement quand le bouton n'est pas en état "done" */
+    .btn:not(.btn--done):active {
       transform: scale(0.97);
     }
 
@@ -266,7 +267,15 @@
       background: var(--gold);
       color: #000;
     }
-    .btn--primary:hover { background: color-mix(in srgb, var(--gold) 88%, #fff); }
+    .btn--primary:not(.btn--done):hover { background: color-mix(in srgb, var(--gold) 88%, #fff); }
+
+    /* --- État "séance terminée" — transition douce depuis --primary --- */
+    .btn--done {
+      background: var(--green-done);
+      color: #fff;
+      pointer-events: none;   /* bloque tout re-clic pendant l'animation */
+      letter-spacing: .04em;
+    }
 
     /* --- Secondaire (outline) --- */
     .btn--secondary {
@@ -824,16 +833,20 @@
     ============================================================ */
 
     /* --- Overlay plein écran commun --- */
+    /* inset:0 + left:50% créait un conflit (width = 50% viewport).
+       On positionne proprement : top/bottom pour la hauteur, left/transform/width pour le centrage. */
     .overlay-full {
       position: fixed;
-      inset: 0;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
       background: var(--bg);
       z-index: 200;
       display: flex;
       flex-direction: column;
-      max-width: 430px;
-      left: 50%;
-      transform: translateX(-50%);
       padding-top: env(safe-area-inset-top, 0px);
       overflow: hidden;
       animation: fade-in var(--duration-normal) var(--ease-out);
@@ -3164,9 +3177,27 @@
       btn.textContent = 'TERMINER LA SÉANCE';
       const track = loadTrack(sessKey);
       btn.style.display = countDone(track, session.exercises || []) > 0 ? '' : 'none';
+
       btn.addEventListener('click', () => {
-        document.getElementById('modalFinish')?.classList.remove('is-hidden');
+        if (btn.classList.contains('btn--done')) return;
+
+        // 1. Passage immédiat à l'état "terminé" — la transition CSS (0.45s)
+        //    gère le fondu doré → vert de façon fluide et cohérente
+        btn.classList.add('btn--done');
+        btn.textContent = '✓ SÉANCE ENREGISTRÉE';
+
+        // 2. Persistance : sauvegarde le log et efface le tracking
+        saveSessionLog(sessKey);
+        localStorage.removeItem(trackKey(sessKey));
+        App.showToast('Séance enregistrée ✓');
+
+        // 3. Re-render une fois l'animation terminée (le bouton disparaît naturellement)
+        setTimeout(() => {
+          render();
+          if (typeof Stats !== 'undefined') Stats.refresh();
+        }, 1400);
       });
+
       footer.appendChild(btn);
       return footer;
     }
