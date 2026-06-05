@@ -5974,5 +5974,283 @@
   Profil.init();
   </script>
 
+  <!-- ============================================================
+       MODULE AI COACH
+  ============================================================ -->
+  <script>
+  const AiCoach = (function () {
+    'use strict';
+
+    /* ── État ──────────────────────────────────────────────────── */
+    let aiStep           = 0;
+    let aiFormData       = {};
+    let aiGeneratedProgram = null;
+    let msgInterval      = null;
+
+    const MSGS = [
+      'Analyse de ton profil…',
+      'Construction du programme…',
+      'Optimisation des exercices…',
+      'Finalisation…',
+    ];
+    const DAY_NAMES = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+
+    /* ── Refs DOM ──────────────────────────────────────────────── */
+    const $overlay   = document.getElementById('overlayAiCoach');
+    const $back      = document.getElementById('aiBack');
+    const $cancel    = document.getElementById('aiCancel');
+    const $stepLabel = document.getElementById('aiStepLabel');
+    const $next      = document.getElementById('aiNext');
+    const $footer    = document.getElementById('aiFooter');
+    const $steps     = Array.from(document.querySelectorAll('#aiBody .ai-step'));
+
+    /* ── Navigation entre vues ─────────────────────────────────── */
+    function goToAiStep(n) {
+      $steps.forEach((s, i) => s.classList.toggle('is-hidden', i !== n));
+      aiStep = n;
+
+      const isQuestionnaire = n <= 3;
+      $stepLabel.textContent  = isQuestionnaire ? `Étape ${n + 1} / 4` : '';
+      $back.style.visibility  = n === 0 ? 'hidden' : 'visible';
+      $footer.style.display   = isQuestionnaire ? 'block' : 'none';
+      updateNextBtn();
+      /* Scroll en haut de la vue */
+      document.getElementById('aiBody').scrollTop = 0;
+    }
+
+    function updateNextBtn() {
+      let valid = false;
+      if (aiStep === 0) valid = !!aiFormData.objectif;
+      if (aiStep === 1) valid = !!aiFormData.frequence;
+      if (aiStep === 2) valid = !!(aiFormData.materiel?.length);
+      if (aiStep === 3) valid = !!aiFormData.niveau;
+      $next.disabled = !valid;
+    }
+
+    /* ── Vue 0 : Objectif (sélection unique) ───────────────────── */
+    document.querySelectorAll('#aiStep0 .ai-option-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('#aiStep0 .ai-option-card')
+          .forEach(c => c.classList.remove('is-selected'));
+        card.classList.add('is-selected');
+        aiFormData.objectif = card.dataset.value;
+        updateNextBtn();
+      });
+    });
+
+    /* ── Vue 1 : Disponibilités (sélection unique) ─────────────── */
+    document.querySelectorAll('#aiStep1 .ai-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#aiStep1 .ai-chip')
+          .forEach(c => c.classList.remove('is-selected'));
+        chip.classList.add('is-selected');
+        aiFormData.frequence = parseInt(chip.dataset.value, 10);
+        updateNextBtn();
+      });
+    });
+
+    /* ── Vue 2 : Matériel (multi-select) ───────────────────────── */
+    document.querySelectorAll('#aiStep2 .ai-option-card').forEach(card => {
+      card.addEventListener('click', () => {
+        card.classList.toggle('is-selected');
+        aiFormData.materiel = Array.from(
+          document.querySelectorAll('#aiStep2 .ai-option-card.is-selected')
+        ).map(c => c.dataset.value);
+        updateNextBtn();
+      });
+    });
+
+    /* ── Vue 3 : Contexte ──────────────────────────────────────── */
+    document.querySelectorAll('#aiStep3 .ai-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#aiStep3 .ai-chip')
+          .forEach(c => c.classList.remove('is-selected'));
+        chip.classList.add('is-selected');
+        aiFormData.niveau = chip.dataset.value;
+        updateNextBtn();
+      });
+    });
+
+    /* ── Vue 4 : Génération ────────────────────────────────────── */
+    function updateGenerateSummary() {
+      document.getElementById('aiGenerateSummary').textContent =
+        `${aiFormData.objectif} · ${aiFormData.frequence} j/sem · ${aiFormData.niveau}`;
+    }
+
+    async function doGenerate() {
+      const $btn    = document.getElementById('aiGenerate');
+      const $spin   = document.getElementById('aiSpinner');
+      const $err    = document.getElementById('aiError');
+      const $msgEl  = document.getElementById('aiGeneratingMsg');
+
+      $err.classList.add('is-hidden');
+      $btn.classList.add('is-hidden');
+      $spin.classList.remove('is-hidden');
+      $msgEl.textContent = MSGS[0];
+
+      let msgIdx = 0;
+      clearInterval(msgInterval);
+      msgInterval = setInterval(() => {
+        msgIdx = (msgIdx + 1) % MSGS.length;
+        $msgEl.textContent = MSGS[msgIdx];
+      }, 2000);
+
+      const antecedents = document.getElementById('aiAntecedents').value.trim() || null;
+
+      try {
+        const res = await fetch('/api/generate-program', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            objectif:  aiFormData.objectif,
+            frequence: aiFormData.frequence,
+            materiel:  aiFormData.materiel,
+            niveau:    aiFormData.niveau,
+            antecedents,
+          }),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Erreur inconnue');
+
+        aiGeneratedProgram    = json.program;
+        aiGeneratedProgram.id = 'prog-' + Date.now();
+        clearInterval(msgInterval);
+        showPreview();
+
+      } catch (err) {
+        clearInterval(msgInterval);
+        $spin.classList.add('is-hidden');
+        $btn.classList.remove('is-hidden');
+        $err.classList.remove('is-hidden');
+        document.getElementById('aiErrorMsg').textContent = err.message;
+      }
+    }
+
+    document.getElementById('aiGenerate').addEventListener('click', doGenerate);
+    document.getElementById('aiRetry').addEventListener('click', doGenerate);
+
+    /* ── Vue 5 : Prévisualisation ──────────────────────────────── */
+    function showPreview() {
+      const prog     = aiGeneratedProgram;
+      const sessions = Object.values(prog.sessions || {});
+      const exoCount = sessions.reduce((acc, s) => acc + (s.exercises?.length || 0), 0);
+      const dayCount = Object.keys(prog.schedule || {}).length;
+
+      document.getElementById('aiProgName').value = prog.meta?.label || 'Mon programme';
+      document.getElementById('aiProgSummary').textContent =
+        `${dayCount} jour${dayCount > 1 ? 's' : ''} · ${exoCount} exercice${exoCount > 1 ? 's' : ''}`;
+
+      /* Accordéon */
+      const $acc = document.getElementById('aiAccordion');
+      $acc.innerHTML = '';
+      const sortedDays = Object.entries(prog.schedule || {})
+        .sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+
+      sortedDays.forEach(([day, sessKey]) => {
+        const sess = prog.sessions[sessKey];
+        if (!sess) return;
+
+        const item = document.createElement('div');
+        item.className = 'ai-accordion-item';
+        item.innerHTML = `
+          <div class="ai-accordion-item__header">
+            <div>
+              <span class="ai-day">${DAY_NAMES[parseInt(day)] || `Jour ${day}`}</span>
+              <div>${sess.name || sessKey}</div>
+            </div>
+            <svg class="ai-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+          <div class="ai-accordion-item__body">
+            <ul>
+              ${(sess.exercises || []).map(e =>
+                `<li>${e.name || '?'}<span>${e.scheme || ''}</span></li>`
+              ).join('')}
+              ${!sess.exercises?.length ? '<li style="color:var(--text-faint)">Aucun exercice</li>' : ''}
+            </ul>
+          </div>`;
+        item.querySelector('.ai-accordion-item__header').addEventListener('click', () => {
+          item.classList.toggle('is-open');
+        });
+        $acc.appendChild(item);
+      });
+
+      goToAiStep(5);
+    }
+
+    /* CTA "Modifier dans l'éditeur" */
+    document.getElementById('aiEditInEditor').addEventListener('click', () => {
+      const name = document.getElementById('aiProgName').value.trim();
+      if (name) aiGeneratedProgram.meta.label = name;
+      closeAiCoach();
+      App.openEditorWithProgram(aiGeneratedProgram);
+    });
+
+    /* CTA "Utiliser ce programme" */
+    document.getElementById('aiUseProgram').addEventListener('click', () => {
+      const name = document.getElementById('aiProgName').value.trim();
+      if (name) aiGeneratedProgram.meta.label = name;
+
+      const all = JSON.parse(localStorage.getItem('programs') || '[]');
+      all.push(aiGeneratedProgram);
+      localStorage.setItem('programs', JSON.stringify(all));
+      localStorage.setItem('activeProgram', aiGeneratedProgram.id);
+      localStorage.setItem('onboarded', 'true');
+
+      closeAiCoach();
+      if (typeof Today !== 'undefined') Today.refresh();
+      if (typeof Plan  !== 'undefined') Plan.refresh();
+      /* Navigation vers l'onglet Today */
+      document.querySelector('[data-tab="0"]')?.click();
+      App.showToast('Programme activé ✓');
+    });
+
+    /* ── SUIVANT ───────────────────────────────────────────────── */
+    $next.addEventListener('click', () => {
+      if (aiStep < 3) {
+        goToAiStep(aiStep + 1);
+      } else {
+        updateGenerateSummary();
+        goToAiStep(4);
+      }
+    });
+
+    /* ── Retour / Annuler ──────────────────────────────────────── */
+    $back.addEventListener('click', () => { if (aiStep > 0) goToAiStep(aiStep - 1); });
+    $cancel.addEventListener('click', closeAiCoach);
+
+    /* ── Open / Close ──────────────────────────────────────────── */
+    function openAiCoach() {
+      aiStep             = 0;
+      aiFormData         = {};
+      aiGeneratedProgram = null;
+      clearInterval(msgInterval);
+
+      /* Réinitialise sélections */
+      $overlay.querySelectorAll('.ai-option-card, .ai-chip')
+        .forEach(el => el.classList.remove('is-selected'));
+      document.getElementById('aiAntecedents').value = '';
+      document.getElementById('aiSpinner').classList.add('is-hidden');
+      document.getElementById('aiGenerate').classList.remove('is-hidden');
+      document.getElementById('aiError').classList.add('is-hidden');
+
+      $overlay.classList.remove('is-hidden');
+      goToAiStep(0);
+    }
+
+    function closeAiCoach() {
+      clearInterval(msgInterval);
+      $overlay.classList.add('is-hidden');
+      if (!localStorage.getItem('onboarded')) {
+        document.getElementById('overlayOnboarding').classList.remove('is-hidden');
+      }
+    }
+
+    return { open: openAiCoach };
+  })();
+  </script>
+
 </body>
 </html>
