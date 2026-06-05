@@ -439,9 +439,15 @@
       --border:          #2a2a2a;
       --border-active:   #d4a23c;
 
+      /* --- Fills vibrants (background des cercles, barres) --- */
+      --gold-fill:       var(--gold);
+      --rust-fill:       var(--rust);
+      --blue-fill:       var(--blue);
+
       /* --- Accent dynamique (surchargé par JS selon la séance) --- */
       --accent:          var(--gold);
       --accent-dim:      var(--gold-dim);
+      --accent-fill:     var(--gold-fill);
 
       /* --- Typographie --- */
       --font-display:    'Barlow Condensed', sans-serif;
@@ -491,14 +497,19 @@
       --text-dim:        #6b6560;
       --text-faint:      #b5aea5;
 
-      /* Accents légèrement assombris pour contraste sur fond clair */
-      --gold:            #a07010;
+      /* Accents texte — assombris pour contraste en lecture sur fond clair */
+      --gold:            #9a6b08;
       --gold-dim:        #c9a852;
       --rust:            #b54518;
       --blue:            #2e6fa8;
-      --green-done:      #1e6b3a;
+      --green-done:      #3a8a52;
       --red-timer:       #c02828;
       --red-danger:      #a01818;
+
+      /* Fills vibrants — tonalités claires du thème sombre, pour cercles/barres sur fond blanc */
+      --gold-fill:       #d4920c;
+      --rust-fill:       #c84018;
+      --blue-fill:       #4a88c8;
 
       /* Bordures */
       --border:          #ddd8d0;
@@ -650,6 +661,10 @@
       transition: background var(--duration-slow) var(--ease-out),
                   border-color var(--duration-slow) var(--ease-out);
     }
+    [data-theme="light"] .card--done {
+      background: color-mix(in srgb, var(--green-done) 28%, var(--bg-card));
+      border-color: color-mix(in srgb, var(--green-done) 45%, var(--border));
+    }
 
     /* ============================================================
        5. BOUTONS
@@ -694,10 +709,10 @@
 
     /* --- Primaire (fond doré) --- */
     .btn--primary {
-      background: var(--gold);
+      background: var(--gold-fill);
       color: #000;
     }
-    .btn--primary:not(.btn--done):hover { background: color-mix(in srgb, var(--gold) 88%, #fff); }
+    .btn--primary:not(.btn--done):hover { background: color-mix(in srgb, var(--gold-fill) 88%, #fff); }
 
     /* --- État "séance terminée" — transition douce depuis --primary --- */
     .btn--done {
@@ -839,10 +854,10 @@
       transform: scale(0.9);
     }
 
-    /* État coché — couleur d'accent (gold par défaut, rust pour bas du corps) */
+    /* État coché — fill vibrant (tonalité fill, lisible avec texte noir) */
     .set-circle--done {
-      background: var(--accent);
-      border-color: var(--accent);
+      background: var(--accent-fill);
+      border-color: var(--accent-fill);
       color: #000;
     }
 
@@ -879,7 +894,7 @@
 
     .progress-bar__fill {
       height: 100%;
-      background: var(--accent);
+      background: var(--accent-fill);
       border-radius: var(--radius-full);
       transition: width var(--duration-slow) var(--ease-out);
     }
@@ -1060,13 +1075,21 @@
       from { transform: translateY(100%); }
       to   { transform: translateY(0); }
     }
+    @keyframes slide-down {
+      from { transform: translateY(0); }
+      to   { transform: translateY(100%); }
+    }
 
     .anim-slide-up { animation: slide-up var(--duration-normal) var(--ease-out); }
 
-    /* Fade-in générique (backdrop, overlays plein écran) */
+    /* Fade-in / fade-out génériques (backdrop, overlays plein écran) */
     @keyframes fade-in {
       from { opacity: 0; }
       to   { opacity: 1; }
+    }
+    @keyframes fade-out {
+      from { opacity: 1; }
+      to   { opacity: 0; }
     }
 
     /* Respect prefers-reduced-motion */
@@ -1653,6 +1676,14 @@
       animation: fade-in var(--duration-normal) var(--ease-out);
     }
 
+    .modal-overlay.is-closing {
+      animation: fade-out var(--duration-normal) var(--ease-out) forwards;
+      pointer-events: none;
+    }
+    .modal-overlay.is-closing .modal-sheet {
+      animation: slide-down var(--duration-normal) var(--ease-out) forwards;
+    }
+
     .modal-sheet {
       background: var(--bg-elevated);
       border-radius: var(--radius-lg) var(--radius-lg) 0 0;
@@ -1768,8 +1799,11 @@
     #appToast {
       position: fixed;
       bottom: calc(var(--tab-height) + var(--safe-bottom) + 16px);
-      left: 50%;
-      transform: translateX(-50%);
+      left: 0;
+      right: 0;
+      width: fit-content;
+      max-width: calc(100vw - 32px);
+      margin: 0 auto;
       background: var(--bg-elevated);
       color: var(--text);
       border: 1px solid var(--border);
@@ -1781,7 +1815,14 @@
       z-index: 400;
       white-space: nowrap;
       pointer-events: none;
-      animation: fade-slide-up 200ms var(--ease-out);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 220ms var(--ease-out), transform 220ms var(--ease-out);
+    }
+
+    #appToast.toast--visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     /* ============================================================
@@ -2115,7 +2156,9 @@
       .anim-onboarding-logo,
       .anim-onboarding-ctas,
       .editor-step,
-      .modal-sheet { animation: none !important; transition: none !important; }
+      .modal-sheet,
+      .modal-overlay.is-closing,
+      .modal-overlay.is-closing .modal-sheet { animation: none !important; transition: none !important; }
     }
 
     /* ============================================================
@@ -2287,6 +2330,11 @@
     .exo-today--done {
       background: color-mix(in srgb, var(--green-done) 18%, var(--bg-card));
       border-color: color-mix(in srgb, var(--green-done) 40%, var(--border));
+    }
+
+    [data-theme="light"] .exo-today--done {
+      background: color-mix(in srgb, var(--green-done) 28%, var(--bg-card));
+      border-color: color-mix(in srgb, var(--green-done) 45%, var(--border));
     }
 
     .exo-today__header {
@@ -3322,7 +3370,8 @@
     const LS_ACTIVE   = 'activeProgram';
 
     const WEEK_ORDER  = [1,2,3,4,5,6,0]; // Lun → Dim
-    const ACCENT_VAR  = { gold:'--gold', rust:'--rust', blue:'--blue', gray:'--text-faint' };
+    const ACCENT_VAR      = { gold:'--gold',      rust:'--rust',      blue:'--blue',      gray:'--text-faint' };
+    const ACCENT_FILL_VAR = { gold:'--gold-fill', rust:'--rust-fill', blue:'--blue-fill', gray:'--text-faint' };
 
     let program  = null;
     let viewDay  = new Date().getDay();
@@ -3389,8 +3438,10 @@
 
     /* ── Accent CSS ──────────────────────────────────────── */
     function applyAccent(accent) {
-      const v = ACCENT_VAR[accent] || '--text-faint';
-      document.documentElement.style.setProperty('--accent', `var(${v})`);
+      const v  = ACCENT_VAR[accent]      || '--text-faint';
+      const vf = ACCENT_FILL_VAR[accent] || '--text-faint';
+      document.documentElement.style.setProperty('--accent',      `var(${v})`);
+      document.documentElement.style.setProperty('--accent-fill', `var(${vf})`);
     }
 
     /* ── RENDU PRINCIPAL ─────────────────────────────────── */
@@ -3870,14 +3921,16 @@
         date: logKey().replace('log:', ''), setsCompleted: done, totalSets: total,
         finishedAt: new Date().toISOString(),
         exercises: exos.map((exo, i) => {
+          const setsCompleted = (track[i] || []).filter(Boolean).length;
+          if (setsCompleted === 0) return null; // exercice non pratiqué → ne pas logguer
           const weight = resolveWeightForLog(exo, i);
           if (weight) localStorage.setItem(weightKey(exo.id), weight);
           return {
             id: exo.id, name: exo.name,
-            sets: (track[i] || []).filter(Boolean).length,
+            sets: setsCompleted,
             weight: weight || null
           };
-        })
+        }).filter(Boolean)
       };
       localStorage.setItem(logKey(), JSON.stringify(log));
     }
@@ -4017,7 +4070,8 @@
     /* ──────────────────────────────────────────────────────
        TOAST
     ────────────────────────────────────────────────────── */
-    let toastTimer = null;
+    let toastTimer  = null;
+    let toastHideTimer = null;
 
     function showToast(msg) {
       let $t = document.getElementById('appToast');
@@ -4027,9 +4081,22 @@
         document.body.appendChild($t);
       }
       $t.textContent = msg;
-      $t.style.display = 'block';
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => { $t.style.display = 'none'; }, 2600);
+      clearTimeout(toastHideTimer);
+
+      /* Affiche l'élément, retire la classe pour pouvoir la re-déclencher, reflow, puis entre */
+      $t.style.display = 'block';
+      $t.classList.remove('toast--visible');
+      void $t.offsetWidth; /* force reflow — déclenche la transition dès l'ajout de la classe */
+      $t.classList.add('toast--visible');
+
+      toastTimer = setTimeout(() => {
+        $t.classList.remove('toast--visible');
+        /* Cache l'élément après la fin de la transition de sortie */
+        toastHideTimer = setTimeout(() => {
+          if (!$t.classList.contains('toast--visible')) $t.style.display = 'none';
+        }, 230);
+      }, 2400);
     }
 
     /* ──────────────────────────────────────────────────────
@@ -4440,9 +4507,10 @@
         bE.addEventListener('click', () => openExerciseModal(exo.id));
 
         const bD = document.createElement('button');
-        bD.className = 'btn btn--ghost btn--sm';
+        bD.className = 'btn btn--secondary btn--sm';
         bD.style.color = 'var(--red-danger)';
-        bD.innerHTML = '&times;';
+        bD.style.borderColor = 'var(--red-danger)';
+        bD.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
         bD.addEventListener('click', () => {
           const s = readSessionForm();
           s.exercises.splice(i, 1);
@@ -4538,6 +4606,14 @@
     const $exoCue   = document.getElementById('exoCue');
     const $altList  = document.getElementById('altList');
 
+    function closeModal(el) {
+      el.classList.add('is-closing');
+      setTimeout(() => {
+        el.classList.remove('is-closing');
+        el.classList.add('is-hidden');
+      }, 250);
+    }
+
     function openExerciseModal(exoId) {
       editExoId = exoId;
       document.getElementById('exerciseModalTitle').textContent =
@@ -4578,7 +4654,7 @@
     });
 
     document.getElementById('btnCancelExercise').addEventListener('click', () => {
-      $modalExo.classList.add('is-hidden');
+      closeModal($modalExo);
     });
 
     document.getElementById('btnSaveExercise').addEventListener('click', () => {
@@ -4613,7 +4689,7 @@
       draft.sessions[sessKey].exercises = exos;
       persistDraft();
       renderExercises(exos);
-      $modalExo.classList.add('is-hidden');
+      closeModal($modalExo);
     });
 
     /* ──────────────────────────────────────────────────────
@@ -4921,7 +4997,7 @@
       const map = new Map();
       logs.forEach(log => {
         (log.exercises || []).forEach(exo => {
-          if (exo.id && exo.name && !map.has(exo.id)) {
+          if (exo.id && exo.name && (exo.sets || 0) > 0 && !map.has(exo.id)) {
             map.set(exo.id, exo.name);
           }
         });
@@ -4934,7 +5010,7 @@
       logs.forEach(log => {
         if (log.completed === false) return;
         const exo = (log.exercises || []).find(e => e.id === exoId);
-        if (!exo) return;
+        if (!exo || (exo.sets || 0) === 0) return;
         const w = parseWeight(exo.weight);
         if (w > 0) pts.push({ date: log.date, weight: w });
       });
