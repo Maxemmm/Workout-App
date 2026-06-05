@@ -3065,7 +3065,7 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
       </button>
       <span class="editor-header__step-label" id="aiStepLabel">Étape 1 / 4</span>
-      <button class="editor-header__cancel" id="aiCancel">Annuler</button>
+      <button class="editor-header__cancel" id="aiCancel" aria-label="Annuler">Annuler</button>
     </div>
 
     <!-- Corps : 6 vues -->
@@ -4472,6 +4472,7 @@
       draft = JSON.parse(JSON.stringify(program));
       if (!draft.id) draft.id = 'prog-' + Date.now();
       persistDraft();
+      localStorage.setItem(LS_ONBOARDED, 'true');
       prevDisplayStep = 1;
       $editor.classList.remove('is-hidden');
       goToEditorStep(1, false);
@@ -5993,6 +5994,11 @@
   const AiCoach = (function () {
     'use strict';
 
+    /* Clés localStorage — miroir des constantes App */
+    const LS_PROGRAMS  = 'programs';
+    const LS_ACTIVE    = 'activeProgram';
+    const LS_ONBOARDED = 'onboarded';
+
     /* Échappe les caractères HTML pour prévenir le XSS dans innerHTML */
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
       ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'": '&#39;' }[c])
@@ -6028,7 +6034,7 @@
 
       const isQuestionnaire = n <= 3;
       $stepLabel.textContent  = isQuestionnaire ? `Étape ${n + 1} / 4` : '';
-      $back.style.visibility  = n === 0 ? 'hidden' : 'visible';
+      $back.style.visibility  = (n === 0 || n >= 4) ? 'hidden' : 'visible';
       $footer.style.display   = isQuestionnaire ? 'block' : 'none';
       updateNextBtn();
       /* Scroll en haut de la vue */
@@ -6209,7 +6215,7 @@
     /* CTA "Modifier dans l'éditeur" */
     document.getElementById('aiEditInEditor').addEventListener('click', () => {
       const name = document.getElementById('aiProgName').value.trim();
-      if (name) aiGeneratedProgram.meta.label = name;
+      if (name && aiGeneratedProgram.meta) aiGeneratedProgram.meta.label = name;
       closeAiCoach();
       App.openEditorWithProgram(aiGeneratedProgram);
     });
@@ -6218,16 +6224,15 @@
     document.getElementById('aiUseProgram').addEventListener('click', function () {
       this.disabled = true;
       const name = document.getElementById('aiProgName').value.trim();
-      if (name) aiGeneratedProgram.meta.label = name;
+      if (name && aiGeneratedProgram.meta) aiGeneratedProgram.meta.label = name;
 
-      const all = JSON.parse(localStorage.getItem('programs') || '[]');
+      const all = JSON.parse(localStorage.getItem(LS_PROGRAMS) || '[]');
       all.push(aiGeneratedProgram);
-      localStorage.setItem('programs', JSON.stringify(all));
-      localStorage.setItem('activeProgram', aiGeneratedProgram.id);
-      localStorage.setItem('onboarded', 'true');
+      localStorage.setItem(LS_PROGRAMS, JSON.stringify(all));
+      localStorage.setItem(LS_ACTIVE, aiGeneratedProgram.id);
+      localStorage.setItem(LS_ONBOARDED, 'true');
 
       closeAiCoach();
-      if (typeof Today !== 'undefined') Today.refresh();
       if (typeof Plan  !== 'undefined') Plan.refresh();
       /* Navigation vers l'onglet Today */
       document.querySelector('[data-tab="0"]')?.click();
@@ -6271,7 +6276,7 @@
     function closeAiCoach() {
       clearInterval(msgInterval);
       $overlay.classList.add('is-hidden');
-      if (!localStorage.getItem('onboarded')) {
+      if (!localStorage.getItem(LS_ONBOARDED)) {
         document.getElementById('overlayOnboarding').classList.remove('is-hidden');
       }
     }
