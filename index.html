@@ -4170,6 +4170,16 @@
       }
     }
 
+    function openEditorWithProgram(program) {
+      loadDraft();
+      draft = JSON.parse(JSON.stringify(program));
+      if (!draft.id) draft.id = 'prog-' + Date.now();
+      persistDraft();
+      prevDisplayStep = 1;
+      $editor.classList.remove('is-hidden');
+      goToEditorStep(1, false);
+    }
+
     document.getElementById('editorCancel').addEventListener('click', () => closeEditor(true));
 
     document.getElementById('editorBack').addEventListener('click', () => {
@@ -4933,7 +4943,8 @@
     init();
 
     /* API publique (utilisée par d'autres modules) */
-    return { openEditor, openImport, showToast, getPrograms: () => programs,
+    return { openEditor, openEditorWithProgram, openImport, showToast,
+             getPrograms: () => programs,
              getActiveId: () => localStorage.getItem(LS_ACTIVE) };
   })();
   </script>
