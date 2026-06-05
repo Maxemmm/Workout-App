@@ -6084,7 +6084,7 @@
       const $progress = document.getElementById('aiProgress');
       $stepLabel.textContent   = isQuestionnaire ? `Étape ${n + 1} / 4` : '';
       $progress.style.visibility = isQuestionnaire ? 'visible' : 'hidden';
-      $back.style.visibility   = (n === 0 || n >= 4) ? 'hidden' : 'visible';
+      $back.style.visibility   = n >= 4 ? 'hidden' : 'visible';
       $footer.style.display    = isQuestionnaire ? 'block' : 'none';
 
       /* Mise à jour des dots (étapes 0-3) */
@@ -6327,7 +6327,7 @@
     });
 
     /* ── Retour / Annuler ──────────────────────────────────────── */
-    $back.addEventListener('click', () => { if (aiStep > 0) goToAiStep(aiStep - 1); });
+    $back.addEventListener('click', () => { aiStep > 0 ? goToAiStep(aiStep - 1) : closeAiCoach(); });
     $cancel.addEventListener('click', closeAiCoach);
 
     /* ── Open / Close ──────────────────────────────────────────── */
