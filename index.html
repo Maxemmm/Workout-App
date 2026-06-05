@@ -4171,7 +4171,6 @@
     }
 
     function openEditorWithProgram(program) {
-      loadDraft();
       draft = JSON.parse(JSON.stringify(program));
       if (!draft.id) draft.id = 'prog-' + Date.now();
       persistDraft();
