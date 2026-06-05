@@ -262,14 +262,26 @@ function validateRequest(body) {
   return errors;
 }
 
+// ─── CORS : restreint à l'origine configurée en production ────────────────
+// Définir ALLOWED_ORIGIN dans les variables d'environnement Vercel (ex: https://user.github.io).
+// Sans cette variable (développement local), l'origine de la requête est renvoyée telle quelle.
+function resolveCorsOrigin(reqOrigin) {
+  const allowed = process.env.ALLOWED_ORIGIN;
+  if (!allowed) return reqOrigin || '*'; // développement : permissif
+  return allowed === reqOrigin ? reqOrigin : null; // production : origin exacte uniquement
+}
+
 // ─── Handler principal (Node.js style) ─────────────────────────────────────
 export default async function handler(req, res) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  const reqOrigin  = req.headers['origin'] || '';
+  const corsOrigin = resolveCorsOrigin(reqOrigin);
 
   if (req.method === 'OPTIONS') {
+    if (!corsOrigin) return res.status(403).end();
+    res.setHeader('Access-Control-Allow-Origin', corsOrigin);
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Vary', 'Origin');
     return res.status(204).end();
   }
 
@@ -277,12 +289,29 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Méthode non autorisée' });
   }
 
-  // Lecture du stream brut — bypass le parser automatique de Vercel
+  // Rejet immédiat si l'origine n'est pas autorisée (requêtes navigateur)
+  if (process.env.ALLOWED_ORIGIN && reqOrigin && corsOrigin === null) {
+    return res.status(403).json({ error: 'Origine non autorisée' });
+  }
+
+  if (corsOrigin) {
+    res.setHeader('Access-Control-Allow-Origin', corsOrigin);
+    res.setHeader('Vary', 'Origin');
+  }
+
+  // Lecture du stream brut — limite 8 Ko (payload légitime < 1 Ko)
+  const MAX_BODY = 8 * 1024;
   let body;
   try {
     const raw = await new Promise((resolve, reject) => {
       let data = '';
-      req.on('data', chunk => { data += chunk.toString(); });
+      req.on('data', chunk => {
+        data += chunk.toString();
+        if (data.length > MAX_BODY) {
+          req.destroy();
+          reject(new Error('Payload trop volumineux'));
+        }
+      });
       req.on('end', () => resolve(data));
       req.on('error', reject);
     });
@@ -359,7 +388,9 @@ export default async function handler(req, res) {
     if (status === 401 || status === 403) {
       return res.status(500).json({ error: 'Clé API invalide ou accès refusé' });
     }
-    return res.status(502).json({ error: `Erreur API (${status})`, detail: errData?.error?.message ?? null });
+    // Détail d'erreur loggé côté serveur uniquement — jamais exposé au client
+    console.error(`[generate-program] Groq error ${status}:`, errData?.error?.message);
+    return res.status(502).json({ error: 'Service IA temporairement indisponible' });
   }
 
   // Extraction du texte généré (format OpenAI-compatible)
@@ -367,9 +398,9 @@ export default async function handler(req, res) {
   try {
     const data = await apiResponse.json();
     rawText = data?.choices?.[0]?.message?.content;
-    if (!rawText) throw new Error('Champ content absent dans la réponse');
-  } catch (err) {
-    return res.status(502).json({ error: 'Réponse API illisible', detail: err.message });
+    if (!rawText) throw new Error('Champ content absent');
+  } catch {
+    return res.status(502).json({ error: 'Réponse IA illisible. Réessaie.' });
   }
 
   // Validation stricte du JSON retourné avant envoi au frontend
@@ -378,7 +409,7 @@ export default async function handler(req, res) {
     program = validateProgramJSON(rawText);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      return res.status(422).json({ error: 'Programme généré invalide', detail: err.message });
+      return res.status(422).json({ error: 'Programme généré invalide. Réessaie.' });
     }
     return res.status(500).json({ error: 'Erreur interne lors de la validation du programme' });
   }
