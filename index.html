@@ -3600,6 +3600,13 @@
         ${t('plan_create_new')}`;
       btnNew.addEventListener('click', () => App.openEditor(null));
       body.appendChild(btnNew);
+
+      /* Bouton Créer avec l'IA */
+      const btnAi = mkEl('button', 'btn btn--secondary btn--full');
+      btnAi.style.marginTop = 'var(--space-xs)';
+      btnAi.textContent = '✨ CRÉER AVEC L\'IA';
+      btnAi.addEventListener('click', () => AiCoach.open());
+      body.appendChild(btnAi);
     }
 
     /* ── Actions programmes ───────────────────────────────── */
@@ -4415,6 +4422,11 @@
     document.getElementById('btnCreate').addEventListener('click', () => {
       $onboarding.classList.add('is-hidden');
       openEditor(null);
+    });
+
+    document.getElementById('btnCreateAi').addEventListener('click', () => {
+      $onboarding.classList.add('is-hidden');
+      AiCoach.open();
     });
 
     document.getElementById('btnImport').addEventListener('click', () => {
