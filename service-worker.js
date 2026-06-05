@@ -29,23 +29,41 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
-// Fetch : cache-first, réseau en fallback
+// Fetch : network-first pour index.html (reçoit les mises à jour immédiatement),
+//         cache-first pour les autres assets (manifest, icônes).
 self.addEventListener('fetch', (e) => {
-  // Ignorer les requêtes non-GET et les URLs externes
   if (e.request.method !== 'GET') return;
   if (!e.request.url.startsWith(self.location.origin)) return;
 
-  e.respondWith(
-    caches.match(e.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(e.request).then((response) => {
-        // Mettre en cache la réponse fraîche
-        if (response.ok) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
-        }
-        return response;
-      });
-    })
-  );
+  const url = new URL(e.request.url);
+  const isShell = url.pathname === '/' || url.pathname === '/index.html';
+
+  if (isShell) {
+    // Network-first : correctifs de sécurité reçus sans attendre un bump de CACHE_NAME
+    e.respondWith(
+      fetch(e.request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(e.request)) // fallback hors-ligne
+    );
+  } else {
+    // Cache-first pour les assets statiques (manifest, icônes)
+    e.respondWith(
+      caches.match(e.request).then((cached) => {
+        if (cached) return cached;
+        return fetch(e.request).then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
+          }
+          return response;
+        });
+      })
+    );
+  }
 });

@@ -4,6 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
+  <!-- Sécurité : Content-Security-Policy en défense en profondeur.
+       'unsafe-inline' requis car JS et CSS sont inline dans ce fichier.
+       connect-src 'none' garantit qu'aucune donnée ne quitte l'appareil. -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'none';
+    script-src  'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
+    style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
+    font-src    https://fonts.gstatic.com;
+    img-src     'self' data:;
+    connect-src 'none';
+    frame-src   'none';
+    object-src  'none';
+    base-uri    'self';
+    form-action 'none';
+  " />
+
   <!-- PWA / iOS standalone -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -4716,12 +4732,63 @@
       return errs;
     }
 
+    /* Borne et assainit les chaînes + valeurs numériques d'un programme.
+       Appelé après validateProgram pour garantir qu'aucune donnée surdimensionnée
+       n'atteint localStorage. */
+    function sanitizeProgram(data) {
+      const str = (s, max) => (typeof s === 'string' ? s.trim().slice(0, max) : s);
+      const int = (n, min, max, def) => {
+        const v = parseInt(n, 10);
+        return isNaN(v) ? def : Math.min(Math.max(v, min), max);
+      };
+
+      if (data.meta) {
+        data.meta.label          = str(data.meta.label, 100);
+        data.meta.restDefaultSec = int(data.meta.restDefaultSec, 10, 600, 90);
+        data.meta.repsInReserve  = str(data.meta.repsInReserve, 100);
+      }
+
+      Object.values(data.sessions || {}).forEach(sess => {
+        sess.name     = str(sess.name,     100);
+        sess.subtitle = str(sess.subtitle, 150);
+        sess.note     = str(sess.note,     500);
+        if (Array.isArray(sess.warmup)) {
+          sess.warmup = sess.warmup.slice(0, 20).map(w => str(w, 200));
+        }
+        if (sess.cardio) {
+          sess.cardio.label  = str(sess.cardio.label,  100);
+          sess.cardio.detail = str(sess.cardio.detail, 200);
+        }
+        if (Array.isArray(sess.tips)) {
+          sess.tips = sess.tips.slice(0, 20).map(tip => ({
+            ...tip,
+            title: str(tip.title, 100),
+            body:  str(tip.body,  300),
+          }));
+        }
+        (sess.exercises || []).forEach(exo => {
+          exo.name   = str(exo.name,   100);
+          exo.scheme = str(exo.scheme,  50);
+          exo.load   = str(exo.load,   100);
+          exo.cue    = str(exo.cue,    300);
+          exo.sets   = int(exo.sets,   1, 20, 1);
+          exo.restSec = int(exo.restSec, 0, 600, 90);
+          if (Array.isArray(exo.alternatives)) {
+            exo.alternatives = exo.alternatives.slice(0, 10).map(a => str(a, 100));
+          }
+        });
+      });
+
+      return data;
+    }
+
     function saveProgram() {
       /* Nettoie la session temporaire non commitée */
       delete draft.sessions['_tmp_'];
 
       const errs = validateProgram(draft);
       if (errs.length) { alert(t('editor_alert_prefix') + errs.join('\n')); return; }
+      sanitizeProgram(draft);
 
       if (!draft.id) draft.id = 'prog-' + Date.now();
 
@@ -4780,6 +4847,7 @@
 
       const errs = validateProgram(data);
       if (errs.length) { showImportError(errs.join('\n')); return; }
+      sanitizeProgram(data);
 
       if (!data.id) data.id = 'prog-' + Date.now();
 
@@ -4839,9 +4907,14 @@
       if (ins.length) ins[ins.length - 1].focus();
     }
 
-    /* Échappement HTML minimal */
+    /* Échappement HTML — couvre tous les contextes (texte et attributs) */
     function esc(str) {
-      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return String(str)
+        .replace(/&/g,  '&amp;')
+        .replace(/</g,  '&lt;')
+        .replace(/>/g,  '&gt;')
+        .replace(/"/g,  '&quot;')
+        .replace(/'/g,  '&#39;');
     }
 
     /* ──────────────────────────────────────────────────────
@@ -4953,16 +5026,27 @@
 
     /* ── Lecture des logs localStorage ───────────────────── */
     function getLogs() {
+      const cutoff = new Date();
+      cutoff.setFullYear(cutoff.getFullYear() - 1);
+      const cutoffStr = toDateStr(cutoff);
+
       const logs = [];
+      const staleKeys = [];
+
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
-        if (k && k.startsWith('log:')) {
-          try {
-            const v = JSON.parse(localStorage.getItem(k));
-            if (v && v.date) logs.push(v);
-          } catch {}
-        }
+        if (!k?.startsWith('log:')) continue;
+        try {
+          const v = JSON.parse(localStorage.getItem(k));
+          if (!v?.date) { staleKeys.push(k); continue; }
+          if (v.date >= cutoffStr) logs.push(v);
+          else staleKeys.push(k); // log > 12 mois
+        } catch { staleKeys.push(k); }
       }
+
+      // Purge silencieuse des logs trop anciens et des entrées corrompues
+      staleKeys.forEach(k => localStorage.removeItem(k));
+
       return repairLogWeights(logs.sort((a, b) => a.date.localeCompare(b.date)));
     }
 
