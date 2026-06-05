@@ -2552,6 +2552,176 @@
     }
     .no-program p { color: var(--text-faint); }
 
+    /* ═══════════════════════════════════════════════════════════
+       AI COACH — composants spécifiques
+    ═══════════════════════════════════════════════════════════ */
+
+    /* Vues */
+    .ai-step { display: flex; flex-direction: column; gap: var(--space-md); padding: var(--space-lg); }
+    .ai-step.is-hidden { display: none; }
+    .ai-step__title {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text);
+      margin: 0;
+    }
+    .ai-step__label {
+      font-size: .75rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin: 0;
+      display: block;
+    }
+    .ai-step__sub { color: var(--text-dim); font-size: .9rem; text-align: center; margin: 0; }
+    .ai-optional { color: var(--text-faint); font-size: .8rem; text-transform: none; letter-spacing: 0; }
+
+    /* Cards de sélection (objectif, matériel) */
+    .ai-options-grid { display: flex; flex-direction: column; gap: var(--space-sm); }
+    .ai-option-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: var(--space-md);
+      text-align: left;
+      color: var(--text);
+      font-size: .95rem;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+      min-height: 52px;
+      width: 100%;
+    }
+    .ai-option-card:active { transform: scale(.98); }
+    .ai-option-card.is-selected {
+      border-color: var(--gold);
+      background: var(--bg-card-soft);
+    }
+
+    /* Chips (fréquence, niveau) */
+    .ai-chips { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+    .ai-chip {
+      background: var(--bg-card-soft);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: .5rem 1.25rem;
+      color: var(--text);
+      font-size: .9rem;
+      cursor: pointer;
+      min-height: 44px;
+      transition: all .15s;
+    }
+    .ai-chip.is-selected {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #000;
+      font-weight: 700;
+    }
+
+    /* Textarea */
+    .ai-textarea {
+      background: var(--bg-card-soft);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: .95rem;
+      padding: var(--space-md);
+      min-height: 100px;
+      resize: vertical;
+      width: 100%;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    .ai-textarea:focus { outline: none; border-color: var(--border-active); }
+    .ai-privacy-note { font-size: .75rem; color: var(--text-faint); margin: 0; }
+
+    /* Génération */
+    .ai-generate-content {
+      display: flex; flex-direction: column;
+      align-items: center; gap: var(--space-lg);
+      padding: var(--space-xl) var(--space-lg);
+      width: 100%;
+    }
+    .ai-spinner { display: flex; flex-direction: column; align-items: center; gap: var(--space-md); }
+    .ai-spinner__ring {
+      width: 48px; height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: aiSpin .8s linear infinite;
+    }
+    @keyframes aiSpin { to { transform: rotate(360deg); } }
+    .ai-generating-msg { color: var(--text-dim); font-size: .9rem; text-align: center; }
+    .ai-error { display: flex; flex-direction: column; align-items: center; gap: var(--space-md); width: 100%; }
+    .ai-error p { color: var(--rust); text-align: center; margin: 0; }
+
+    /* Footer SUIVANT — positionné en bas, respecte safe areas iOS */
+    .editor-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: var(--space-md) var(--space-lg) calc(var(--space-md) + env(safe-area-inset-bottom, 0px));
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      z-index: 10;
+    }
+
+    /* Prévisualisation */
+    .ai-prog-name {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: .25rem 0;
+      width: 100%;
+    }
+    .ai-prog-name:focus { outline: none; border-bottom-color: var(--gold); }
+    .ai-prog-summary { color: var(--text-dim); font-size: .85rem; margin: 0; }
+
+    .ai-accordion { display: flex; flex-direction: column; gap: var(--space-sm); }
+    .ai-accordion-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .ai-accordion-item__header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: var(--space-md);
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .ai-accordion-item__header .ai-day {
+      display: block;
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--text-dim);
+      margin-bottom: .2rem;
+    }
+    .ai-accordion-item__header .ai-chevron { transition: transform .2s; color: var(--text-dim); flex-shrink: 0; }
+    .ai-accordion-item.is-open .ai-chevron { transform: rotate(180deg); }
+    .ai-accordion-item__body { display: none; padding: 0 var(--space-md) var(--space-md); }
+    .ai-accordion-item.is-open .ai-accordion-item__body { display: block; }
+    .ai-accordion-item__body ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: .4rem; }
+    .ai-accordion-item__body li { font-size: .875rem; color: var(--text-dim); display: flex; justify-content: space-between; }
+    .ai-accordion-item__body li span { color: var(--text-faint); font-size: .8rem; }
+
+    .ai-preview-ctas { display: flex; flex-direction: column; gap: var(--space-sm); padding-top: var(--space-md); }
+
+    /* Réduction des animations si préférence utilisateur */
+    @media (prefers-reduced-motion: reduce) {
+      .ai-spinner__ring { animation: none; }
+      .ai-option-card, .ai-chip { transition: none; }
+      .ai-accordion-item__header .ai-chevron { transition: none; }
+    }
+
   </style>
 </head>
 
