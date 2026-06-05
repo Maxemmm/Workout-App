@@ -2556,6 +2556,28 @@
        AI COACH — composants spécifiques
     ═══════════════════════════════════════════════════════════ */
 
+    /* Bouton IA — outline or avec étoile, distinct du btn--primary solide */
+    .btn--ai {
+      background: transparent;
+      border: 1.5px solid var(--gold);
+      color: var(--gold);
+      height: 52px;
+      border-radius: var(--radius-md);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      cursor: pointer;
+      transition: background var(--duration-fast) var(--ease-out);
+    }
+    .btn--ai:active { transform: scale(.97); }
+    [data-theme="light"] .btn--ai { background: rgba(212, 162, 60, .05); }
+
     /* Vues */
     .ai-step { display: flex; flex-direction: column; gap: var(--space-md); padding: var(--space-lg); }
     .ai-step.is-hidden { display: none; }
@@ -2843,7 +2865,10 @@
       </div>
       <div class="onboarding__ctas anim-onboarding-ctas">
         <button class="btn btn--primary btn--full" id="btnCreate" data-i18n="onboarding_create">CRÉER MON PROGRAMME</button>
-        <button class="btn btn--primary btn--full" id="btnCreateAi">CRÉER AVEC L'IA</button>
+        <button class="btn btn--ai btn--full" id="btnCreateAi">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2 14.4 9.6 22 12 14.4 14.4 12 22 9.6 14.4 2 12 9.6 9.6Z"/></svg>
+          CRÉER AVEC L'IA
+        </button>
         <button class="btn btn--secondary btn--full" id="btnImport" data-i18n="onboarding_import">Importer un programme (JSON)</button>
       </div>
     </div>
@@ -3625,9 +3650,9 @@
       body.appendChild(btnNew);
 
       /* Bouton Créer avec l'IA */
-      const btnAi = mkEl('button', 'btn btn--secondary btn--full');
+      const btnAi = mkEl('button', 'btn btn--ai btn--full');
       btnAi.style.marginTop = 'var(--space-xs)';
-      btnAi.textContent = 'CRÉER AVEC L\'IA';
+      btnAi.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2 14.4 9.6 22 12 14.4 14.4 12 22 9.6 14.4 2 12 9.6 9.6Z"/></svg> CRÉER AVEC L\'IA';
       btnAi.addEventListener('click', () => AiCoach.open());
       body.appendChild(btnAi);
     }
