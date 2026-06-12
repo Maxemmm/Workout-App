@@ -3128,17 +3128,69 @@
         </div>
       </div>
 
-      <!-- Vue 2 : Matériel (multi-select) -->
+      <!-- Vue 2 : Matériel (nouveau programme) OU Modifier un programme existant -->
       <div class="ai-step is-hidden" id="aiStep2">
-        <h2 class="editor-step__title">Matériel</h2>
-        <p class="editor-step__subtitle">Quel équipement avez-vous à disposition ? Sélection multiple.</p>
-        <div class="ai-options-grid">
-          <button class="ai-option-card" data-value="Haltères à la maison">Haltères à la maison</button>
-          <button class="ai-option-card" data-value="Salle de sport complète">Salle de sport complète</button>
-          <button class="ai-option-card" data-value="Machines guidées uniquement">Machines guidées uniquement</button>
-          <button class="ai-option-card" data-value="Élastiques / poids de corps">Élastiques / poids de corps</button>
-          <button class="ai-option-card" data-value="Cardio machines (vélo, tapis)">Cardio machines (vélo, tapis)</button>
+
+        <!-- Toggle mode -->
+        <div class="segmented" id="aiModeToggle" style="margin-bottom: var(--space-md);">
+          <button class="segmented__btn segmented__btn--active" data-value="create">Nouveau programme</button>
+          <button class="segmented__btn" data-value="modify">Modifier existant</button>
         </div>
+
+        <!-- Panel mode "create" : matériel -->
+        <div id="aiStep2Create">
+          <h2 class="editor-step__title">Matériel</h2>
+          <p class="editor-step__subtitle">Quel équipement avez-vous à disposition ? Sélection multiple.</p>
+          <div class="ai-options-grid">
+            <button class="ai-option-card" data-value="Haltères à la maison">Haltères à la maison</button>
+            <button class="ai-option-card" data-value="Salle de sport complète">Salle de sport complète</button>
+            <button class="ai-option-card" data-value="Machines guidées uniquement">Machines guidées uniquement</button>
+            <button class="ai-option-card" data-value="Élastiques / poids de corps">Élastiques / poids de corps</button>
+            <button class="ai-option-card" data-value="Cardio machines (vélo, tapis)">Cardio machines (vélo, tapis)</button>
+          </div>
+        </div>
+
+        <!-- Panel mode "modify" : programme existant + instructions -->
+        <div id="aiStep2Modify" class="is-hidden stack stack--lg">
+          <div>
+            <h2 class="editor-step__title">Modifier un programme</h2>
+            <p class="editor-step__subtitle">Décris ce que tu veux changer dans ton programme actuel.</p>
+          </div>
+          <!-- Sélecteur (masqué si 1 seul programme, ou si aucun) -->
+          <div class="input-wrapper" id="aiProgramSelectorWrapper">
+            <span class="input-label">Programme à modifier</span>
+            <select class="input" id="aiProgramSelector"></select>
+          </div>
+          <!-- Message "aucun programme" -->
+          <p id="aiNoProgramsMsg" class="is-hidden"
+            style="color:var(--text-dim);font-size:.85rem;text-align:center;padding:var(--space-md) 0;">
+            Aucun programme enregistré. Crée d'abord un programme.
+          </p>
+          <!-- Texte libre -->
+          <div class="input-wrapper">
+            <label class="input-label" for="aiModificationText">
+              Que veux-tu modifier ?
+            </label>
+            <textarea id="aiModificationText" class="ai-textarea" maxlength="500"
+              placeholder="Ex. Ajoute un 4e jour le jeudi axé jambes, remplace le gainage par du gainage dynamique…"></textarea>
+            <p style="color:var(--text-dim);font-size:.72rem;margin-top:var(--space-xs);">
+              <span id="aiModifCharCount">0</span> / 500 — minimum 10 caractères
+            </p>
+          </div>
+          <!-- Chips d'intention rapide (multi-select, optionnel) -->
+          <div class="editor-section">
+            <p class="editor-section__label">Intentions rapides <span class="ai-optional">(optionnel)</span></p>
+            <div class="ai-chips ai-chips--wrap" id="aiIntentChips">
+              <button class="ai-chip" data-value="Ajouter un jour">Ajouter un jour</button>
+              <button class="ai-chip" data-value="Supprimer un jour">Supprimer un jour</button>
+              <button class="ai-chip" data-value="Changer des exercices">Changer des exercices</button>
+              <button class="ai-chip" data-value="Modifier les charges">Modifier les charges</button>
+              <button class="ai-chip" data-value="Réduire la durée">Réduire la durée</button>
+              <button class="ai-chip" data-value="Plus de cardio">Plus de cardio</button>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- Vue 3 : Profil -->
@@ -3196,6 +3248,10 @@
         <input class="ai-prog-name" type="text" id="aiProgName" maxlength="100" />
         <p class="ai-prog-summary" id="aiProgSummary"></p>
         <div id="aiAccordion" class="ai-accordion"></div>
+        <div id="aiDiffPanel" class="ai-diff-panel is-hidden">
+          <p class="editor-section__label" style="margin-bottom:var(--space-sm);">MODIFICATIONS PROPOSÉES</p>
+          <div id="aiDiffList"></div>
+        </div>
         <div class="ai-preview-ctas">
           <button class="btn btn--secondary btn--full" id="aiEditInEditor">MODIFIER DANS L'ÉDITEUR</button>
           <button class="btn btn--primary btn--full" id="aiUseProgram">UTILISER CE PROGRAMME</button>
