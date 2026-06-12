@@ -6331,9 +6331,14 @@
 
     /* ── Vue 4 : Génération ────────────────────────────────────── */
     function updateGenerateSummary() {
-      const dureeLabel = { 30: '30 min', 45: '45 min', 60: '1h', 90: '1h30+' }[aiFormData.duree] || `${aiFormData.duree} min`;
-      document.getElementById('aiGenerateSummary').textContent =
-        `${aiFormData.objectif} · ${aiFormData.frequence} j/sem · ${dureeLabel} · ${aiFormData.niveau}`;
+      if (aiMode === 'modify' && aiBaseProgram) {
+        document.getElementById('aiGenerateSummary').textContent =
+          `Modification de "${aiBaseProgram.meta?.label || 'votre programme'}"`;
+      } else {
+        const dureeLabel = { 30: '30 min', 45: '45 min', 60: '1h', 90: '1h30+' }[aiFormData.duree] || `${aiFormData.duree} min`;
+        document.getElementById('aiGenerateSummary').textContent =
+          `${aiFormData.objectif} · ${aiFormData.frequence} j/sem · ${dureeLabel} · ${aiFormData.niveau}`;
+      }
     }
 
     async function doGenerate() {
@@ -6361,11 +6366,33 @@
       const poids  = poidsVal  ? parseInt(poidsVal, 10)  : null;
       const taille = tailleVal ? parseInt(tailleVal, 10) : null;
 
-      try {
-        const res = await fetch('/api/generate-program', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+      /* Sérialisation partielle : exclut warmup/tips/cues/alternatives */
+      function slimProgram(prog) {
+        const s = { meta: prog.meta, sessions: {}, schedule: prog.schedule };
+        for (const [k, sess] of Object.entries(prog.sessions || {})) {
+          s.sessions[k] = {
+            type: sess.type, name: sess.name, accent: sess.accent, subtitle: sess.subtitle,
+            exercises: (sess.exercises || []).map(e => ({
+              id: e.id, name: e.name, scheme: e.scheme,
+              sets: e.sets, load: e.load, restSec: e.restSec,
+            })),
+            cardio: sess.cardio ?? null,
+          };
+        }
+        return s;
+      }
+
+      const isModify = aiMode === 'modify';
+      const endpoint = isModify ? '/api/modify-program' : '/api/generate-program';
+      const payload  = isModify
+        ? {
+            existingProgram: slimProgram(aiBaseProgram),
+            modification:    aiModification.trim(),
+            intents:         aiIntents,
+            frequence:       aiFormData.frequence ?? null,
+            duree:           aiFormData.duree     ?? null,
+          }
+        : {
             objectif:  aiFormData.objectif,
             frequence: aiFormData.frequence,
             duree:     aiFormData.duree,
@@ -6374,7 +6401,13 @@
             poids,
             taille,
             antecedents,
-          }),
+          };
+
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
         });
         if (!res.ok) {
           let msg = 'Erreur inconnue';
@@ -6386,10 +6419,17 @@
         if (!json.program || typeof json.program !== 'object') {
           throw new Error('Réponse invalide du serveur');
         }
-        aiGeneratedProgram    = json.program;
-        aiGeneratedProgram.id = 'prog-' + Date.now();
+        aiGeneratedProgram = json.program;
+        /* En mode modify : conserver l'id existant pour remplacer en place */
+        aiGeneratedProgram.id = (isModify && aiBaseProgram?.id)
+          ? aiBaseProgram.id
+          : 'prog-' + Date.now();
         clearInterval(msgInterval);
-        showPreview();
+        if (isModify) {
+          showDiff();
+        } else {
+          showPreview();
+        }
 
       } catch (err) {
         clearInterval(msgInterval);
@@ -6403,6 +6443,51 @@
 
     document.getElementById('aiGenerate').addEventListener('click', doGenerate);
     document.getElementById('aiRetry').addEventListener('click', doGenerate);
+
+    /* Calcule le diff entre deux programmes (avant/après).
+       Retourne un tableau de { day, type, newSess, oldSess, exoDiffs }.
+       type : 'added' | 'removed' | 'modified' | 'unchanged' */
+    function computeDiff(oldProg, newProg) {
+      const oldSchedule = oldProg.schedule || {};
+      const newSchedule = newProg.schedule || {};
+      const allDays     = new Set([...Object.keys(oldSchedule), ...Object.keys(newSchedule)]);
+
+      return Array.from(allDays)
+        .sort((a, b) => parseInt(a) - parseInt(b))
+        .map(day => {
+          const oldKey  = oldSchedule[day];
+          const newKey  = newSchedule[day];
+          const oldSess = oldKey ? oldProg.sessions[oldKey] : null;
+          const newSess = newKey ? newProg.sessions[newKey] : null;
+
+          if (!oldKey && newKey) return { day, type: 'added',   newSess, oldSess: null, exoDiffs: [] };
+          if (oldKey && !newKey) return { day, type: 'removed', newSess: null, oldSess, exoDiffs: [] };
+
+          /* Même jour : comparer exercices par id */
+          const oldExos = oldSess?.exercises || [];
+          const newExos = newSess?.exercises || [];
+          const oldById = Object.fromEntries(oldExos.map(e => [e.id, e]));
+          const newIds  = new Set(newExos.map(e => e.id));
+
+          const exoDiffs = [];
+          newExos.forEach(e => {
+            if (!oldById[e.id]) {
+              exoDiffs.push({ sign: '+', name: e.name, scheme: e.scheme });
+            } else {
+              const old = oldById[e.id];
+              if (old.scheme !== e.scheme || old.sets !== e.sets || old.load !== e.load) {
+                exoDiffs.push({ sign: '~', name: e.name, scheme: e.scheme });
+              }
+            }
+          });
+          oldExos.forEach(e => {
+            if (!newIds.has(e.id)) exoDiffs.push({ sign: '−', name: e.name, scheme: '' });
+          });
+
+          const type = exoDiffs.length > 0 ? 'modified' : 'unchanged';
+          return { day, type, newSess, oldSess, exoDiffs };
+        });
+    }
 
     /* ── Vue 5 : Prévisualisation ──────────────────────────────── */
     function showPreview() {
@@ -6455,6 +6540,53 @@
       goToAiStep(5);
     }
 
+    /* Vue 5 en mode modify : diff avant/après ─────────────────── */
+    function showDiff() {
+      const prog = aiGeneratedProgram;
+
+      document.getElementById('aiProgName').value =
+        prog.meta?.label || aiBaseProgram?.meta?.label || 'Mon programme';
+
+      const diffs        = computeDiff(aiBaseProgram, prog);
+      const changesCount = diffs.filter(d => d.type !== 'unchanged').length;
+      document.getElementById('aiProgSummary').textContent =
+        `${changesCount} modification${changesCount > 1 ? 's' : ''} sur ${diffs.length} jour${diffs.length > 1 ? 's' : ''}`;
+
+      /* Basculer : masquer l'accordéon normal, afficher le diff */
+      document.getElementById('aiAccordion').classList.add('is-hidden');
+      const $diffPanel = document.getElementById('aiDiffPanel');
+      $diffPanel.classList.remove('is-hidden');
+
+      const BADGE = { added: 'Nouveau', removed: 'Supprimé', modified: 'Modifié', unchanged: 'Inchangé' };
+      const $list = document.getElementById('aiDiffList');
+      $list.innerHTML = '';
+
+      diffs.forEach(({ day, type, newSess, oldSess, exoDiffs }) => {
+        const sess    = newSess || oldSess;
+        const dayName = DAY_NAMES[parseInt(day)] || `Jour ${day}`;
+        const item    = document.createElement('div');
+        item.className = `ai-diff-item ai-diff-item--${type}`;
+
+        const exosHtml = exoDiffs.map(e =>
+          `<li data-sign="${esc(e.sign)}">${esc(e.name)}${e.scheme
+            ? ` <span style="color:var(--text-dim);font-size:.72rem">${esc(e.scheme)}</span>`
+            : ''}</li>`
+        ).join('');
+
+        item.innerHTML = `
+          <div class="ai-diff-item__header">
+            <span class="ai-diff-badge ai-diff-badge--${type}">${BADGE[type]}</span>
+            <span class="ai-diff-item__day">${esc(dayName)}</span>
+          </div>
+          <div class="ai-diff-item__name">${esc(sess?.name || '')}</div>
+          ${exosHtml ? `<ul class="ai-diff-item__exos">${exosHtml}</ul>` : ''}`;
+        $list.appendChild(item);
+      });
+
+      document.getElementById('aiUseProgram').textContent = 'APPLIQUER LES MODIFICATIONS';
+      goToAiStep(5);
+    }
+
     /* CTA "Modifier dans l'éditeur" */
     document.getElementById('aiEditInEditor').addEventListener('click', () => {
       const name = document.getElementById('aiProgName').value.trim();
@@ -6469,8 +6601,14 @@
       const name = document.getElementById('aiProgName').value.trim();
       if (name && aiGeneratedProgram.meta) aiGeneratedProgram.meta.label = name;
 
-      const all = JSON.parse(localStorage.getItem(LS_PROGRAMS) || '[]');
-      all.push(aiGeneratedProgram);
+      let all = JSON.parse(localStorage.getItem(LS_PROGRAMS) || '[]');
+      if (aiMode === 'modify' && aiBaseProgram) {
+        const idx = all.findIndex(p => p.id === aiBaseProgram.id);
+        if (idx >= 0) all[idx] = aiGeneratedProgram;
+        else all.push(aiGeneratedProgram);
+      } else {
+        all.push(aiGeneratedProgram);
+      }
       localStorage.setItem(LS_PROGRAMS, JSON.stringify(all));
       localStorage.setItem(LS_ACTIVE, aiGeneratedProgram.id);
       localStorage.setItem(LS_ONBOARDED, 'true');
