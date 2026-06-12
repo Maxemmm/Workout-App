@@ -62,6 +62,11 @@ function validateRequest(body) {
 
   if (!body.existingProgram || typeof body.existingProgram !== 'object' || Array.isArray(body.existingProgram)) {
     errors.push('"existingProgram" est requis (objet)');
+  } else {
+    const ep = body.existingProgram;
+    if (!ep.meta || !ep.sessions || !ep.schedule) {
+      errors.push('"existingProgram" doit avoir les champs "meta", "sessions" et "schedule"');
+    }
   }
 
   if (!body.modification || typeof body.modification !== 'string') {
