@@ -6158,10 +6158,14 @@
     );
 
     /* ── État ──────────────────────────────────────────────────── */
-    let aiStep           = 0;
-    let aiFormData       = {};
+    let aiStep             = 0;
+    let aiMode             = 'create'; // 'create' | 'modify'
+    let aiBaseProgram      = null;     // programme source en mode modify
+    let aiFormData         = {};
+    let aiModification     = '';       // texte libre (mode modify)
+    let aiIntents          = [];       // chips d'intention sélectionnées (mode modify)
     let aiGeneratedProgram = null;
-    let msgInterval      = null;
+    let msgInterval        = null;
 
     const MSGS = [
       'Analyse de ton profil…',
@@ -6185,20 +6189,26 @@
       $steps.forEach((s, i) => s.classList.toggle('is-hidden', i !== n));
       aiStep = n;
 
-      const isQuestionnaire = n <= 3;
+      const totalSteps      = aiMode === 'modify' ? 3 : 4;
+      const isQuestionnaire = n <= (aiMode === 'modify' ? 2 : 3);
       const $progress = document.getElementById('aiProgress');
-      $stepLabel.textContent   = isQuestionnaire ? `Étape ${n + 1} / 4` : '';
+      $stepLabel.textContent     = isQuestionnaire ? `Étape ${n + 1} / ${totalSteps}` : '';
       $progress.style.visibility = isQuestionnaire ? 'visible' : 'hidden';
-      $back.style.visibility   = n >= 4 ? 'hidden' : 'visible';
-      $footer.style.display    = isQuestionnaire ? 'block' : 'none';
+      $back.style.visibility     = n >= 4 ? 'hidden' : 'visible';
+      $footer.style.display      = isQuestionnaire ? 'block' : 'none';
 
-      /* Mise à jour des dots (étapes 0-3) */
+      /* Dots : 3 en modify mode, 4 en create mode */
+      const activeDots = aiMode === 'modify' ? 3 : 4;
       const dots = Array.from(document.querySelectorAll('#aiDots .editor-dot'));
       dots.forEach((dot, i) => {
+        dot.style.display = i < activeDots ? '' : 'none';
         dot.classList.toggle('editor-dot--active', i === n);
         dot.classList.toggle('editor-dot--done',   i < n);
-        if (i > n) { dot.classList.remove('editor-dot--active', 'editor-dot--done'); }
+        if (i > n) dot.classList.remove('editor-dot--active', 'editor-dot--done');
       });
+
+      /* En mode modify, peupler le sélecteur de programme à l'arrivée en step 2 */
+      if (n === 2 && aiMode === 'modify') populateProgramSelector();
 
       updateNextBtn();
       document.getElementById('aiBody').scrollTop = 0;
@@ -6206,9 +6216,19 @@
 
     function updateNextBtn() {
       let valid = false;
-      if (aiStep === 0) valid = !!aiFormData.objectif;
-      if (aiStep === 1) valid = !!aiFormData.frequence && !!aiFormData.duree;
-      if (aiStep === 2) valid = !!(aiFormData.materiel?.length > 0);
+      if (aiStep === 0) {
+        /* En mode modify : objectif optionnel (non envoyé à l'API modify) */
+        valid = aiMode === 'modify' ? true : !!aiFormData.objectif;
+      }
+      if (aiStep === 1) {
+        /* En mode modify : fréquence/durée optionnelles (contexte supplémentaire) */
+        valid = aiMode === 'modify' ? true : (!!aiFormData.frequence && !!aiFormData.duree);
+      }
+      if (aiStep === 2) {
+        valid = aiMode === 'create'
+          ? !!(aiFormData.materiel?.length > 0)
+          : !!(aiBaseProgram && aiModification.trim().length >= 10);
+      }
       if (aiStep === 3) valid = !!aiFormData.niveau;
       $next.disabled = !valid;
     }
@@ -6255,6 +6275,47 @@
         ).map(c => c.dataset.value);
         updateNextBtn();
       });
+    });
+
+    /* ── Vue 2 : Toggle mode create / modify ────────────────────── */
+    document.querySelectorAll('#aiModeToggle .segmented__btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#aiModeToggle .segmented__btn')
+          .forEach(b => b.classList.remove('segmented__btn--active'));
+        btn.classList.add('segmented__btn--active');
+        aiMode = btn.dataset.value;
+        document.getElementById('aiStep2Create').classList.toggle('is-hidden', aiMode === 'modify');
+        document.getElementById('aiStep2Modify').classList.toggle('is-hidden', aiMode === 'create');
+        if (aiMode === 'modify') populateProgramSelector();
+        updateNextBtn();
+      });
+    });
+
+    /* ── Vue 2 : Texte de modification ──────────────────────────── */
+    document.getElementById('aiModificationText').addEventListener('input', function () {
+      aiModification = this.value;
+      const len     = this.value.length;
+      const counter = document.getElementById('aiModifCharCount');
+      counter.textContent = len;
+      counter.className   = len >= 10 ? 'is-valid' : (len > 0 ? 'is-error' : '');
+      updateNextBtn();
+    });
+
+    /* ── Vue 2 : Chips d'intention (multi-select) ───────────────── */
+    document.querySelectorAll('#aiIntentChips .ai-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('is-selected');
+        aiIntents = Array.from(
+          document.querySelectorAll('#aiIntentChips .ai-chip.is-selected')
+        ).map(c => c.dataset.value);
+      });
+    });
+
+    /* ── Vue 2 : Sélecteur de programme ─────────────────────────── */
+    document.getElementById('aiProgramSelector').addEventListener('change', function () {
+      const progs = JSON.parse(localStorage.getItem(LS_PROGRAMS) || '[]');
+      aiBaseProgram = progs.find(p => p.id === this.value) || null;
+      updateNextBtn();
     });
 
     /* ── Vue 3 : Niveau (segmented control) ────────────────────── */
@@ -6423,7 +6484,11 @@
 
     /* ── SUIVANT ───────────────────────────────────────────────── */
     $next.addEventListener('click', () => {
-      if (aiStep < 3) {
+      if (aiMode === 'modify' && aiStep === 2) {
+        /* Mode modify : sauter l'étape profil (3), aller directement à la génération */
+        updateGenerateSummary();
+        goToAiStep(4);
+      } else if (aiStep < 3) {
         goToAiStep(aiStep + 1);
       } else {
         updateGenerateSummary();
@@ -6436,6 +6501,43 @@
     $cancel.addEventListener('click', closeAiCoach);
 
     /* ── Open / Close ──────────────────────────────────────────── */
+    /* Peuple le sélecteur de programmes (mode modify).
+       Masque le sélecteur s'il n'y a qu'un seul programme ou aucun. */
+    function populateProgramSelector() {
+      const progs = JSON.parse(localStorage.getItem(LS_PROGRAMS) || '[]');
+      const $sel  = document.getElementById('aiProgramSelector');
+      const $wrap = document.getElementById('aiProgramSelectorWrapper');
+      const $none = document.getElementById('aiNoProgramsMsg');
+
+      $sel.innerHTML = '';
+
+      if (progs.length === 0) {
+        $wrap.style.display = 'none';
+        $none.classList.remove('is-hidden');
+        aiBaseProgram = null;
+        updateNextBtn();
+        return;
+      }
+
+      $none.classList.add('is-hidden');
+      /* Masquer le sélecteur si 1 seul programme (pas de choix à faire) */
+      $wrap.style.display = progs.length > 1 ? '' : 'none';
+
+      progs.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value       = p.id;
+        opt.textContent = p.meta?.label || 'Programme';
+        $sel.appendChild(opt);
+      });
+
+      /* Priorité : programme pré-sélectionné par openAiCoachModify → programme actif → premier */
+      const targetId = aiBaseProgram?.id || localStorage.getItem(LS_ACTIVE);
+      if (targetId && progs.find(p => p.id === targetId)) $sel.value = targetId;
+
+      aiBaseProgram = progs.find(p => p.id === $sel.value) || progs[0] || null;
+      updateNextBtn();
+    }
+
     function openAiCoach() {
       aiStep             = 0;
       aiFormData         = {};
@@ -6448,15 +6550,54 @@
       $overlay.querySelectorAll('#aiNiveauSegmented .segmented__btn')
         .forEach(b => b.classList.remove('segmented__btn--active'));
       document.getElementById('aiAntecedents').value = '';
-      document.getElementById('aiPoids').value = '';
+      document.getElementById('aiPoids').value  = '';
       document.getElementById('aiTaille').value = '';
       document.getElementById('aiSpinner').classList.add('is-hidden');
       document.getElementById('aiGenerate').classList.remove('is-hidden');
       document.getElementById('aiError').classList.add('is-hidden');
-      document.getElementById('aiUseProgram').disabled = false;
+      document.getElementById('aiUseProgram').disabled  = false;
+      document.getElementById('aiUseProgram').textContent = 'UTILISER CE PROGRAMME';
+
+      /* Réinitialise le mode modify */
+      aiMode         = 'create';
+      aiBaseProgram  = null;
+      aiModification = '';
+      aiIntents      = [];
+      document.getElementById('aiModificationText').value = '';
+      const counter = document.getElementById('aiModifCharCount');
+      counter.textContent = '0';
+      counter.className   = '';
+      /* Remettre toggle sur "Nouveau programme" */
+      document.querySelectorAll('#aiModeToggle .segmented__btn').forEach((b, i) => {
+        b.classList.toggle('segmented__btn--active', i === 0);
+      });
+      document.getElementById('aiStep2Create').classList.remove('is-hidden');
+      document.getElementById('aiStep2Modify').classList.add('is-hidden');
+
+      /* Réinitialise le diff panel */
+      document.getElementById('aiAccordion').classList.remove('is-hidden');
+      document.getElementById('aiDiffPanel').classList.add('is-hidden');
+      document.getElementById('aiDiffList').innerHTML = '';
 
       $overlay.classList.remove('is-hidden');
       goToAiStep(0);
+    }
+
+    /* Point d'entrée depuis les cartes programme (Plan tab).
+       Ouvre l'overlay en mode modify avec le programme pré-sélectionné,
+       directement à l'étape 1 (disponibilités optionnelles). */
+    function openAiCoachModify(program) {
+      openAiCoach();              // reset complet (aiMode = 'create')
+      aiMode        = 'modify';
+      aiBaseProgram = program;
+      /* Pré-activer visuellement le toggle "Modifier existant" */
+      document.querySelectorAll('#aiModeToggle .segmented__btn').forEach(b => {
+        b.classList.toggle('segmented__btn--active', b.dataset.value === 'modify');
+      });
+      document.getElementById('aiStep2Create').classList.add('is-hidden');
+      document.getElementById('aiStep2Modify').classList.remove('is-hidden');
+      /* Démarrer à l'étape 1 — l'utilisateur clique Suivant pour arriver à l'étape 2 */
+      goToAiStep(1);
     }
 
     function closeAiCoach() {
@@ -6467,7 +6608,7 @@
       }
     }
 
-    return { open: openAiCoach };
+    return { open: openAiCoach, openModify: openAiCoachModify };
   })();
   </script>
 
