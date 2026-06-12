@@ -6497,7 +6497,15 @@
     });
 
     /* ── Retour / Annuler ──────────────────────────────────────── */
-    $back.addEventListener('click', () => { aiStep > 0 ? goToAiStep(aiStep - 1) : closeAiCoach(); });
+    $back.addEventListener('click', () => {
+      if (aiStep > 0) {
+        /* En modify mode, depuis la génération (step 4) on revient au step 2 (pas au profil) */
+        const prev = (aiMode === 'modify' && aiStep === 4) ? 2 : aiStep - 1;
+        goToAiStep(prev);
+      } else {
+        closeAiCoach();
+      }
+    });
     $cancel.addEventListener('click', closeAiCoach);
 
     /* ── Open / Close ──────────────────────────────────────────── */
