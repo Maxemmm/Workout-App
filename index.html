@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
 
   <!-- Sécurité : Content-Security-Policy en défense en profondeur.
        'unsafe-inline' requis car JS et CSS sont inline dans ce fichier.
@@ -58,7 +58,19 @@
         today_session_saved: '✓ SÉANCE ENREGISTRÉE',
         today_session_saved_toast: 'Séance enregistrée ✓',
         today_weight: 'Poids',
-        timer_rest: 'REPOS', timer_done: 'TERMINÉ',
+        timer_rest: 'REPOS', timer_work: 'SÉRIE', timer_done: 'TERMINÉ',
+        timer_notif_title: 'Minuteur',
+        timer_notif_rest: 'Repos terminé — prêt pour la série suivante.',
+        timer_notif_work: 'Série terminée.',
+        profile_timer_section: 'Minuteur',
+        profile_timer_alerts: 'Alertes de fin de repos',
+        profile_timer_alerts_on: 'Son, vibration et notifications',
+        profile_timer_alerts_off: 'Appuyer pour activer les notifications',
+        profile_timer_alerts_denied: 'Refusées — autoriser dans Réglages du téléphone',
+        profile_wakelock: 'Écran actif pendant le repos',
+        profile_wakelock_on: 'La mise en veille est bloquée pendant le minuteur',
+        profile_wakelock_off: 'Désactivé',
+        profile_timer_toast_on: 'Alertes activées ✓',
 
         plan_title: 'PLAN', plan_this_week: 'Cette semaine', plan_my_programs: 'Mes programmes',
         plan_no_active: 'Aucun programme actif.', plan_create_program: 'CRÉER MON PROGRAMME',
@@ -74,13 +86,14 @@
 
         editor_step: 'Étape', editor_step_of: '/',
         editor_no_sessions: 'Aucune séance — créez-en une ci-dessous.',
-        session_type_lift: 'Musculation', session_type_cardio: 'Cardio',
-        session_type_rest: 'Repos', session_type_mixed: 'Mixte', session_type_unknown: 'Inconnu',
-        session_type_mixed_opt: 'Mixte (musculation + cardio)', session_type_rest_opt: 'Repos / récupération',
+        session_type_lift: 'Muscu', session_type_cardio: 'Cardio',
+        session_type_rest: 'Repos', session_type_mixed: 'Mixte', session_type_stretch: 'Étirement',
+        session_type_unknown: 'Inconnu',
+        session_type_mixed_opt: 'Mixte', session_type_stretch_opt: 'Étirement',
         editor_no_name: 'Sans nom',
         editor_edit_session: 'Modifier la séance', editor_new_session: 'Nouvelle séance',
         editor_edit_short: 'Édit.',
-        editor_warmup_ph: 'Ex. Vélo 5 min', editor_alt_ph: 'Ex. Développé haltères',
+        editor_warmup_ph: 'EX: Vélo 5 min', editor_alt_ph: 'EX: Développé haltères',
         editor_edit_exo: "Modifier l'exercice", editor_new_exo: 'Nouvel exercice',
         editor_tip_title_ph: 'Titre', editor_tip_body_ph: 'Contenu',
         editor_err_name: 'Le nom du programme est requis.',
@@ -91,7 +104,7 @@
         editor_import_err: 'JSON invalide — vérifiez la syntaxe.',
 
         stats_title: 'STATS',
-        stats_streak: 'Jours de suite', stats_week_vol: 'Volume semaine',
+        stats_streak: 'Jours de suite', stats_streak_one: 'Jour de suite', stats_week_vol: 'Volume semaine',
         stats_last_session: 'Dernière séance',
         stats_progress_title: 'Progression par exercice',
         stats_no_data: 'Aucune donnée. Enregistre ta première séance pour voir ta progression ici.',
@@ -136,13 +149,14 @@
         editor_step1_title: 'Votre programme',
         editor_step1_sub: 'Donnez un nom à votre programme.',
         editor_prog_name_label: 'Nom du programme',
-        editor_prog_name_ph: 'Ex. Programme Salle',
+        editor_prog_name_ph: 'EX: Programme Salle',
         editor_prog_units_label: 'Unité de poids',
         step_next: 'SUIVANT',
 
         /* Éditeur — étape 2 */
         editor_step2_title: 'Séances',
         editor_step2_sub: 'Créez les séances de votre programme.',
+        editor_step2_sub_named: 'Créez les séances de votre programme : %s',
         editor_add_session_btn: 'CRÉER UNE SÉANCE',
         editor_configure_planning: 'CONFIGURER LE PLANNING',
 
@@ -153,17 +167,16 @@
 
         /* Éditeur — étape 4 */
         editor_sess_name_label: 'Nom de la séance',
-        editor_sess_name_ph: 'Ex. FULL BODY',
+        editor_sess_name_ph: 'EX: FULL BODY',
         editor_sess_type_label: 'Type',
         editor_sess_subtitle_label: 'Sous-titre (optionnel)',
-        editor_sess_subtitle_ph: 'Ex. PECS · DOS · BRAS',
-        editor_sess_accent_label: 'Couleur accent',
+        editor_sess_subtitle_ph: 'EX: PECS · DOS · BRAS',
         editor_warmup_section: 'Échauffement',
         editor_exercises_section: 'Exercices',
         editor_cardio_section: 'Cardio de fin (optionnel)',
         editor_tips_section: 'Conseils',
-        editor_cardio_label_ph: 'Ex. Marche inclinée',
-        editor_cardio_detail_ph: 'Ex. 15 min — inclinaison 5%',
+        editor_cardio_label_ph: 'EX: Marche inclinée',
+        editor_cardio_detail_ph: 'EX: 15 min — inclinaison 5%',
         editor_add_warmup: 'Ajouter une note',
         editor_add_exercise: 'AJOUTER UN EXERCICE',
         editor_add_tip: 'Ajouter un conseil',
@@ -171,16 +184,17 @@
 
         /* Modal exercice */
         exo_name_label: "Nom de l'exercice",
-        exo_name_ph: 'Ex. Presse à cuisses',
+        exo_name_ph: 'EX: Presse à cuisses',
         exo_sets_label: 'Séries',
-        exo_scheme_label: 'Schéma reps',
-        exo_scheme_ph: 'Ex. 8, 8-12, MAX, 45 sec',
-        exo_load_label: 'Charge suggérée',
-        exo_load_ph: 'Ex. 100 à 120 kg',
+        exo_scheme_label: 'Répétitions',
+        exo_scheme_ph: 'EX: 8, 8-12, MAX, 45 sec',
+        exo_load_label_fmt: 'Poids (%s)',
+        exo_load_ph: '',
         exo_rest_label: 'Repos (sec)',
         exo_cue_label: 'Consigne (optionnel)',
-        exo_cue_ph: 'Ex. Contrôler la descente 3 sec',
+        exo_cue_ph: 'EX: Contrôler la descente 3 sec',
         exo_alt_label: 'Alternatives (optionnel)',
+        exo_alt_name_ph: 'EX: Nom de l\'alternative',
         exo_add_alt: 'Ajouter une alternative',
         exo_save: "ENREGISTRER L'EXERCICE",
         exo_cancel: 'Annuler',
@@ -223,7 +237,19 @@
         today_session_saved: '✓ SESSION SAVED',
         today_session_saved_toast: 'Session saved ✓',
         today_weight: 'Weight',
-        timer_rest: 'REST', timer_done: 'DONE',
+        timer_rest: 'REST', timer_work: 'SET', timer_done: 'DONE',
+        timer_notif_title: 'Timer',
+        timer_notif_rest: 'Rest over — ready for the next set.',
+        timer_notif_work: 'Set complete.',
+        profile_timer_section: 'Timer',
+        profile_timer_alerts: 'Rest timer alerts',
+        profile_timer_alerts_on: 'Sound, vibration and notifications',
+        profile_timer_alerts_off: 'Tap to enable notifications',
+        profile_timer_alerts_denied: 'Denied — allow in phone Settings',
+        profile_wakelock: 'Keep screen on during rest',
+        profile_wakelock_on: 'Screen stays awake while the timer runs',
+        profile_wakelock_off: 'Disabled',
+        profile_timer_toast_on: 'Alerts enabled ✓',
 
         plan_title: 'PLAN', plan_this_week: 'This week', plan_my_programs: 'My programs',
         plan_no_active: 'No active program.', plan_create_program: 'CREATE MY PROGRAM',
@@ -240,12 +266,13 @@
         editor_step: 'Step', editor_step_of: '/',
         editor_no_sessions: 'No sessions — create one below.',
         session_type_lift: 'Strength', session_type_cardio: 'Cardio',
-        session_type_rest: 'Rest', session_type_mixed: 'Mixed', session_type_unknown: 'Unknown',
-        session_type_mixed_opt: 'Mixed (strength + cardio)', session_type_rest_opt: 'Rest / recovery',
+        session_type_rest: 'Rest', session_type_mixed: 'Mixed', session_type_stretch: 'Stretch',
+        session_type_unknown: 'Unknown',
+        session_type_mixed_opt: 'Mixed', session_type_stretch_opt: 'Stretch',
         editor_no_name: 'Untitled',
         editor_edit_session: 'Edit session', editor_new_session: 'New session',
         editor_edit_short: 'Edit',
-        editor_warmup_ph: 'E.g. Bike 5 min', editor_alt_ph: 'E.g. Dumbbell press',
+        editor_warmup_ph: 'EX: Bike 5 min', editor_alt_ph: 'EX: Dumbbell press',
         editor_edit_exo: 'Edit exercise', editor_new_exo: 'New exercise',
         editor_tip_title_ph: 'Title', editor_tip_body_ph: 'Content',
         editor_err_name: 'Program name is required.',
@@ -256,7 +283,7 @@
         editor_import_err: 'Invalid JSON — check the syntax.',
 
         stats_title: 'STATS',
-        stats_streak: 'Day streak', stats_week_vol: 'Week volume',
+        stats_streak: 'Day streak', stats_streak_one: 'Day streak', stats_week_vol: 'Week volume',
         stats_last_session: 'Last session',
         stats_progress_title: 'Progress by exercise',
         stats_no_data: 'No data yet. Log your first session to see your progress here.',
@@ -301,13 +328,14 @@
         editor_step1_title: 'Your program',
         editor_step1_sub: 'Give your program a name.',
         editor_prog_name_label: 'Program name',
-        editor_prog_name_ph: 'E.g. Gym Program',
+        editor_prog_name_ph: 'EX: Gym Program',
         editor_prog_units_label: 'Weight unit',
         step_next: 'NEXT',
 
         /* Editor — step 2 */
         editor_step2_title: 'Sessions',
         editor_step2_sub: 'Create your program sessions.',
+        editor_step2_sub_named: 'Create your program sessions: %s',
         editor_add_session_btn: 'CREATE A SESSION',
         editor_configure_planning: 'CONFIGURE SCHEDULE',
 
@@ -318,17 +346,16 @@
 
         /* Editor — step 4 */
         editor_sess_name_label: 'Session name',
-        editor_sess_name_ph: 'E.g. FULL BODY',
+        editor_sess_name_ph: 'EX: FULL BODY',
         editor_sess_type_label: 'Type',
         editor_sess_subtitle_label: 'Subtitle (optional)',
-        editor_sess_subtitle_ph: 'E.g. CHEST · BACK · ARMS',
-        editor_sess_accent_label: 'Accent color',
+        editor_sess_subtitle_ph: 'EX: CHEST · BACK · ARMS',
         editor_warmup_section: 'Warm-up',
         editor_exercises_section: 'Exercises',
         editor_cardio_section: 'End cardio (optional)',
         editor_tips_section: 'Tips',
-        editor_cardio_label_ph: 'E.g. Incline walk',
-        editor_cardio_detail_ph: 'E.g. 15 min — 5% incline',
+        editor_cardio_label_ph: 'EX: Incline walk',
+        editor_cardio_detail_ph: 'EX: 15 min — 5% incline',
         editor_add_warmup: 'Add a note',
         editor_add_exercise: 'ADD AN EXERCISE',
         editor_add_tip: 'Add a tip',
@@ -336,16 +363,17 @@
 
         /* Exercise modal */
         exo_name_label: 'Exercise name',
-        exo_name_ph: 'E.g. Leg press',
+        exo_name_ph: 'EX: Leg press',
         exo_sets_label: 'Sets',
-        exo_scheme_label: 'Rep scheme',
-        exo_scheme_ph: 'E.g. 8, 8-12, MAX, 45 sec',
-        exo_load_label: 'Suggested load',
-        exo_load_ph: 'E.g. 100 to 120 kg',
+        exo_scheme_label: 'Reps',
+        exo_scheme_ph: 'EX: 8, 8-12, MAX, 45 sec',
+        exo_load_label_fmt: 'Weight (%s)',
+        exo_load_ph: '',
         exo_rest_label: 'Rest (sec)',
         exo_cue_label: 'Cue (optional)',
-        exo_cue_ph: 'E.g. Control the descent 3 sec',
+        exo_cue_ph: 'EX: Control the descent 3 sec',
         exo_alt_label: 'Alternatives (optional)',
+        exo_alt_name_ph: 'EX: Alternative name',
         exo_add_alt: 'Add an alternative',
         exo_save: 'SAVE EXERCISE',
         exo_cancel: 'Cancel',
@@ -561,6 +589,8 @@
       -webkit-text-size-adjust: 100%;
       background: var(--bg);
       height: 100%;
+      /* Désactive le zoom au double-tap sur iOS */
+      touch-action: manipulation;
     }
 
     body {
@@ -576,6 +606,7 @@
       position: relative;
       /* Empêche le rebond de scroll sur iOS */
       overscroll-behavior: none;
+      touch-action: manipulation;
     }
 
     /* Supprime les styles par défaut des listes */
@@ -792,7 +823,8 @@
       border-radius: var(--radius-md);
       color: var(--text);
       font-family: var(--font-ui);
-      font-size: 15px;
+      /* ≥ 16px : évite le zoom automatique iOS au focus */
+      font-size: 16px;
       height: 48px;
       padding: 0 var(--space-md);
       transition: border-color var(--duration-fast) var(--ease-out);
@@ -821,7 +853,7 @@
       border-radius: var(--radius-md);
       color: var(--text);
       font-family: var(--font-ui);
-      font-size: 15px;
+      font-size: 16px;
       height: 48px;
       padding: 0 var(--space-md);
       transition: border-color var(--duration-fast) var(--ease-out);
@@ -1000,6 +1032,24 @@
       animation: pulse-red 1s ease-in-out infinite;
     }
 
+    /* Minuteur de série (répétitions en secondes) */
+    .rest-bar--work {
+      color: var(--accent);
+    }
+
+    .rest-bar--work.rest-bar--critical {
+      color: var(--red-timer);
+    }
+
+    .rest-bar--done-flash {
+      animation: timer-done-flash 0.55s ease-out;
+    }
+
+    @keyframes timer-done-flash {
+      0%   { background: color-mix(in srgb, var(--green-done) 35%, var(--bg-card-soft)); }
+      100% { background: var(--bg-card-soft); }
+    }
+
     @keyframes pulse-red {
       0%, 100% { background: var(--bg-card-soft); }
       50%       { background: color-mix(in srgb, var(--red-timer) 12%, var(--bg-card-soft)); }
@@ -1167,8 +1217,8 @@
       -webkit-backdrop-filter: saturate(180%) blur(20px);
       border-top: 1px solid var(--border);
       display: flex;
-      align-items: flex-start;
-      padding-top: 6px;
+      align-items: flex-end;
+      justify-content: stretch;
       padding-bottom: var(--safe-bottom);
       z-index: 50;
     }
@@ -1178,8 +1228,9 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 3px;
-      padding: 4px 0;
+      padding: 6px 0 4px;
       cursor: pointer;
       color: var(--text-dim);
       transition: color var(--duration-fast) var(--ease-out);
@@ -1323,22 +1374,127 @@
 
     /* --- Onboarding --- */
     .onboarding {
-      justify-content: flex-end;
+      justify-content: space-between;
       padding: var(--space-lg);
-      padding-bottom: calc(var(--space-2xl) + env(safe-area-inset-bottom, 0px));
+      padding-top: calc(12vh + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
     }
 
-    /* Halo doré en fond */
+    /* Fond ambiant : halos flous, boucles fermées linear (sans à-coups ni lignes droites) */
     .onboarding__bg {
       position: absolute;
       inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      isolation: isolate;
+      transform: translateZ(0);
       background:
-        radial-gradient(ellipse 80% 50% at 50% 20%,
-          color-mix(in srgb, var(--gold) 8%, transparent) 0%,
-          transparent 70%),
-        var(--bg);
+        radial-gradient(ellipse 110% 75% at 50% -15%,
+          color-mix(in srgb, var(--gold) 8%, var(--bg)), var(--bg));
+    }
+
+    /* Wash global — uniquement radial + blur (pas de linear-gradient = pas de lignes) */
+    .onboarding__bg::before {
+      content: '';
+      position: absolute;
+      width: 150%;
+      height: 150%;
+      top: -25%;
+      left: -25%;
+      background:
+        radial-gradient(ellipse 58% 48% at 32% 36%,
+          color-mix(in srgb, var(--gold) 22%, transparent) 0%,
+          color-mix(in srgb, var(--gold) 8%, transparent) 32%,
+          transparent 72%),
+        radial-gradient(ellipse 52% 44% at 70% 64%,
+          color-mix(in srgb, var(--rust) 16%, transparent) 0%,
+          color-mix(in srgb, var(--blue) 10%, transparent) 38%,
+          transparent 74%);
+      filter: blur(56px);
+      -webkit-filter: blur(56px);
+      opacity: .7;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      animation-name: var(--ob-wash-keyframes, none);
+      animation-duration: var(--ob-wash-duration, 26s);
+      animation-delay: var(--ob-wash-delay, 0s);
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      will-change: transform;
+    }
+
+    .onboarding__bg-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(44px);
+      -webkit-filter: blur(44px);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transform: translate3d(0, 0, 0);
+      will-change: transform, opacity;
+    }
+
+    .onboarding__bg-blob--gold {
+      width: 95vmax;
+      height: 95vmax;
+      top: -40%;
+      left: -35%;
+      background: radial-gradient(circle at 48% 48%,
+        color-mix(in srgb, var(--gold) 35%, transparent) 0%,
+        color-mix(in srgb, var(--gold) 14%, transparent) 28%,
+        color-mix(in srgb, var(--gold) 4%, transparent) 52%,
+        transparent 78%);
+      opacity: .62;
+    }
+
+    .onboarding__bg-blob--rust {
+      width: 82vmax;
+      height: 82vmax;
+      bottom: -35%;
+      right: -30%;
+      background: radial-gradient(circle at 52% 52%,
+        color-mix(in srgb, var(--rust) 28%, transparent) 0%,
+        color-mix(in srgb, var(--rust) 10%, transparent) 30%,
+        color-mix(in srgb, var(--rust) 3%, transparent) 54%,
+        transparent 76%);
+      opacity: .54;
+    }
+
+    .onboarding__bg-blob--blue {
+      width: 65vmax;
+      height: 65vmax;
+      top: 48%;
+      right: -22%;
+      background: radial-gradient(circle at 50% 50%,
+        color-mix(in srgb, var(--blue) 22%, transparent) 0%,
+        color-mix(in srgb, var(--blue) 8%, transparent) 32%,
+        transparent 74%);
+      opacity: .48;
+    }
+
+    /* Vignette — transitions douces, stops intermédiaires anti-banding */
+    .onboarding__bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 100% 90% at 50% 45%,
+        transparent 38%,
+        color-mix(in srgb, var(--bg) 18%, transparent) 72%,
+        color-mix(in srgb, var(--bg) 42%, transparent) 100%);
       pointer-events: none;
     }
+
+    /* Keyframes injectés par initOnboardingBg() — trajectoires aléatoires à chaque affichage */
+
+    [data-theme="light"] .onboarding__bg {
+      background:
+        radial-gradient(ellipse 110% 75% at 50% -15%,
+          color-mix(in srgb, var(--gold) 10%, var(--bg)), var(--bg));
+    }
+    [data-theme="light"] .onboarding__bg::before { opacity: .45; }
+    [data-theme="light"] .onboarding__bg-blob--gold { opacity: .4; }
+    [data-theme="light"] .onboarding__bg-blob--rust { opacity: .34; }
+    [data-theme="light"] .onboarding__bg-blob--blue { opacity: .3; }
 
     .onboarding__content {
       position: relative;
@@ -1399,6 +1555,8 @@
       display: flex;
       flex-direction: column;
       gap: var(--space-sm);
+      /* Zone pouce : CTAs remontés au-dessus du bord bas */
+      margin-bottom: 6vh;
     }
 
     /* Animations onboarding */
@@ -1628,6 +1786,31 @@
     }
 
     .dynamic-item .input { flex: 1; }
+
+    /* Carte alternative (nom + séries / reps / poids / repos) */
+    .alt-card {
+      background: var(--bg-card-soft);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .alt-card__header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .alt-card__header .input { flex: 1; }
+
+    .alt-card__grid {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: var(--space-sm);
+    }
 
     .dynamic-item__remove {
       width: 36px;
@@ -2171,6 +2354,8 @@
     @media (prefers-reduced-motion: reduce) {
       .anim-onboarding-logo,
       .anim-onboarding-ctas,
+      .onboarding__bg::before,
+      .onboarding__bg-blob,
       .editor-step,
       .modal-sheet,
       .modal-overlay.is-closing,
@@ -2432,7 +2617,7 @@
       border-right: 1px solid var(--border);
       color: var(--text);
       font-family: var(--font-ui);
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 600;
       height: 34px;
       width: 60px;
@@ -2899,7 +3084,11 @@
        ONBOARDING (premier lancement — affiché si non onboardé)
   ============================================================ -->
   <div id="overlayOnboarding" class="overlay-full onboarding is-hidden" aria-label="Bienvenue">
-    <div class="onboarding__bg" aria-hidden="true"></div>
+    <div class="onboarding__bg" aria-hidden="true">
+      <div class="onboarding__bg-blob onboarding__bg-blob--gold"></div>
+      <div class="onboarding__bg-blob onboarding__bg-blob--rust"></div>
+      <div class="onboarding__bg-blob onboarding__bg-blob--blue"></div>
+    </div>
 
     <!-- Bouton langue — coin supérieur droit -->
     <button class="onboarding__lang-btn" id="btnOnboardingLang" aria-label="Change language">
@@ -2957,7 +3146,7 @@
         <div class="stack stack--lg">
           <div class="input-wrapper">
             <label class="input-label" for="progName" data-i18n="editor_prog_name_label">Nom du programme</label>
-            <input class="input" type="text" id="progName" placeholder="Ex. Programme Salle" data-i18n-ph="editor_prog_name_ph" maxlength="40" autocomplete="off" />
+            <input class="input" type="text" id="progName" placeholder="EX: Programme Salle" data-i18n-ph="editor_prog_name_ph" maxlength="40" autocomplete="off" />
           </div>
           <div class="input-wrapper">
             <label class="input-label" for="progUnits" data-i18n="editor_prog_units_label">Unité de poids</label>
@@ -3012,48 +3201,22 @@
 
           <div class="input-wrapper">
             <label class="input-label" for="sessName" data-i18n="editor_sess_name_label">Nom de la séance</label>
-            <input class="input" type="text" id="sessName" placeholder="Ex. FULL BODY" data-i18n-ph="editor_sess_name_ph" maxlength="30" autocomplete="off" />
+            <input class="input" type="text" id="sessName" placeholder="EX: FULL BODY" data-i18n-ph="editor_sess_name_ph" maxlength="30" autocomplete="off" />
           </div>
 
           <div class="input-wrapper">
             <label class="input-label" for="sessType" data-i18n="editor_sess_type_label">Type</label>
             <select class="select" id="sessType">
-              <option value="lift"   data-i18n="session_type_lift">Musculation</option>
-              <option value="mixed"  data-i18n="session_type_mixed_opt">Mixte (musculation + cardio)</option>
-              <option value="cardio" data-i18n="session_type_cardio">Cardio</option>
-              <option value="rest"   data-i18n="session_type_rest_opt">Repos / récupération</option>
+              <option value="lift"    data-i18n="session_type_lift">Muscu</option>
+              <option value="cardio"  data-i18n="session_type_cardio">Cardio</option>
+              <option value="mixed"   data-i18n="session_type_mixed_opt">Mixte</option>
+              <option value="stretch" data-i18n="session_type_stretch_opt">Étirement</option>
             </select>
           </div>
 
           <div class="input-wrapper">
             <label class="input-label" for="sessSubtitle" data-i18n="editor_sess_subtitle_label">Sous-titre (optionnel)</label>
-            <input class="input" type="text" id="sessSubtitle" placeholder="Ex. PECS · DOS · BRAS" data-i18n-ph="editor_sess_subtitle_ph" maxlength="60" />
-          </div>
-
-          <div class="input-wrapper">
-            <label class="input-label" data-i18n="editor_sess_accent_label">Couleur accent</label>
-            <div class="accent-picker" id="accentPicker">
-              <label class="accent-option">
-                <input type="radio" name="sessAccent" value="gold" checked />
-                <span class="accent-dot" style="background: var(--gold);"></span>
-                <span class="accent-option__label" data-i18n="accent_gold">Or</span>
-              </label>
-              <label class="accent-option">
-                <input type="radio" name="sessAccent" value="rust" />
-                <span class="accent-dot" style="background: var(--rust);"></span>
-                <span class="accent-option__label" data-i18n="accent_rust">Rouille</span>
-              </label>
-              <label class="accent-option">
-                <input type="radio" name="sessAccent" value="blue" />
-                <span class="accent-dot" style="background: var(--blue);"></span>
-                <span class="accent-option__label" data-i18n="accent_blue">Bleu</span>
-              </label>
-              <label class="accent-option">
-                <input type="radio" name="sessAccent" value="gray" />
-                <span class="accent-dot" style="background: var(--text-faint);"></span>
-                <span class="accent-option__label" data-i18n="accent_gray">Gris</span>
-              </label>
-            </div>
+            <input class="input" type="text" id="sessSubtitle" placeholder="EX: PECS · DOS · BRAS" data-i18n-ph="editor_sess_subtitle_ph" maxlength="60" />
           </div>
 
           <!-- Sections lift / mixed -->
@@ -3080,8 +3243,8 @@
             <div class="editor-section">
               <p class="editor-section__label" data-i18n="editor_cardio_section">Cardio de fin (optionnel)</p>
               <div class="stack stack--sm">
-                <input class="input" type="text" id="cardioLabel" placeholder="Ex. Marche inclinée" data-i18n-ph="editor_cardio_label_ph" />
-                <input class="input" type="text" id="cardioDetail" placeholder="Ex. 15 min — inclinaison 5%" data-i18n-ph="editor_cardio_detail_ph" />
+                <input class="input" type="text" id="cardioLabel" placeholder="EX: Marche inclinée" data-i18n-ph="editor_cardio_label_ph" />
+                <input class="input" type="text" id="cardioDetail" placeholder="EX: 15 min — inclinaison 5%" data-i18n-ph="editor_cardio_detail_ph" />
               </div>
             </div>
 
@@ -3330,34 +3493,34 @@
 
         <div class="input-wrapper">
           <label class="input-label" for="exoName" data-i18n="exo_name_label">Nom de l'exercice</label>
-          <input class="input" type="text" id="exoName" placeholder="Ex. Presse à cuisses" data-i18n-ph="exo_name_ph" autocomplete="off" />
+          <input class="input" type="text" id="exoName" placeholder="EX: Presse à cuisses" data-i18n-ph="exo_name_ph" autocomplete="off" />
         </div>
 
         <div class="row row--gap">
           <div class="input-wrapper" style="flex: 1;">
             <label class="input-label" for="exoSets" data-i18n="exo_sets_label">Séries</label>
-            <input class="input" type="number" id="exoSets" placeholder="4" min="1" max="20" />
+            <input class="input" type="number" id="exoSets" placeholder="4" min="1" max="20" inputmode="numeric" />
           </div>
           <div class="input-wrapper" style="flex: 2;">
-            <label class="input-label" for="exoScheme" data-i18n="exo_scheme_label">Schéma reps</label>
-            <input class="input" type="text" id="exoScheme" placeholder="Ex. 8, 8-12, MAX, 45 sec" data-i18n-ph="exo_scheme_ph" />
+            <label class="input-label" for="exoScheme" data-i18n="exo_scheme_label">Répétitions</label>
+            <input class="input" type="text" id="exoScheme" placeholder="EX: 8, 8-12, MAX, 45 sec" data-i18n-ph="exo_scheme_ph" inputmode="text" />
           </div>
         </div>
 
         <div class="row row--gap">
           <div class="input-wrapper" style="flex: 2;">
-            <label class="input-label" for="exoLoad" data-i18n="exo_load_label">Charge suggérée</label>
-            <input class="input" type="text" id="exoLoad" placeholder="Ex. 100 à 120 kg" data-i18n-ph="exo_load_ph" />
+            <label class="input-label" for="exoLoad" id="exoLoadLabel">Poids (KG)</label>
+            <input class="input" type="text" id="exoLoad" placeholder="" data-i18n-ph="exo_load_ph" inputmode="decimal" />
           </div>
           <div class="input-wrapper" style="flex: 1;">
             <label class="input-label" for="exoRest" data-i18n="exo_rest_label">Repos (sec)</label>
-            <input class="input" type="number" id="exoRest" placeholder="90" min="0" max="600" />
+            <input class="input" type="number" id="exoRest" placeholder="90" min="0" max="600" inputmode="numeric" />
           </div>
         </div>
 
         <div class="input-wrapper">
           <label class="input-label" for="exoCue" data-i18n="exo_cue_label">Consigne (optionnel)</label>
-          <input class="input" type="text" id="exoCue" placeholder="Ex. Contrôler la descente 3 sec" data-i18n-ph="exo_cue_ph" />
+          <input class="input" type="text" id="exoCue" placeholder="EX: Contrôler la descente 3 sec" data-i18n-ph="exo_cue_ph" />
         </div>
 
         <div class="input-wrapper">
@@ -3839,11 +4002,20 @@
     let viewDay  = new Date().getDay();
     const TODAY  = new Date().getDay();
 
-    /* Minuteur */
-    let timerInterval = null;
-    let timerRemaining = 0;
-    let timerExoIdx   = -1;
-    let $timerBar     = null;
+    /* Minuteur (repos ou série chronométrée) — basé sur Date.now(), pas sur setInterval seul */
+    let timerInterval    = null;
+    let timerEndAt       = null; /* timestamp ms de fin */
+    let timerRemaining   = 0;
+    let timerExoIdx      = -1;
+    let timerMode        = 'rest'; /* 'rest' | 'work' */
+    let timerPending     = null;  /* { exoIdx, setIdx, exo, sessKey, session } */
+    let timerHiddenSince = null;
+    let $timerBar        = null;
+    let audioCtx         = null;
+    let wakeLock         = null;
+
+    const TIMER_STORAGE_KEY = 'workout-active-timer';
+    const PREF_WAKELOCK     = 'pref-timer-wakelock';
 
     const $screen = document.getElementById('screen-today');
 
@@ -3908,6 +4080,8 @@
 
     /* ── RENDU PRINCIPAL ─────────────────────────────────── */
     function render() {
+      let timerSnap = captureTimerSnapshot();
+      if (!timerSnap) timerSnap = loadTimerFromStorage();
       loadProgram();
       stopTimer();
       $screen.innerHTML = '';
@@ -3929,6 +4103,7 @@
         $screen.appendChild(buildProgress(sessKey, session));
         $screen.appendChild(buildBody(sessKey, session));
         $screen.appendChild(buildFooter(sessKey, session));
+        resumeTimerFromSnapshot(timerSnap);
       }
     }
 
@@ -4036,7 +4211,7 @@
     function buildProgress(sessKey, session) {
       const exos  = session.exercises || [];
       const total = exos.reduce((s, e) => s + (e.sets || 0), 0);
-      const track = loadTrack(sessKey);
+      const track = loadTrack(sessKey, exos);
       const done  = countDone(track, exos);
 
       const wrap = mkEl('div', 'today-progress');
@@ -4060,7 +4235,7 @@
     /* ── Corps de séance (lift / mixed) ──────────────────── */
     function buildBody(sessKey, session) {
       const body  = mkEl('div', 'today-body');
-      const track = loadTrack(sessKey);
+      const track = loadTrack(sessKey, session.exercises || []);
 
       /* Note de séance */
       if (session.note) {
@@ -4141,6 +4316,7 @@
 
       const wInp = mkEl('input', 'weight-stepper__input');
       wInp.type = 'number'; wInp.min = '0'; wInp.step = step;
+      wInp.inputMode = 'decimal';
       wInp.placeholder = '—';
       /* Valeur de départ : poids sauvegardé, sinon 1er nombre de la charge suggérée */
       const defaultWeight = exo.load ? (exo.load.match(/\d+[.,]?\d*/) || [''])[0] : '';
@@ -4235,7 +4411,7 @@
       const btn    = mkEl('button', 'btn btn--primary btn--full');
       btn.id = 'btnFinishSession';
       btn.textContent = t('today_finish_session');
-      const track = loadTrack(sessKey);
+      const track = loadTrack(sessKey, session.exercises || []);
       btn.style.display = countDone(track, session.exercises || []) > 0 ? '' : 'none';
 
       btn.addEventListener('click', () => {
@@ -4262,14 +4438,31 @@
       return footer;
     }
 
+    /* Exercice chronométré (ex. "45 sec") */
+    function parseTimedSeconds(scheme) {
+      const m = String(scheme || '').match(/(\d+)\s*sec/i);
+      return m ? parseInt(m[1], 10) : 0;
+    }
+
     /* ── Clic sur un cercle ───────────────────────────────── */
     function onSetClick(exoIdx, setIdx, exo, sessKey, session) {
-      const track = loadTrack(sessKey);
+      const exos  = session.exercises || [];
+      const track = loadTrack(sessKey, exos);
       if (!track[exoIdx]) track[exoIdx] = Array(exo.sets || 0).fill(false);
 
       const nowChecked = !track[exoIdx][setIdx];
+      const timedSec   = parseTimedSeconds(exo.scheme);
+
+      /* Série en secondes : lancer le chrono avant de cocher */
+      if (!nowChecked && timedSec > 0) {
+        if (timerExoIdx === exoIdx && timerMode === 'work') stopTimer();
+        timerPending = { exoIdx, setIdx, exo, sessKey, session };
+        startTimer(timedSec, exoIdx, 'work');
+        return;
+      }
+
       track[exoIdx][setIdx] = nowChecked;
-      saveTrack(sessKey, track);
+      saveTrack(sessKey, track, exos);
 
       /* Cercle */
       const circle = document.querySelector(`#exo-${exoIdx} .set-circle:nth-child(${setIdx+1})`);
@@ -4293,64 +4486,312 @@
       const btnF = document.getElementById('btnFinishSession');
       if (btnF) btnF.style.display = countDone(track, session.exercises || []) > 0 ? '' : 'none';
 
-      /* Minuteur */
+      /* Minuteur de repos */
       if (nowChecked) {
-        startTimer(parseInt(exo.restSec, 10) || 90, exoIdx);
+        startTimer(parseInt(exo.restSec, 10) || 90, exoIdx, 'rest');
       } else if (timerExoIdx === exoIdx) {
         stopTimer();
       }
     }
 
-    /* ── Minuteur ─────────────────────────────────────────── */
-    function startTimer(restSec, exoIdx) {
-      stopTimer();
-      timerRemaining = restSec;
-      timerExoIdx    = exoIdx;
-      $timerBar      = document.getElementById(`rest-${exoIdx}`);
-      updateTimerBar();
-      timerInterval  = setInterval(() => {
-        timerRemaining--;
-        if (timerRemaining <= 0) {
-          timerRemaining = 0;
-          updateTimerBar();
-          stopTimer();
-          onTimerEnd();
-        } else {
-          updateTimerBar();
+    /* Applique le cochage d'une série (après chrono ou clic direct) */
+    function applySetChecked(exoIdx, setIdx, exo, sessKey, session, checked) {
+      const exos  = session.exercises || [];
+      const track = loadTrack(sessKey, exos);
+      if (!track[exoIdx]) track[exoIdx] = Array(exo.sets || 0).fill(false);
+      track[exoIdx][setIdx] = checked;
+      saveTrack(sessKey, track, exos);
+
+      const circle = document.querySelector(`#exo-${exoIdx} .set-circle:nth-child(${setIdx+1})`);
+      if (circle) {
+        circle.classList.toggle('set-circle--done', checked);
+        if (checked) {
+          circle.classList.add('anim-bounce');
+          circle.addEventListener('animationend', () => circle.classList.remove('anim-bounce'), { once: true });
         }
-      }, 1000);
+      }
+
+      const card    = document.getElementById(`exo-${exoIdx}`);
+      const allDone = track[exoIdx].slice(0, exo.sets).every(Boolean);
+      card?.classList.toggle('exo-today--done', allDone);
+
+      updateProgress(sessKey, session);
+
+      const btnF = document.getElementById('btnFinishSession');
+      if (btnF) btnF.style.display = countDone(track, exos) > 0 ? '' : 'none';
+
+      if (checked) {
+        startTimer(parseInt(exo.restSec, 10) || 90, exoIdx, 'rest');
+      }
+    }
+
+    /* ── Minuteur (horloge système + alertes) ─────────────── */
+
+    function captureTimerSnapshot() {
+      if (!timerEndAt) return null;
+      return {
+        endAt: timerEndAt,
+        exoIdx: timerExoIdx,
+        mode: timerMode,
+        pending: timerPending ? { ...timerPending } : null,
+        viewDay
+      };
+    }
+
+    function persistTimerToStorage() {
+      if (!timerEndAt) {
+        sessionStorage.removeItem(TIMER_STORAGE_KEY);
+        return;
+      }
+      sessionStorage.setItem(TIMER_STORAGE_KEY, JSON.stringify({
+        endAt: timerEndAt,
+        exoIdx: timerExoIdx,
+        mode: timerMode,
+        pending: timerPending,
+        viewDay
+      }));
+    }
+
+    function loadTimerFromStorage() {
+      try {
+        const raw = sessionStorage.getItem(TIMER_STORAGE_KEY);
+        if (!raw) return null;
+        const st = JSON.parse(raw);
+        if (st.viewDay !== viewDay) return null;
+        return st;
+      } catch { return null; }
+    }
+
+    function wakeLockEnabled() {
+      return localStorage.getItem(PREF_WAKELOCK) !== 'false';
+    }
+
+    async function acquireWakeLock() {
+      if (!wakeLockEnabled() || !('wakeLock' in navigator)) return;
+      try {
+        if (wakeLock) return;
+        wakeLock = await navigator.wakeLock.request('screen');
+        wakeLock.addEventListener('release', () => { wakeLock = null; });
+      } catch { /* refus ou non supporté */ }
+    }
+
+    function releaseWakeLock() {
+      if (!wakeLock) return;
+      wakeLock.release().catch(() => {});
+      wakeLock = null;
+    }
+
+    function resumeTimerFromSnapshot(snap) {
+      if (!snap || snap.viewDay !== viewDay) return;
+      if (snap.endAt <= Date.now()) {
+        timerMode    = snap.mode || 'rest';
+        timerPending = snap.pending;
+        timerExoIdx  = snap.exoIdx;
+        $timerBar    = document.getElementById(`rest-${snap.exoIdx}`);
+        completeTimer();
+        return;
+      }
+      timerEndAt     = snap.endAt;
+      timerExoIdx    = snap.exoIdx;
+      timerMode      = snap.mode || 'rest';
+      timerPending   = snap.pending;
+      $timerBar      = document.getElementById(`rest-${snap.exoIdx}`);
+      scheduleTimerTick();
+      tickTimer();
+      acquireWakeLock();
+    }
+
+    function unlockAudio() {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+      } catch { /* navigateur sans Web Audio */ }
+    }
+
+    function playBeep(freq, start, duration) {
+      if (!audioCtx) return;
+      const osc  = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.28, start);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(start);
+      osc.stop(start + duration);
+    }
+
+    function playTimerDoneSound() {
+      try {
+        unlockAudio();
+        if (!audioCtx) return;
+        const t0 = audioCtx.currentTime;
+        playBeep(880, t0, 0.22);
+        playBeep(1100, t0 + 0.28, 0.28);
+      } catch { /* silencieux si autoplay bloqué */ }
+    }
+
+    function vibrateTimerDone(mode) {
+      if (!navigator.vibrate) return;
+      navigator.vibrate(mode === 'work'
+        ? [180, 70, 180]
+        : [280, 90, 280, 90, 280]);
+    }
+
+    function maybeRequestNotificationPermission() {
+      if (!('Notification' in window)) return;
+      if (Notification.permission === 'default') {
+        Notification.requestPermission().catch(() => {});
+      }
+    }
+
+    function showTimerNotification(mode) {
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      try {
+        const body = mode === 'work' ? t('timer_notif_work') : t('timer_notif_rest');
+        new Notification(t('timer_notif_title'), {
+          body,
+          tag: 'workout-timer',
+          renotify: true
+        });
+      } catch { /* iOS / permissions */ }
+    }
+
+    function fireTimerAlarm(mode, barEl) {
+      vibrateTimerDone(mode);
+      playTimerDoneSound();
+      const wasBackgrounded = document.hidden
+        || (timerHiddenSince && (Date.now() - timerHiddenSince) > 1500);
+      if (wasBackgrounded) showTimerNotification(mode);
+      timerHiddenSince = null;
+      const bar = barEl || $timerBar;
+      if (bar) {
+        bar.classList.add('rest-bar--done-flash');
+        setTimeout(() => bar.classList.remove('rest-bar--done-flash'), 600);
+      }
+    }
+
+    function getTimerRemainingSec() {
+      if (!timerEndAt) return 0;
+      return Math.max(0, Math.ceil((timerEndAt - Date.now()) / 1000));
+    }
+
+    function tickTimer() {
+      if (!timerEndAt) return;
+      timerRemaining = getTimerRemainingSec();
+      if (timerRemaining <= 0) {
+        completeTimer();
+        return;
+      }
+      updateTimerBar();
+      persistTimerToStorage();
+    }
+
+    function completeTimer() {
+      const wasWork = timerMode === 'work';
+      const pending = timerPending;
+      const mode    = timerMode;
+      const bar     = $timerBar;
+      stopTimer();
+      fireTimerAlarm(mode, bar);
+      if (wasWork && pending) {
+        applySetChecked(pending.exoIdx, pending.setIdx, pending.exo,
+                        pending.sessKey, pending.session, true);
+      }
+    }
+
+    function scheduleTimerTick() {
+      if (timerInterval) clearInterval(timerInterval);
+      /* Rafraîchissement UI ; le temps réel vient de Date.now() */
+      timerInterval = setInterval(tickTimer, 250);
+    }
+
+    function startTimer(seconds, exoIdx, mode) {
+      const keepPending = mode === 'work' ? timerPending : null;
+      stopTimer();
+      if (mode === 'work') timerPending = keepPending;
+
+      unlockAudio();
+      maybeRequestNotificationPermission();
+      timerHiddenSince = null;
+
+      timerEndAt  = Date.now() + seconds * 1000;
+      timerExoIdx = exoIdx;
+      timerMode   = mode || 'rest';
+      $timerBar   = document.getElementById(`rest-${exoIdx}`);
+      scheduleTimerTick();
+      tickTimer();
+      persistTimerToStorage();
+      acquireWakeLock();
     }
 
     function stopTimer() {
       if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+      timerEndAt = null;
+      sessionStorage.removeItem(TIMER_STORAGE_KEY);
+      releaseWakeLock();
       if ($timerBar) {
         const $txt = $timerBar.querySelector('.rest-bar__text');
         if ($txt) $txt.textContent = ` ${t('timer_rest')} ${$timerBar.dataset.restSec || 90}S`;
-        $timerBar.classList.remove('rest-bar--active', 'rest-bar--critical');
+        $timerBar.classList.remove('rest-bar--active', 'rest-bar--critical', 'rest-bar--work', 'rest-bar--done-flash');
         $timerBar = null;
       }
-      timerExoIdx = -1;
+      timerExoIdx  = -1;
+      timerMode    = 'rest';
+      timerPending = null;
     }
 
     function updateTimerBar() {
       if (!$timerBar) return;
       const $txt = $timerBar.querySelector('.rest-bar__text');
       if (!$txt) return;
+      const label = timerMode === 'work' ? t('timer_work') : t('timer_rest');
       const m   = String(Math.floor(timerRemaining / 60)).padStart(2,'0');
       const s   = String(timerRemaining % 60).padStart(2,'0');
-      $txt.textContent = ` ${t('timer_rest')} · ${m}:${s}`;
+      $txt.textContent = ` ${label} · ${m}:${s}`;
       $timerBar.classList.add('rest-bar--active');
+      $timerBar.classList.toggle('rest-bar--work', timerMode === 'work');
       $timerBar.classList.toggle('rest-bar--critical', timerRemaining <= 10);
     }
 
-    function onTimerEnd() {
-      if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+    function onTimerVisibilityOrFocus() {
+      if (document.visibilityState === 'hidden') {
+        timerHiddenSince = Date.now();
+        releaseWakeLock();
+        return;
+      }
+      if (timerEndAt) {
+        tickTimer();
+        acquireWakeLock();
+      }
     }
+
+    /* API exposée au module Profil */
+    function requestTimerNotifications() {
+      if (!('Notification' in window)) return Promise.resolve('unsupported');
+      return Notification.requestPermission();
+    }
+
+    function getTimerNotificationStatus() {
+      if (!('Notification' in window)) return 'unsupported';
+      return Notification.permission;
+    }
+
+    function setWakeLockPref(enabled) {
+      localStorage.setItem(PREF_WAKELOCK, enabled ? 'true' : 'false');
+      if (enabled && timerEndAt) acquireWakeLock();
+      else releaseWakeLock();
+    }
+
+    function getWakeLockPref() { return wakeLockEnabled(); }
 
     /* ── Progression ─────────────────────────────────────── */
     function updateProgress(sessKey, session) {
-      const track = loadTrack(sessKey);
       const exos  = session.exercises || [];
+      const track = loadTrack(sessKey, exos);
       const total = exos.reduce((s, e) => s + (e.sets || 0), 0);
       const done  = countDone(track, exos);
       const $cnt  = document.getElementById('todayProgressCount');
@@ -4359,14 +4800,29 @@
       if ($fill) $fill.style.width = total > 0 ? `${(done/total)*100}%` : '0%';
     }
 
-    /* ── Track localStorage ───────────────────────────────── */
-    function loadTrack(sessKey) {
+    /* ── Track localStorage (v2 : indexé par id d'exercice) ─ */
+    function loadTrack(sessKey, exos) {
       if (!sessKey) return [];
-      try { return JSON.parse(localStorage.getItem(trackKey(sessKey)) || '[]'); }
-      catch { return []; }
+      try {
+        const raw = JSON.parse(localStorage.getItem(trackKey(sessKey)) || 'null');
+        if (raw && raw.v === 2 && exos) {
+          return exos.map(e => {
+            const row = raw[e.id];
+            return Array.isArray(row) ? row.slice() : Array(e.sets || 0).fill(false);
+          });
+        }
+        if (Array.isArray(raw)) return raw;
+      } catch { /* ignore */ }
+      return (exos || []).map(e => Array(e.sets || 0).fill(false));
     }
-    function saveTrack(sessKey, data) {
-      localStorage.setItem(trackKey(sessKey), JSON.stringify(data));
+    function saveTrack(sessKey, data, exos) {
+      if (!exos) {
+        localStorage.setItem(trackKey(sessKey), JSON.stringify(data));
+        return;
+      }
+      const byId = { v: 2 };
+      exos.forEach((e, i) => { if (data[i]) byId[e.id] = data[i]; });
+      localStorage.setItem(trackKey(sessKey), JSON.stringify(byId));
     }
 
     /* ── Log de séance ────────────────────────────────────── */
@@ -4374,8 +4830,8 @@
       if (!program || !sessKey) return;
       const session = program.sessions[sessKey];
       if (!session) return;
-      const track = loadTrack(sessKey);
       const exos  = session.exercises || [];
+      const track = loadTrack(sessKey, exos);
       const done  = countDone(track, exos);
       const total = exos.reduce((s, e) => s + (e.sets || 0), 0);
       const log = {
@@ -4445,14 +4901,24 @@
       loadProgram();
       render();
       setupFinishModal();
+      document.addEventListener('visibilitychange', onTimerVisibilityOrFocus);
+      window.addEventListener('focus', onTimerVisibilityOrFocus);
+      window.addEventListener('pageshow', onTimerVisibilityOrFocus);
     }
 
-    function refresh() {
-      viewDay = new Date().getDay();
+    function refresh(opts) {
+      const preserve = opts && (opts.preserveViewDay === true || opts === true);
+      if (!preserve) viewDay = new Date().getDay();
       render();
     }
 
-    return { init, refresh };
+    return {
+      init, refresh,
+      requestTimerNotifications,
+      getTimerNotificationStatus,
+      setWakeLockPref,
+      getWakeLockPref
+    };
   })();
 
   Today.init();
@@ -4520,8 +4986,39 @@
       if (!draft) draft = makeFreshDraft();
     }
 
+    const ACCENT_CYCLE = ['gold', 'rust', 'blue'];
+
+    /* Accent automatique : or → rouille → bleu (reboucle), gris pour repos */
+    function assignSessionAccents() {
+      let i = 0;
+      Object.keys(draft.sessions).sort().forEach(k => {
+        if (k === '_tmp_') return;
+        const s = draft.sessions[k];
+        if (s.type === 'rest') s.accent = 'gray';
+        else {
+          s.accent = ACCENT_CYCLE[i % ACCENT_CYCLE.length];
+          i++;
+        }
+      });
+    }
+
+    function syncActiveProgramFromDraft() {
+      const activeId = localStorage.getItem(LS_ACTIVE);
+      if (!draft?.id || draft.id !== activeId) return;
+      assignSessionAccents();
+      const snapshot = JSON.parse(JSON.stringify(draft));
+      delete snapshot.sessions['_tmp_'];
+      loadPrograms();
+      const idx = programs.findIndex(p => p.id === draft.id);
+      if (idx < 0) return;
+      programs[idx] = snapshot;
+      savePrograms();
+      if (typeof Today !== 'undefined') Today.refresh({ preserveViewDay: true });
+    }
+
     function persistDraft() {
       localStorage.setItem(LS_DRAFT, JSON.stringify(draft));
+      syncActiveProgramFromDraft();
     }
 
     function clearDraft() {
@@ -4566,9 +5063,86 @@
     ────────────────────────────────────────────────────── */
     const $onboarding = document.getElementById('overlayOnboarding');
 
+    /* Trajectoires aléatoires (direction + amplitude) régénérées à chaque affichage */
+    function initOnboardingBg() {
+      const bg = $onboarding.querySelector('.onboarding__bg');
+      if (!bg) return;
+
+      const STYLE_ID = 'onboarding-bg-keyframes';
+      let styleEl = document.getElementById(STYLE_ID);
+      if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = STYLE_ID;
+        document.head.appendChild(styleEl);
+      }
+
+      function randomLoop(count, minR, maxR) {
+        const pts = [];
+        for (let i = 0; i < count; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const radius = minR + Math.random() * (maxR - minR);
+          pts.push({
+            x: +(Math.cos(angle) * radius).toFixed(1),
+            y: +(Math.sin(angle) * radius).toFixed(1),
+            scale: +(0.88 + Math.random() * 0.24).toFixed(3),
+            opacity: +(0.42 + Math.random() * 0.24).toFixed(2),
+          });
+        }
+        return pts;
+      }
+
+      function buildKeyframes(name, pts, unit, baseOpacity, withOpacity) {
+        const step = 100 / pts.length;
+        let css = `0%,100%{transform:translate3d(0,0,0) scale(1)`;
+        if (withOpacity) css += `;opacity:${baseOpacity}`;
+        css += '}';
+        pts.forEach((p, i) => {
+          const pct = +((i + 1) * step).toFixed(2);
+          css += `${pct}%{transform:translate3d(${p.x}${unit},${p.y}${unit},0) scale(${p.scale})`;
+          if (withOpacity) css += `;opacity:${p.opacity}`;
+          css += '}';
+        });
+        return `@keyframes ${name}{${css}}`;
+      }
+
+      const uid = Math.random().toString(36).slice(2, 7);
+      const washName = `ob-w-${uid}`;
+      const goldName = `ob-g-${uid}`;
+      const rustName = `ob-r-${uid}`;
+      const blueName = `ob-b-${uid}`;
+
+      styleEl.textContent = [
+        buildKeyframes(washName, randomLoop(5, 10, 28), '%', 1, false),
+        buildKeyframes(goldName, randomLoop(5, 22, 42), 'vmin', 0.55, true),
+        buildKeyframes(rustName, randomLoop(5, 20, 40), 'vmin', 0.48, true),
+        buildKeyframes(blueName, randomLoop(5, 18, 38), 'vmin', 0.42, true),
+      ].join('\n');
+
+      const washDur = 20 + Math.random() * 16;
+      bg.style.setProperty('--ob-wash-keyframes', washName);
+      bg.style.setProperty('--ob-wash-duration', `${washDur.toFixed(1)}s`);
+      bg.style.setProperty('--ob-wash-delay', `${(-Math.random() * washDur).toFixed(1)}s`);
+
+      const blobCfg = [
+        { name: goldName, min: 17, max: 26 },
+        { name: rustName, min: 19, max: 28 },
+        { name: blueName, min: 21, max: 32 },
+      ];
+      bg.querySelectorAll('.onboarding__bg-blob').forEach((el, i) => {
+        const dur = blobCfg[i].min + Math.random() * (blobCfg[i].max - blobCfg[i].min);
+        el.style.animation = `${blobCfg[i].name} ${dur.toFixed(1)}s linear infinite`;
+        el.style.animationDelay = `${(-Math.random() * dur).toFixed(1)}s`;
+      });
+    }
+
+    function showOnboarding() {
+      initOnboardingBg();
+      $onboarding.classList.remove('is-hidden');
+    }
+
     function checkOnboarding() {
       if (!localStorage.getItem(LS_ONBOARDED)) {
-        $onboarding.classList.remove('is-hidden');
+        showOnboarding();
       }
     }
 
@@ -4616,7 +5190,7 @@
       if (cancelled) {
         clearDraft();
         if (!localStorage.getItem(LS_ONBOARDED)) {
-          $onboarding.classList.remove('is-hidden');
+          showOnboarding();
         }
       }
     }
@@ -4799,6 +5373,14 @@
 
     /* ── ÉTAPE 2 — Liste des séances (populée quand step 2 est actif) ── */
     function populateStep3() {
+      const $sub = document.querySelector('#editorStep2 .editor-step__subtitle');
+      if ($sub) {
+        const progName = draft.meta?.label?.trim();
+        $sub.textContent = progName
+          ? t('editor_step2_sub_named').replace('%s', progName)
+          : t('editor_step2_sub');
+      }
+
       const $list = document.getElementById('sessionsList');
       $list.innerHTML = '';
       const keys = Object.keys(draft.sessions);
@@ -4815,7 +5397,10 @@
         const sess      = draft.sessions[key];
         const exoCount  = (sess.exercises || []).length;
         /* Fallback sur 'Inconnu' (jamais sess.type brut) pour éviter l'injection HTML */
-        const typeLabel = { lift:t('session_type_lift'), cardio:t('session_type_cardio'), rest:t('session_type_rest'), mixed:t('session_type_mixed') }[sess.type] || t('session_type_unknown');
+        const typeLabel = {
+          lift: t('session_type_lift'), cardio: t('session_type_cardio'), rest: t('session_type_rest'),
+          mixed: t('session_type_mixed'), stretch: t('session_type_stretch')
+        }[sess.type] || t('session_type_unknown');
         const accentVar = { gold:'--gold', rust:'--rust', blue:'--blue', gray:'--text-faint' }[sess.accent] || '--gold';
 
         const card = document.createElement('div');
@@ -4900,10 +5485,6 @@
       $sessType.value     = sess.type || 'lift';
       $sessSubtitle.value = sess.subtitle || '';
 
-      document.querySelectorAll('input[name="sessAccent"]').forEach(r => {
-        r.checked = r.value === (sess.accent || 'gold');
-      });
-
       $cardioLabel.value  = sess.cardio ? sess.cardio.label  : '';
       $cardioDetail.value = sess.cardio ? sess.cardio.detail : '';
 
@@ -4915,8 +5496,9 @@
 
     function updateTypeSections(type) {
       const isLift = type === 'lift' || type === 'mixed';
+      const isTips = type === 'cardio' || type === 'rest' || type === 'stretch';
       $liftSections.classList.toggle('is-hidden', !isLift);
-      $tipsSections.classList.toggle('is-hidden', isLift);
+      $tipsSections.classList.toggle('is-hidden', !isTips);
     }
 
     $sessType.addEventListener('change', () => updateTypeSections($sessType.value));
@@ -4932,7 +5514,7 @@
       s.name     = $sessName.value.trim();
       s.type     = $sessType.value;
       s.subtitle = $sessSubtitle.value.trim();
-      s.accent   = (document.querySelector('input[name="sessAccent"]:checked') || {}).value || 'gold';
+      assignSessionAccents();
       s.warmup   = Array.from($warmupList.querySelectorAll('input')).map(i => i.value.trim()).filter(Boolean);
       const cl   = $cardioLabel.value.trim(), cd = $cardioDetail.value.trim();
       s.cardio   = cl ? { label: cl, detail: cd } : null;
@@ -5107,26 +5689,123 @@
       $exoLoad.value   = exo?.load   || '';
       $exoRest.value   = exo?.restSec || '';
       $exoCue.value    = exo?.cue    || '';
-      renderAltList(exo?.alternatives || []);
+      const unitLabel = (draft.meta?.units || 'kg').toUpperCase();
+      document.getElementById('exoLoadLabel').textContent =
+        t('exo_load_label_fmt').replace('%s', unitLabel);
+      renderAltList(exo?.alternatives || [], exo);
 
       $modalExo.classList.remove('is-hidden');
       requestAnimationFrame(() => $exoName.focus());
     }
 
-    function renderAltList(alts) {
+    function normalizeAlt(alt, parentExo) {
+      if (typeof alt === 'string') {
+        return {
+          name: alt,
+          sets: parentExo?.sets ?? null,
+          scheme: parentExo?.scheme ?? null,
+          load: parentExo?.load ?? null,
+          restSec: parentExo?.restSec ?? null
+        };
+      }
+      return {
+        name: alt?.name || '',
+        sets: alt?.sets ?? parentExo?.sets ?? null,
+        scheme: alt?.scheme ?? parentExo?.scheme ?? null,
+        load: alt?.load ?? parentExo?.load ?? null,
+        restSec: alt?.restSec ?? parentExo?.restSec ?? null
+      };
+    }
+
+    function readAltListFromDom(parentExo) {
+      return Array.from($altList.querySelectorAll('.alt-card')).map(card => {
+        const ins = card.querySelectorAll('input');
+        return {
+          name: (ins[0]?.value || '').trim(),
+          sets: parseInt(ins[1]?.value, 10) || null,
+          scheme: (ins[2]?.value || '').trim() || null,
+          load: (ins[3]?.value || '').trim() || null,
+          restSec: parseInt(ins[4]?.value, 10) || null
+        };
+      }).filter(a => a.name);
+    }
+
+    function renderAltList(alts, parentExo) {
       $altList.innerHTML = '';
-      alts.forEach((alt, i) => {
-        $altList.appendChild(makeDynItem(alt, () => {
-          const cur = Array.from($altList.querySelectorAll('input')).map(e => e.value.trim());
+      const normalized = (alts.length ? alts : []).map(a => normalizeAlt(a, parentExo));
+
+      normalized.forEach((alt, i) => {
+        const card = document.createElement('div');
+        card.className = 'alt-card';
+
+        const header = document.createElement('div');
+        header.className = 'alt-card__header';
+
+        const nameInp = document.createElement('input');
+        nameInp.className = 'input';
+        nameInp.type = 'text';
+        nameInp.placeholder = t('exo_alt_name_ph');
+        nameInp.value = alt.name || '';
+
+        const rmBtn = document.createElement('button');
+        rmBtn.type = 'button';
+        rmBtn.className = 'dynamic-item__remove';
+        rmBtn.innerHTML = '&times;';
+        rmBtn.addEventListener('click', () => {
+          const cur = readAltListFromDom(parentExo);
           cur.splice(i, 1);
-          renderAltList(cur.filter(Boolean));
-        }, t('editor_alt_ph')));
+          renderAltList(cur, parentExo);
+        });
+
+        header.append(nameInp, rmBtn);
+
+        const grid = document.createElement('div');
+        grid.className = 'alt-card__grid';
+
+        const setsInp = document.createElement('input');
+        setsInp.className = 'input input--sm';
+        setsInp.type = 'number';
+        setsInp.inputMode = 'numeric';
+        setsInp.placeholder = t('exo_sets_label');
+        setsInp.min = '1';
+        setsInp.max = '20';
+        setsInp.value = alt.sets || '';
+
+        const schemeInp = document.createElement('input');
+        schemeInp.className = 'input input--sm';
+        schemeInp.type = 'text';
+        schemeInp.placeholder = t('exo_scheme_label');
+        schemeInp.value = alt.scheme || '';
+
+        const loadInp = document.createElement('input');
+        loadInp.className = 'input input--sm';
+        loadInp.type = 'text';
+        loadInp.inputMode = 'decimal';
+        loadInp.placeholder = t('exo_load_label_fmt').replace('%s', (draft.meta?.units || 'kg').toUpperCase());
+        loadInp.value = alt.load || '';
+
+        const restInp = document.createElement('input');
+        restInp.className = 'input input--sm';
+        restInp.type = 'number';
+        restInp.inputMode = 'numeric';
+        restInp.placeholder = t('exo_rest_label');
+        restInp.min = '0';
+        restInp.max = '600';
+        restInp.value = alt.restSec || '';
+
+        grid.append(setsInp, schemeInp, loadInp, restInp);
+        card.append(header, grid);
+        $altList.appendChild(card);
       });
     }
 
     document.getElementById('btnAddAlt').addEventListener('click', () => {
-      const cur = Array.from($altList.querySelectorAll('input')).map(e => e.value.trim());
-      renderAltList([...cur, '']);
+      const sessKey = editSessKey || '_tmp_';
+      const parentExo = editExoId
+        ? (draft.sessions[sessKey]?.exercises || []).find(e => e.id === editExoId)
+        : null;
+      const cur = readAltListFromDom(parentExo);
+      renderAltList([...cur, normalizeAlt('', parentExo)], parentExo);
       focusLast($altList);
     });
 
@@ -5140,8 +5819,11 @@
       if (!name)       { flashError($exoName); return; }
       if (!(sets > 0)) { flashError($exoSets); return; }
 
-      const alts = Array.from($altList.querySelectorAll('input'))
-        .map(i => i.value.trim()).filter(Boolean);
+      const sessKeyForAlt = editSessKey || '_tmp_';
+      const parentForAlt = editExoId
+        ? (draft.sessions[sessKeyForAlt]?.exercises || []).find(e => e.id === editExoId)
+        : null;
+      const alts = readAltListFromDom(parentForAlt);
 
       const exoData = {
         id:           editExoId || ('exo-' + Date.now() + '-' + Math.random().toString(36).slice(2,7)),
@@ -5235,7 +5917,16 @@
           exo.sets   = int(exo.sets,   1, 20, 1);
           exo.restSec = int(exo.restSec, 0, 600, 90);
           if (Array.isArray(exo.alternatives)) {
-            exo.alternatives = exo.alternatives.slice(0, 10).map(a => str(a, 100));
+            exo.alternatives = exo.alternatives.slice(0, 10).map(a => {
+              if (typeof a === 'string') return str(a, 100);
+              return {
+                name: str(a.name, 100),
+                sets: a.sets ? int(a.sets, 1, 20, null) : null,
+                scheme: a.scheme ? str(a.scheme, 50) : null,
+                load: a.load ? str(a.load, 100) : null,
+                restSec: a.restSec ? int(a.restSec, 0, 600, null) : null
+              };
+            });
           }
         });
       });
@@ -5246,6 +5937,7 @@
     function saveProgram() {
       /* Nettoie la session temporaire non commitée */
       delete draft.sessions['_tmp_'];
+      assignSessionAccents();
 
       const errs = validateProgram(draft);
       if (errs.length) { alert(t('editor_alert_prefix') + errs.join('\n')); return; }
@@ -5263,7 +5955,7 @@
 
       clearDraft();
       closeEditor(false);
-      Today.refresh();
+      Today.refresh({ preserveViewDay: true });
       Plan.refresh();
       showToast(t('editor_saved'));
     }
@@ -5283,7 +5975,7 @@
     function closeImport() {
       $overlayImport.classList.add('is-hidden');
       if (importFromOnboarding && !localStorage.getItem(LS_ONBOARDED)) {
-        $onboarding.classList.remove('is-hidden');
+        showOnboarding();
       }
     }
 
@@ -5665,7 +6357,7 @@
       const weekVol = getWeekVolume(logs);
 
       summary.append(
-        makeStatCard(streak,              t('stats_streak'),   flameIcon),
+        makeStatCard(streak, streak === 1 ? t('stats_streak_one') : t('stats_streak'), flameIcon),
         makeStatCard(fmtVolume(weekVol),  t('stats_week_vol'), null),
       );
       body.appendChild(summary);
@@ -5999,6 +6691,12 @@
         buildRow(t('profile_reset_today'), null, false, resetToday),
       ]));
 
+      /* ── MINUTEUR ──────────────────────────────────────── */
+      body.appendChild(buildSection(t('profile_timer_section'), [
+        buildTimerAlertsRow(),
+        buildWakeLockRow(),
+      ]));
+
       /* ── LANGUE ────────────────────────────────────────── */
       body.appendChild(buildSection(t('profile_language'), [
         buildLangRow(),
@@ -6052,6 +6750,42 @@
       sec.appendChild(titleEl);
       rows.forEach(r => sec.appendChild(r));
       return sec;
+    }
+
+    function timerAlertsMeta() {
+      const st = typeof Today !== 'undefined' ? Today.getTimerNotificationStatus() : 'unsupported';
+      if (st === 'granted')    return t('profile_timer_alerts_on');
+      if (st === 'denied')     return t('profile_timer_alerts_denied');
+      if (st === 'unsupported') return '—';
+      return t('profile_timer_alerts_off');
+    }
+
+    function buildTimerAlertsRow() {
+      const meta = timerAlertsMeta();
+      return buildRow(t('profile_timer_alerts'), meta, true, () => {
+        if (typeof Today === 'undefined') return;
+        Today.requestTimerNotifications().then((perm) => {
+          if (perm === 'granted') App.showToast(t('profile_timer_toast_on'));
+          render();
+        });
+      });
+    }
+
+    function buildWakeLockRow() {
+      const on = typeof Today !== 'undefined' && Today.getWakeLockPref();
+      const meta = on ? t('profile_wakelock_on') : t('profile_wakelock_off');
+      const row = buildRow(t('profile_wakelock'), meta, false, () => {
+        if (typeof Today === 'undefined') return;
+        const next = !Today.getWakeLockPref();
+        Today.setWakeLockPref(next);
+        render();
+      });
+      /* Indicateur visuel on/off */
+      const badge = mkEl('span', 'settings-row__badge');
+      badge.textContent = on ? 'ON' : 'OFF';
+      badge.style.cssText = `font-size:11px;font-weight:700;color:${on ? 'var(--gold)' : 'var(--text-faint)'};`;
+      row.appendChild(badge);
+      return row;
     }
 
     function buildLangRow() {
@@ -6383,6 +7117,15 @@
       }
 
       const isModify = aiMode === 'modify';
+      if (isModify && !aiBaseProgram) {
+        clearInterval(msgInterval);
+        $spin.classList.add('is-hidden');
+        $btn.classList.remove('is-hidden');
+        $back.style.visibility = 'visible';
+        $err.classList.remove('is-hidden');
+        document.getElementById('aiErrorMsg').textContent = "Programme de base introuvable. Relancez en mode création.";
+        return;
+      }
       const endpoint = isModify ? '/api/modify-program' : '/api/generate-program';
       const payload  = isModify
         ? {
@@ -6475,7 +7218,7 @@
               exoDiffs.push({ sign: '+', name: e.name, scheme: e.scheme });
             } else {
               const old = oldById[e.id];
-              if (old.scheme !== e.scheme || old.sets !== e.sets || old.load !== e.load) {
+              if (old.name !== e.name || old.scheme !== e.scheme || old.sets !== e.sets || old.load !== e.load) {
                 exoDiffs.push({ sign: '~', name: e.name, scheme: e.scheme });
               }
             }
@@ -6750,7 +7493,7 @@
       clearInterval(msgInterval);
       $overlay.classList.add('is-hidden');
       if (!localStorage.getItem(LS_ONBOARDED)) {
-        document.getElementById('overlayOnboarding').classList.remove('is-hidden');
+        showOnboarding();
       }
     }
 
