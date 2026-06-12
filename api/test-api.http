@@ -1,0 +1,99 @@
+# test-api.http — Tests de l'edge function /api/generate-program
+# Compatible VS Code REST Client (extension "REST Client" de Huachao Mao)
+# Variable @baseUrl : ajuster selon l'environnement
+
+@baseUrl = http://localhost:3000
+
+###
+# ── CAS VALIDE — 3 jours, salle de sport, intermédiaire ──────────────────────
+# Doit retourner 200 avec { program: { meta, sessions, schedule, rules } }
+
+POST {{baseUrl}}/api/generate-program
+Content-Type: application/json
+
+{
+  "objectif": "Prise de masse",
+  "frequence": 3,
+  "materiel": ["Salle de sport complète"],
+  "niveau": "intermédiaire",
+  "antecedents": "Légère douleur épaule droite"
+}
+
+###
+# ── CAS VALIDE — 4 jours, haltères maison, débutant, sans antécédents ────────
+
+POST {{baseUrl}}/api/generate-program
+Content-Type: application/json
+
+{
+  "objectif": "Forme générale",
+  "frequence": 4,
+  "materiel": ["Haltères à la maison", "Élastiques / poids de corps"],
+  "niveau": "débutant"
+}
+
+###
+# ── CAS INVALIDE — objectif manquant ─────────────────────────────────────────
+# Doit retourner 400 avec { error: "Paramètres invalides", details: [...] }
+
+POST {{baseUrl}}/api/generate-program
+Content-Type: application/json
+
+{
+  "frequence": 3,
+  "materiel": ["Salle de sport complète"],
+  "niveau": "intermédiaire"
+}
+
+###
+# ── CAS INVALIDE — frequence hors plage (7) ───────────────────────────────────
+
+POST {{baseUrl}}/api/generate-program
+Content-Type: application/json
+
+{
+  "objectif": "Sèche / définition",
+  "frequence": 7,
+  "materiel": ["Salle de sport complète"],
+  "niveau": "avancé"
+}
+
+###
+# ── CAS INVALIDE — niveau non reconnu ────────────────────────────────────────
+
+POST {{baseUrl}}/api/generate-program
+Content-Type: application/json
+
+{
+  "objectif": "Recomposition corporelle",
+  "frequence": 4,
+  "materiel": ["Machines guidées uniquement"],
+  "niveau": "expert"
+}
+
+###
+# ── CAS INVALIDE — materiel vide ─────────────────────────────────────────────
+
+POST {{baseUrl}}/api/generate-program
+Content-Type: application/json
+
+{
+  "objectif": "Gagner en force",
+  "frequence": 3,
+  "materiel": [],
+  "niveau": "avancé"
+}
+
+###
+# ── CAS INVALIDE — antecedents trop long (> 300 chars) ────────────────────────
+
+POST {{baseUrl}}/api/generate-program
+Content-Type: application/json
+
+{
+  "objectif": "Gagner en force",
+  "frequence": 3,
+  "materiel": ["Salle de sport complète"],
+  "niveau": "avancé",
+  "antecedents": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint."
+}
