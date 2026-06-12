@@ -44,12 +44,12 @@ export function validateProgramJSON(raw) {
   for (const day of scheduleKeys) {
     const dayInt = parseInt(day, 10);
     if (isNaN(dayInt) || dayInt < 0 || dayInt > 6) {
-      throw new ValidationError(`Schedule invalide : clé "${day}" n'est pas un indice valide (0-6)`);
+      throw new ValidationError(`Schedule invalide : la clé "${day}" n'est pas un indice de jour valide (0-6)`);
     }
     const sessionKey = program.schedule[day];
     if (!program.sessions[sessionKey]) {
       throw new ValidationError(
-        `Schedule invalide : jour ${day} référence "${sessionKey}" absent de sessions`
+        `Schedule invalide : jour ${day} référence "${sessionKey}" qui n'existe pas dans sessions`
       );
     }
   }
@@ -65,7 +65,7 @@ export function validateProgramJSON(raw) {
     }
     for (const exo of exercises) {
       if (!exo.id || typeof exo.id !== 'string' || exo.id.trim() === '') {
-        throw new ValidationError(`Session "${sessionKey}" : exercice sans "id" valide`);
+        throw new ValidationError(`Session "${sessionKey}" : un exercice n'a pas de champ "id" valide`);
       }
       if (!exo.name || typeof exo.name !== 'string' || exo.name.trim() === '') {
         throw new ValidationError(`Session "${sessionKey}" : exercice "${exo.id}" sans "name" valide`);
@@ -77,7 +77,7 @@ export function validateProgramJSON(raw) {
         );
       }
       if (allIds.has(exo.id)) {
-        throw new ValidationError(`Validation échouée : id dupliqué "${exo.id}"`);
+        throw new ValidationError(`Validation échouée : id d'exercice dupliqué "${exo.id}"`);
       }
       allIds.add(exo.id);
     }
