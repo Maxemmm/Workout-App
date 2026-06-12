@@ -2049,11 +2049,17 @@
       padding: 0 var(--space-md) var(--space-md);
     }
 
+    @keyframes plan-body-in {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0);   }
+    }
+
     /* Corps sous-vue */
     .plan-body {
       padding: 0 var(--space-md);
       display: flex;
       flex-direction: column;
+      animation: plan-body-in .18s var(--ease-out);
       gap: var(--space-sm);
       padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + var(--space-md));
     }
@@ -2139,6 +2145,21 @@
       align-items: center;
       gap: var(--space-sm);
     }
+
+    .prog-card__btn-del {
+      margin-left: auto;
+      background: none;
+      border: none;
+      padding: 4px;
+      color: var(--text-dim);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      border-radius: var(--radius-sm);
+      transition: color var(--duration-fast) var(--ease-out);
+      flex-shrink: 0;
+    }
+    .prog-card__btn-del:hover { color: var(--red-timer); }
 
     .prog-card__indicator {
       width: 10px;
@@ -2762,6 +2783,7 @@
     }
     .btn--ai:active { transform: scale(.97); }
     [data-theme="light"] .btn--ai { background: rgba(212, 162, 60, .05); }
+    .btn--ai.btn--sm { height: 40px; font-size: 12px; }
 
     /* Chips avec retour à la ligne (intentions rapides) */
     .ai-chips--wrap { flex-wrap: wrap; }
@@ -3860,7 +3882,7 @@
 
         const card = mkEl('div', isActive ? 'prog-card prog-card--active' : 'prog-card');
 
-        /* En-tête : indicateur + nom */
+        /* En-tête : indicateur + nom + poubelle */
         const hdr = mkEl('div', 'prog-card__header');
         const dot = mkEl('span', isActive ? 'prog-card__indicator prog-card__indicator--active'
                                           : 'prog-card__indicator prog-card__indicator--inactive');
@@ -3868,6 +3890,15 @@
         name.textContent = prog.meta?.label || 'Programme';
         if (isActive) name.style.color = 'var(--gold)';
         hdr.append(dot, name);
+
+        if (programs.length > 1) {
+          const btnDel = mkEl('button', 'prog-card__btn-del');
+          btnDel.title = t('plan_delete');
+          btnDel.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+          btnDel.addEventListener('click', () => deleteProgram(prog.id, prog.meta?.label));
+          hdr.appendChild(btnDel);
+        }
+
         card.appendChild(hdr);
 
         /* Méta */
@@ -3900,14 +3931,6 @@
         btnModAi.title = 'Modifier avec l\'IA';
         btnModAi.addEventListener('click', () => AiCoach.openModify(prog));
         actions.appendChild(btnModAi);
-
-        if (programs.length > 1) {
-          const btnDel = mkEl('button', 'btn btn--ghost btn--sm');
-          btnDel.style.color = 'var(--red-danger)';
-          btnDel.textContent = t('plan_delete');
-          btnDel.addEventListener('click', () => deleteProgram(prog.id, prog.meta?.label));
-          actions.appendChild(btnDel);
-        }
 
         card.appendChild(actions);
         body.appendChild(card);
