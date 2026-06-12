@@ -129,6 +129,11 @@
         profile_delete_logs_meta: "Efface l'historique des séances",
         profile_reset_app: "Réinitialiser l'application",
         profile_reset_app_meta: 'Efface toutes les données',
+        profile_ai_section: 'FONCTIONNALITÉS EXPÉRIMENTALES',
+        profile_ai_label: 'Coach IA',
+        profile_ai_desc: 'Génération de programme par intelligence artificielle',
+        profile_ai_hint_off: 'Activez pour accéder à la création de programme par IA',
+        profile_ai_hint_on: 'Coach IA activé — disponible dans Créer un programme',
         profile_about: 'À propos',
         profile_format: 'Format de programme',
         profile_format_meta: 'Compatible JSON (voir program.example.json)',
@@ -187,7 +192,9 @@
         exo_name_ph: 'EX: Presse à cuisses',
         exo_sets_label: 'Séries',
         exo_scheme_label: 'Répétitions',
-        exo_scheme_ph: 'EX: 8, 8-12, MAX, 45 sec',
+        exo_scheme_ph: 'EX: 8, 8-12, MAX',
+        exo_scheme_ph_timed: 'EX: 45',
+        exo_timed_label: 'CHRONO',
         exo_load_label_fmt: 'Poids (%s)',
         exo_load_ph: '',
         exo_rest_label: 'Repos (sec)',
@@ -308,6 +315,11 @@
         profile_delete_logs_meta: 'Clears session history',
         profile_reset_app: 'Reset application',
         profile_reset_app_meta: 'Clears all data',
+        profile_ai_section: 'EXPERIMENTAL FEATURES',
+        profile_ai_label: 'AI Coach',
+        profile_ai_desc: 'AI-powered training program generation',
+        profile_ai_hint_off: 'Enable to access AI-powered program creation',
+        profile_ai_hint_on: 'AI Coach enabled — available in Create program',
         profile_about: 'About',
         profile_format: 'Program format',
         profile_format_meta: 'JSON compatible (see program.example.json)',
@@ -366,7 +378,9 @@
         exo_name_ph: 'EX: Leg press',
         exo_sets_label: 'Sets',
         exo_scheme_label: 'Reps',
-        exo_scheme_ph: 'EX: 8, 8-12, MAX, 45 sec',
+        exo_scheme_ph: 'EX: 8, 8-12, MAX',
+        exo_scheme_ph_timed: 'EX: 45',
+        exo_timed_label: 'TIMED',
         exo_load_label_fmt: 'Weight (%s)',
         exo_load_ph: '',
         exo_rest_label: 'Rest (sec)',
@@ -423,11 +437,29 @@
     function setLang(lang) {
       localStorage.setItem('lang', lang);
       applyLang();
+      AppBar.refresh();
       /* Re-rendre tous les modules */
       if (typeof Plan   !== 'undefined') Plan.refresh();
       if (typeof Today  !== 'undefined') Today.refresh();
       if (typeof Stats  !== 'undefined') Stats.refresh();
       if (typeof Profil !== 'undefined') Profil.refresh();
+    }
+
+    /* ── Source de vérité unique pour la feature IA ──────── */
+    /* Jamais initialisé à "true" — OFF par défaut.          */
+    function isAIEnabled() {
+      return localStorage.getItem('aiEnabled') === 'true';
+    }
+
+    /* Met à jour la visibilité de tous les boutons IA statiques.  */
+    /* Appelé à chaque changement de toggle et à chaque ouverture  */
+    /* d'un écran contenant un bouton IA fixe (onboarding, éditeur). */
+    function syncAIVisibility() {
+      const on = isAIEnabled();
+      ['btnCreateAi', 'btnEditorAi'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = on ? '' : 'none';
+      });
     }
 
     /* Fonction globale accessible depuis tous les modules */
@@ -441,6 +473,35 @@
         document.documentElement.classList.remove('theme-transitioning');
       }, 350);
     }
+
+    /* Barre globale : nom du programme · date · thème */
+    function getActiveProgramLabel() {
+      try {
+        const id = localStorage.getItem('activeProgram');
+        const progs = JSON.parse(localStorage.getItem('programs') || '[]');
+        const p = progs.find(x => x.id === id);
+        if (p?.meta?.label) return p.meta.label;
+      } catch { /* ignore */ }
+      return t('editor_no_name');
+    }
+
+    function fmtAppBarDate(d) {
+      d = d || new Date();
+      return `${t('days_short')[d.getDay()]}, ${d.getDate()} ${t('months_short')[d.getMonth()]}`;
+    }
+
+    const AppBar = {
+      refresh() {
+        const lbl = document.getElementById('appBarProgram');
+        const dateEl = document.getElementById('appBarDate');
+        if (lbl) lbl.textContent = getActiveProgramLabel();
+        if (dateEl) dateEl.textContent = fmtAppBarDate(new Date());
+      },
+      init() {
+        document.getElementById('appBarTheme')?.addEventListener('click', toggleTheme);
+        this.refresh();
+      }
+    };
   </script>
 
   <!-- Chart.js 4.4.1 via CDNJS (fichier statique, SRI garanti) -->
@@ -599,14 +660,16 @@
       font-family: var(--font-ui);
       font-size: 15px;
       line-height: 1.45;
-      min-height: 100%;
-      /* Largeur max centrée sur desktop, mais plein écran mobile */
+      min-height: 100dvh;
+      max-height: 100dvh;
       max-width: 430px;
       margin: 0 auto;
       position: relative;
-      /* Empêche le rebond de scroll sur iOS */
       overscroll-behavior: none;
       touch-action: manipulation;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
     /* Supprime les styles par défaut des listes */
@@ -817,6 +880,101 @@
       color: var(--text-dim);
     }
 
+    .input-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+    }
+
+    .input-label-row .input-label {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Case CHRONO / TIMED — compacte, alignée sur la hauteur du label */
+    .timed-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      line-height: 1;
+    }
+
+    .timed-check__label {
+      font-family: var(--font-ui);
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-dim);
+      line-height: 1;
+      transition: color var(--duration-fast) var(--ease-out);
+    }
+
+    .timed-check--on .timed-check__label {
+      color: var(--gold);
+    }
+
+    .timed-check__box {
+      position: relative;
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      border: 1.5px solid var(--text-dim);
+      border-radius: 3px;
+      background: var(--bg-card-soft);
+      transition: background var(--duration-fast) var(--ease-out),
+                  border-color var(--duration-fast) var(--ease-out);
+    }
+
+    .timed-check__box input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .timed-check--on .timed-check__box {
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+
+    .timed-check--on .timed-check__box::after {
+      content: '';
+      position: absolute;
+      left: 3.5px;
+      top: 0.5px;
+      width: 4px;
+      height: 8px;
+      border: solid #000;
+      border-width: 0 1.5px 1.5px 0;
+      transform: rotate(45deg);
+      pointer-events: none;
+    }
+
+    .timed-check--sm .timed-check__label {
+      font-size: 10px;
+    }
+
+    .timed-check--sm .timed-check__box {
+      width: 12px;
+      height: 12px;
+    }
+
+    .timed-check--sm.timed-check--on .timed-check__box::after {
+      left: 3px;
+      top: 0;
+      width: 3px;
+      height: 7px;
+    }
+
     .input {
       background: var(--bg-card-soft);
       border: 1px solid var(--border);
@@ -907,6 +1065,13 @@
       background: var(--accent-fill);
       border-color: var(--accent-fill);
       color: #000;
+    }
+
+    /* Série chronométrée en cours (chrono lancé, pas encore validée) */
+    .set-circle--pending {
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent);
     }
 
     /* ============================================================
@@ -1085,6 +1250,44 @@
       color: var(--text);
     }
 
+    /* Variante Plan : pastille glissante (le fond actif est sur .segmented__thumb) */
+    .segmented--sliding {
+      position: relative;
+      isolation: isolate;
+    }
+
+    .segmented--sliding .segmented__thumb {
+      position: absolute;
+      top: 3px;
+      bottom: 3px;
+      left: 0;
+      width: 0;
+      border-radius: calc(var(--radius-md) - 2px);
+      background: var(--bg-elevated);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.28);
+      z-index: 0;
+      pointer-events: none;
+      transition: transform 0.28s var(--ease-out),
+                  width 0.28s var(--ease-out);
+      will-change: transform, width;
+    }
+
+    [data-theme="light"] .segmented--sliding .segmented__thumb {
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .segmented--sliding .segmented__btn {
+      position: relative;
+      z-index: 1;
+      background: transparent;
+      transition: color 0.22s var(--ease-out);
+    }
+
+    .segmented--sliding .segmented__btn--active {
+      background: transparent;
+      color: var(--text);
+    }
+
     /* ============================================================
        13. SÉPARATEURS & HELPERS
     ============================================================ */
@@ -1256,16 +1459,71 @@
     /* ============================================================
        17. LAYOUT PRINCIPAL
     ============================================================ */
-    .app {
-      min-height: 100dvh;
-      padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + var(--space-lg));
+
+    .app-shell {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding-bottom: calc(var(--tab-height) + var(--safe-bottom));
     }
 
-    /* Zone de contenu de chaque onglet */
-    .tab-content {
-      padding: var(--space-md);
-      /* Safe area haut pour le notch */
-      padding-top: calc(var(--space-md) + env(safe-area-inset-top, 0px));
+    /* Barre globale — programme · date · thème */
+    .app-bar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      padding: calc(env(safe-area-inset-top, 0px) + var(--space-sm)) var(--space-md) var(--space-sm);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      z-index: 40;
+      --bar-chip-h: 28px;
+    }
+
+    .app-bar__label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--gold);
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .app-bar__right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      flex-shrink: 0;
+    }
+
+    .app-bar__date {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: var(--bar-chip-h);
+      box-sizing: border-box;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      line-height: 1;
+      color: var(--text-dim);
+      background: var(--bg-card-soft);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      padding: 0 12px;
+    }
+
+    .app-bar .btn-theme {
+      width: var(--bar-chip-h);
+      height: var(--bar-chip-h);
     }
 
     /* ============================================================
@@ -1276,8 +1534,8 @@
     .screens-wrapper {
       position: relative;
       overflow: hidden;
-      /* Hauteur = viewport moins la tab bar */
-      height: calc(100dvh - var(--tab-height) - var(--safe-bottom));
+      flex: 1;
+      min-height: 0;
     }
 
     /* Chaque écran occupe toute la zone */
@@ -1294,7 +1552,6 @@
       /* Transition gérée en JS (inline style) — valeur CSS = fallback initial */
       transition: transform var(--duration-normal) var(--ease-out),
                   opacity   var(--duration-normal) ease;
-      padding-top: env(safe-area-inset-top, 0px);
       pointer-events: none;
     }
 
@@ -1787,7 +2044,7 @@
 
     .dynamic-item .input { flex: 1; }
 
-    /* Carte alternative (nom + séries / reps / poids / repos) */
+    /* Carte alternative — même logique que le formulaire exercice principal */
     .alt-card {
       background: var(--bg-card-soft);
       border: 1px solid var(--border);
@@ -1795,7 +2052,7 @@
       padding: var(--space-md);
       display: flex;
       flex-direction: column;
-      gap: var(--space-sm);
+      gap: var(--space-md);
     }
 
     .alt-card__header {
@@ -1804,12 +2061,41 @@
       gap: var(--space-sm);
     }
 
-    .alt-card__header .input { flex: 1; }
+    .alt-card__header .input { flex: 1; min-width: 0; }
 
-    .alt-card__grid {
-      display: grid;
-      grid-template-columns: 1fr 1.5fr;
+    .alt-card__row {
+      display: flex;
       gap: var(--space-sm);
+      align-items: stretch;
+    }
+
+    .alt-field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      min-width: 0;
+      flex: 1;
+    }
+
+    .alt-field--wide { flex: 2; }
+
+    .alt-field__label {
+      font-family: var(--font-ui);
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--text-dim);
+      line-height: 1.2;
+    }
+
+    .alt-field .input-label-row {
+      margin-bottom: 0;
+    }
+
+    .alt-field .input-label-row .alt-field__label {
+      flex: 1;
+      min-width: 0;
     }
 
     .dynamic-item__remove {
@@ -2380,12 +2666,84 @@
       padding: var(--space-xl) 0 var(--space-sm);
     }
 
+    /* ── Toggle IA ────────────────────────────────────────── */
+    .ai-feature-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: var(--space-md) 0;
+      gap: var(--space-md);
+      cursor: default;
+    }
+
+    .ai-feature-row__left { flex: 1; min-width: 0; }
+
+    .ai-feature-row__title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .ai-feature-row__desc {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+
+    .ai-feature-row__hint {
+      font-size: 11px;
+      color: var(--text-faint);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+    .ai-feature-row__hint--on { color: var(--gold); }
+
+    /* Pill toggle */
+    .ai-toggle {
+      position: relative;
+      width: 46px;
+      height: 28px;
+      flex-shrink: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .ai-toggle__track {
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      background: var(--text-faint);
+      transition: background 200ms var(--ease-out);
+    }
+
+    .ai-toggle--on .ai-toggle__track { background: var(--gold); }
+
+    .ai-toggle__thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,.35);
+      transition: transform 200ms var(--ease-out);
+    }
+
+    .ai-toggle--on .ai-toggle__thumb { transform: translateX(18px); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ai-toggle__track, .ai-toggle__thumb { transition: none; }
+    }
+
     /* Reduced motion */
     @media (prefers-reduced-motion: reduce) {
       .anim-onboarding-logo,
       .anim-onboarding-ctas,
       .onboarding__bg::before,
       .onboarding__bg-blob,
+      .segmented--sliding .segmented__thumb,
       .editor-step,
       .modal-sheet,
       .modal-overlay.is-closing,
@@ -2396,22 +2754,37 @@
        21. PHASE 3 — TODAY SCREEN
     ============================================================ */
 
-    /* --- En-tête --- */
+    /* Today : en-tête fixe + zone scrollable (sous le compteur de séries) */
+    #screen-today {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .today-layout {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      height: 100%;
+    }
+
+    .today-layout__head {
+      flex-shrink: 0;
+    }
+
+    .today-layout__scroll {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    /* --- En-tête page Today (sous la barre globale) --- */
     .today-header {
-      padding: var(--space-md) var(--space-md) 0;
-    }
-
-    .today-header__top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--space-sm);
-    }
-
-    .today-header__right {
-      display: flex;
-      align-items: center;
-      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-md) 0;
     }
 
     /* Pills de langue (Profil) */
@@ -2473,26 +2846,6 @@
     [data-theme="light"] .btn-theme .icon-sun  { display: none; }
     [data-theme="light"] .btn-theme .icon-moon { display: block; }
 
-    .today-header__label {
-      font-size: 11px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: .12em;
-      color: var(--gold);
-    }
-
-    .today-header__date {
-      font-size: 11px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: .07em;
-      color: var(--text-dim);
-      background: var(--bg-card-soft);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-full);
-      padding: 4px 12px;
-    }
-
     .today-word {
       font-family: var(--font-display);
       font-weight: 800;
@@ -2531,15 +2884,16 @@
 
     /* --- Compteur de progression --- */
     .today-progress {
-      padding: var(--space-sm) var(--space-md);
+      padding: var(--space-sm) var(--space-md) var(--space-md);
       display: flex;
       flex-direction: column;
       gap: 6px;
+      border-bottom: 1px solid var(--border);
     }
 
     /* --- Corps séance --- */
     .today-body {
-      padding: 0 var(--space-md) var(--space-md);
+      padding: var(--space-md) var(--space-md) var(--space-md);
       display: flex;
       flex-direction: column;
       gap: var(--space-md);
@@ -2750,8 +3104,7 @@
 
     /* --- Footer : Terminer la séance --- */
     .today-footer {
-      padding: var(--space-md);
-      padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + var(--space-md));
+      padding: 0 var(--space-md) var(--space-xl);
     }
 
     /* --- Pas de programme --- */
@@ -2926,8 +3279,10 @@
     }
     @keyframes aiSpin { to { transform: rotate(360deg); } }
     .ai-generating-msg { color: var(--text-dim); font-size: .9rem; text-align: center; }
-    .ai-error { display: flex; flex-direction: column; align-items: center; gap: var(--space-md); width: 100%; }
-    .ai-error p { color: var(--rust); text-align: center; margin: 0; }
+    .ai-error { border: 1px solid var(--rust); border-radius: 14px; padding: var(--space-md); background: rgba(196,86,31,.08); width: 100%; box-sizing: border-box; }
+    .ai-error__icon { font-size: 22px; text-align: center; margin-bottom: var(--space-xs); }
+    .ai-error__msg { color: var(--text-dim); font-size: 14px; line-height: 1.5; text-align: center; margin: 0; }
+    .ai-error__actions { display: flex; flex-direction: column; gap: var(--space-xs); margin-top: var(--space-md); }
 
     /* Footer SUIVANT — positionné en bas, respecte safe areas iOS */
     .editor-footer {
@@ -3001,6 +3356,28 @@
 
 <body>
 
+  <div class="app-shell" id="appShell">
+
+  <!-- Barre globale : programme · date · thème -->
+  <header class="app-bar" id="appBar" aria-label="Barre de contexte">
+    <p class="app-bar__label" id="appBarProgram">PROGRAMME</p>
+    <div class="app-bar__right">
+      <p class="app-bar__date" id="appBarDate" aria-live="polite"></p>
+      <button type="button" class="btn-theme" id="appBarTheme" aria-label="Changer de thème">
+        <svg class="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <svg class="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
   <!-- ============================================================
        ÉCRANS PRINCIPAUX
   ============================================================ -->
@@ -3058,6 +3435,8 @@
     </div>
 
   </div><!-- fin screens-wrapper -->
+
+  </div><!-- fin app-shell -->
 
   <!-- ============================================================
        TAB BAR
@@ -3221,6 +3600,10 @@
         <div id="scheduleRows" class="stack stack--sm"></div>
         <div style="margin-top: var(--space-xl);">
           <button class="btn btn--primary btn--full" id="step3Save" data-i18n="editor_save_program_btn">ENREGISTRER LE PROGRAMME</button>
+          <button class="btn btn--ai btn--full" id="btnEditorAi" style="display:none; margin-top: var(--space-xs);">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2 14.4 9.6 22 12 14.4 14.4 12 22 9.6 14.4 2 12 9.6 9.6Z"/></svg>
+            SUGGÉRER DES MODIFICATIONS
+          </button>
         </div>
       </div>
 
@@ -3478,8 +3861,17 @@
             <p class="ai-generating-msg" id="aiGeneratingMsg">Analyse de votre profil…</p>
           </div>
           <div id="aiError" class="ai-error is-hidden">
-            <p id="aiErrorMsg"></p>
-            <button class="btn btn--secondary" id="aiRetry">Réessayer</button>
+            <div class="ai-error__icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--rust)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </div>
+            <p id="aiErrorMsg" class="ai-error__msg"></p>
+            <div class="ai-error__actions">
+              <button class="btn btn--secondary btn--full" id="aiRetry">Réessayer</button>
+              <button class="btn btn--ghost btn--full" id="aiManual">Créer manuellement</button>
+            </div>
           </div>
           <button class="btn btn--primary btn--full" id="aiGenerate">GÉNÉRER MON PROGRAMME</button>
         </div>
@@ -3533,8 +3925,16 @@
             <input class="input" type="number" id="exoSets" placeholder="4" min="1" max="20" inputmode="numeric" />
           </div>
           <div class="input-wrapper" style="flex: 2;">
-            <label class="input-label" for="exoScheme" data-i18n="exo_scheme_label">Répétitions</label>
-            <input class="input" type="text" id="exoScheme" placeholder="EX: 8, 8-12, MAX, 45 sec" data-i18n-ph="exo_scheme_ph" inputmode="text" />
+            <div class="input-label-row">
+              <label class="input-label" for="exoScheme" data-i18n="exo_scheme_label">Répétitions</label>
+              <label class="timed-check" id="exoTimedWrap">
+                <span class="timed-check__box">
+                  <input type="checkbox" id="exoTimed" />
+                </span>
+                <span class="timed-check__label" data-i18n="exo_timed_label">CHRONO</span>
+              </label>
+            </div>
+            <input class="input" type="text" id="exoScheme" placeholder="EX: 8, 8-12, MAX" data-i18n-ph="exo_scheme_ph" inputmode="text" />
           </div>
         </div>
 
@@ -3764,8 +4164,91 @@
       return getPrograms().find(p => p.id === id) || null;
     }
 
+    function motionReduced() {
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+
+    /* Positionne la pastille sous l'onglet actif */
+    function positionPlanThumb(seg, animate) {
+      const thumb = seg.querySelector('.segmented__thumb');
+      const active = seg.querySelector('.segmented__btn--active');
+      if (!thumb || !active) return;
+
+      const useAnim = animate && !motionReduced();
+      if (!useAnim) thumb.style.transition = 'none';
+
+      const segRect  = seg.getBoundingClientRect();
+      const btnRect  = active.getBoundingClientRect();
+      const left     = btnRect.left - segRect.left;
+
+      thumb.style.width = `${btnRect.width}px`;
+      thumb.style.transform = `translateX(${left}px)`;
+
+      if (!useAnim) {
+        void thumb.offsetWidth;
+        thumb.style.transition = '';
+      }
+    }
+
+    function rebuildPlanBody(body, prog) {
+      body.innerHTML = '';
+      if (view === 'week') buildWeekView(body, prog);
+      else                 buildProgramsView(body);
+    }
+
+    function switchPlanView(newView) {
+      if (view === newView) return;
+
+      slideDir = newView === 'programs' ? 'right' : 'left';
+      view = newView;
+
+      const seg = $screen.querySelector('.segmented--sliding');
+      if (!seg) {
+        render({ animateThumb: true });
+        return;
+      }
+
+      const [btnWeek, btnProgs] = seg.querySelectorAll('.segmented__btn');
+      btnWeek.classList.toggle('segmented__btn--active', newView === 'week');
+      btnProgs.classList.toggle('segmented__btn--active', newView === 'programs');
+      positionPlanThumb(seg, true);
+
+      const body = $screen.querySelector('.plan-body');
+      if (body) {
+        const dir = slideDir;
+        slideDir = null;
+        body.style.animation = `plan-slide-from-${dir} .22s var(--ease-out)`;
+        rebuildPlanBody(body, getActiveProgram());
+      }
+    }
+
+    function buildPlanSegmented() {
+      const tabWrap = mkEl('div', 'plan-tabs');
+      const seg     = mkEl('div', 'segmented segmented--sliding');
+      const thumb   = mkEl('div', 'segmented__thumb');
+      seg.appendChild(thumb);
+
+      const btnWeek = mkEl('button', 'segmented__btn');
+      btnWeek.type = 'button';
+      btnWeek.textContent = t('plan_this_week');
+      if (view === 'week') btnWeek.classList.add('segmented__btn--active');
+
+      const btnProgs = mkEl('button', 'segmented__btn');
+      btnProgs.type = 'button';
+      btnProgs.textContent = t('plan_my_programs');
+      if (view === 'programs') btnProgs.classList.add('segmented__btn--active');
+
+      btnWeek.addEventListener('click', () => switchPlanView('week'));
+      btnProgs.addEventListener('click', () => switchPlanView('programs'));
+
+      seg.append(btnWeek, btnProgs);
+      tabWrap.appendChild(seg);
+      return tabWrap;
+    }
+
     /* ── RENDU PRINCIPAL ─────────────────────────────────── */
-    function render() {
+    function render(opts) {
+      const animateThumb = opts && opts.animateThumb;
       $screen.innerHTML = '';
       const prog = getActiveProgram();
 
@@ -3776,32 +4259,7 @@
       $screen.appendChild(hdr);
 
       /* Segmented control */
-      const tabWrap = mkEl('div', 'plan-tabs');
-      const seg = mkEl('div', 'segmented');
-
-      const btnWeek = mkEl('button', 'segmented__btn');
-      btnWeek.textContent = t('plan_this_week');
-      if (view === 'week') btnWeek.classList.add('segmented__btn--active');
-
-      const btnProgs = mkEl('button', 'segmented__btn');
-      btnProgs.textContent = t('plan_my_programs');
-      if (view === 'programs') btnProgs.classList.add('segmented__btn--active');
-
-      btnWeek.addEventListener('click', () => {
-        if (view === 'week') return;
-        slideDir = 'left'; /* programs → week : slide depuis la gauche */
-        view = 'week';
-        render();
-      });
-      btnProgs.addEventListener('click', () => {
-        if (view === 'programs') return;
-        slideDir = 'right'; /* week → programs : slide depuis la droite */
-        view = 'programs';
-        render();
-      });
-
-      seg.append(btnWeek, btnProgs);
-      tabWrap.appendChild(seg);
+      const tabWrap = buildPlanSegmented();
       $screen.appendChild(tabWrap);
 
       /* Corps */
@@ -3810,9 +4268,11 @@
         body.style.animation = `plan-slide-from-${slideDir} .22s var(--ease-out)`;
         slideDir = null;
       }
-      if (view === 'week') buildWeekView(body, prog);
-      else                 buildProgramsView(body);
+      rebuildPlanBody(body, prog);
       $screen.appendChild(body);
+
+      const seg = tabWrap.querySelector('.segmented--sliding');
+      requestAnimationFrame(() => positionPlanThumb(seg, !!animateThumb));
     }
 
     /* ── SOUS-VUE : CETTE SEMAINE ────────────────────────── */
@@ -3919,7 +4379,10 @@
           const btnDel = mkEl('button', 'prog-card__btn-del');
           btnDel.title = t('plan_delete');
           btnDel.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
-          btnDel.addEventListener('click', () => deleteProgram(prog.id, prog.meta?.label));
+          btnDel.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteProgram(prog.id, prog.meta?.label);
+          });
           hdr.appendChild(btnDel);
         }
 
@@ -3944,19 +4407,30 @@
 
         const btnEdit = mkEl('button', 'btn btn--secondary btn--sm');
         btnEdit.textContent = t('plan_edit');
-        btnEdit.addEventListener('click', () => App.openEditor(prog.id));
+        btnEdit.addEventListener('click', (e) => {
+          e.stopPropagation();
+          App.openEditor(prog.id);
+        });
         actions.appendChild(btnEdit);
 
         const btnDup = mkEl('button', 'btn btn--secondary btn--sm');
         btnDup.textContent = t('plan_duplicate');
-        btnDup.addEventListener('click', () => duplicateProgram(prog.id));
+        btnDup.addEventListener('click', (e) => {
+          e.stopPropagation();
+          duplicateProgram(prog.id);
+        });
         actions.appendChild(btnDup);
 
-        const btnModAi = mkEl('button', 'btn btn--ai btn--sm');
-        btnModAi.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2 14.4 9.6 22 12 14.4 14.4 12 22 9.6 14.4 2 12 9.6 9.6Z"/></svg> IA';
-        btnModAi.title = 'Modifier avec l\'IA';
-        btnModAi.addEventListener('click', () => AiCoach.openModify(prog));
-        actions.appendChild(btnModAi);
+        if (isAIEnabled()) {
+          const btnModAi = mkEl('button', 'btn btn--ai btn--sm');
+          btnModAi.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2 14.4 9.6 22 12 14.4 14.4 12 22 9.6 14.4 2 12 9.6 9.6Z"/></svg> IA';
+          btnModAi.title = 'Modifier avec l\'IA';
+          btnModAi.addEventListener('click', (e) => {
+            e.stopPropagation();
+            AiCoach.openModify(prog);
+          });
+          actions.appendChild(btnModAi);
+        }
 
         card.appendChild(actions);
         body.appendChild(card);
@@ -3972,30 +4446,27 @@
       btnNew.addEventListener('click', () => App.openEditor(null));
       body.appendChild(btnNew);
 
-      /* Bouton Créer avec l'IA */
-      const btnAi = mkEl('button', 'btn btn--ai btn--full');
-      btnAi.style.marginTop = 'var(--space-xs)';
-      btnAi.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2 14.4 9.6 22 12 14.4 14.4 12 22 9.6 14.4 2 12 9.6 9.6Z"/></svg> CRÉER AVEC L\'IA';
-      btnAi.addEventListener('click', () => AiCoach.open());
-      body.appendChild(btnAi);
+      /* Bouton Créer avec l'IA — visible uniquement si IA activée */
+      if (isAIEnabled()) {
+        const btnAi = mkEl('button', 'btn btn--ai btn--full');
+        btnAi.style.marginTop = 'var(--space-xs)';
+        btnAi.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2 14.4 9.6 22 12 14.4 14.4 12 22 9.6 14.4 2 12 9.6 9.6Z"/></svg> CRÉER AVEC L\'IA';
+        btnAi.addEventListener('click', () => AiCoach.open());
+        body.appendChild(btnAi);
+      }
     }
 
     /* ── Actions programmes ───────────────────────────────── */
     function activateProgram(id) {
       localStorage.setItem(LS_ACTIVE, id);
+      AppBar.refresh();
       Today.refresh();
       render();
     }
 
     function duplicateProgram(id) {
-      const progs = getPrograms();
-      const src   = progs.find(p => p.id === id);
-      if (!src) return;
-      const copy  = JSON.parse(JSON.stringify(src));
-      copy.id     = 'prog-' + Date.now();
-      copy.meta   = { ...copy.meta, label: (copy.meta?.label || '') + ' (copie)' };
-      progs.push(copy);
-      localStorage.setItem(LS_PROGRAMS, JSON.stringify(progs));
+      const copy = App.duplicateProgram(id);
+      if (!copy) return;
       App.showToast(t('plan_duplicated'));
       render();
     }
@@ -4008,6 +4479,7 @@
       /* Si on supprime l'actif, activer le premier restant */
       if (getActiveId() === id && progs.length) {
         localStorage.setItem(LS_ACTIVE, progs[0].id);
+        AppBar.refresh();
         Today.refresh();
       }
       App.showToast(t('plan_deleted'));
@@ -4027,13 +4499,18 @@
 
     /* Naviguer vers une sous-vue précise (appelé depuis Profil) */
     function navigateTo(targetView) {
-      view = targetView;
-      render();
+      const changed = view !== targetView;
+      if (changed) {
+        slideDir = targetView === 'programs' ? 'right' : 'left';
+        view = targetView;
+      }
+      render({ animateThumb: changed });
     }
 
     return { init, refresh, navigateTo };
   })();
 
+  AppBar.init();
   Plan.init();
   </script>
 
@@ -4133,6 +4610,20 @@
       document.documentElement.style.setProperty('--accent-fill', `var(${vf})`);
     }
 
+    function mountTodayLayout() {
+      const layout = mkEl('div', 'today-layout');
+      const head   = mkEl('div', 'today-layout__head');
+      const scroll = mkEl('div', 'today-layout__scroll');
+      layout.append(head, scroll);
+      $screen.appendChild(layout);
+      return { head, scroll };
+    }
+
+    function scrollTodayToTop() {
+      $screen.querySelector('.today-layout__scroll')
+        ?.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     /* ── RENDU PRINCIPAL ─────────────────────────────────── */
     function render() {
       let timerSnap = captureTimerSnapshot();
@@ -4148,22 +4639,25 @@
       const session = result?.session || null;
       applyAccent(session?.accent || 'gray');
 
-      $screen.appendChild(buildHeader(session));
-      $screen.appendChild(buildDayTabs());
+      const { head, scroll } = mountTodayLayout();
+
+      head.appendChild(buildHeader(session));
+      head.appendChild(buildDayTabs());
 
       const isLift = session && (session.type === 'lift' || session.type === 'mixed');
       if (!isLift) {
-        renderRestOrCardio(session);
+        renderRestOrCardio(session, scroll);
       } else {
-        $screen.appendChild(buildProgress(sessKey, session));
-        $screen.appendChild(buildBody(sessKey, session));
-        $screen.appendChild(buildFooter(sessKey, session));
+        head.appendChild(buildProgress(sessKey, session));
+        scroll.appendChild(buildBody(sessKey, session));
+        scroll.appendChild(buildFooter(sessKey, session));
         resumeTimerFromSnapshot(timerSnap);
       }
     }
 
     /* ── Pas de programme ────────────────────────────────── */
     function renderNoProgram() {
+      const { scroll } = mountTodayLayout();
       const div = mkEl('div', 'no-program');
       const icon = mkEl('svg', 'rest-screen__icon');
       icon.setAttribute('viewBox','0 0 24 24');
@@ -4183,41 +4677,16 @@
       btn.textContent = t('today_create_program');
       btn.addEventListener('click', () => App.openEditor(null));
       div.append(icon, title, sub, btn);
-      $screen.appendChild(div);
+      scroll.appendChild(div);
     }
 
-    /* ── En-tête ─────────────────────────────────────────── */
+    /* ── En-tête page Today ──────────────────────────────── */
     function buildHeader(session) {
       const hdr = mkEl('div', 'today-header');
-      const top = mkEl('div', 'today-header__top');
-      const lbl = mkEl('p', 'today-header__label');
-      lbl.textContent = program.meta?.label || 'PROGRAMME';
-
-      const dateEl = mkEl('p', 'today-header__date');
-      dateEl.textContent = fmtDate(new Date());
-
-      const themeBtn = mkEl('button', 'btn-theme');
-      themeBtn.setAttribute('aria-label', 'Changer de thème');
-      themeBtn.innerHTML =
-        `<svg class="icon-sun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="5"/>
-          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-        </svg>
-        <svg class="icon-moon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>`;
-      themeBtn.addEventListener('click', toggleTheme);
-
-      const right = mkEl('div', 'today-header__right');
-      right.append(dateEl, themeBtn);
-      top.append(lbl, right);
 
       const word = mkEl('p', 'today-word');
       word.textContent = t('today_word');
-      hdr.append(top, word);
+      hdr.appendChild(word);
 
       if (session) {
         const name = mkEl('p', 'today-session-name');
@@ -4254,12 +4723,17 @@
           if (dayIdx === viewDay) return;
           viewDay = dayIdx;
           render();
-          $screen.scrollTo({ top: 0, behavior: 'smooth' });
+          scrollTodayToTop();
         });
         tabs.appendChild(btn);
       });
       wrap.appendChild(tabs);
       return wrap;
+    }
+
+    function formatSetsPercent(done, total) {
+      if (!total) return '0%';
+      return `${Math.round((done / total) * 100)}%`;
     }
 
     /* ── Barre de progression ─────────────────────────────── */
@@ -4275,7 +4749,7 @@
       const cnt  = mkEl('p', 't-label');
       cnt.id = 'todayProgressCount';
       cnt.style.color = 'var(--text)';
-      cnt.textContent = `${done} / ${total}`;
+      cnt.textContent = formatSetsPercent(done, total);
       row.append(lbl, cnt);
 
       const bar  = mkEl('div', 'progress-bar');
@@ -4431,10 +4905,9 @@
     }
 
     /* ── Repos / Cardio ──────────────────────────────────── */
-    function renderRestOrCardio(session) {
+    function renderRestOrCardio(session, scrollEl) {
       if (session?.tips?.length) {
         const body = mkEl('div', 'today-body');
-        body.style.marginTop = 'var(--space-md)';
         session.tips.forEach(tip => {
           const card  = mkEl('div', 'tip-today');
           const title = mkEl('p', 'tip-today__title');
@@ -4445,7 +4918,7 @@
           card.append(title, bdy);
           body.appendChild(card);
         });
-        $screen.appendChild(body);
+        scrollEl.appendChild(body);
       } else {
         const rest = mkEl('div', 'rest-screen');
         rest.innerHTML = `
@@ -4456,7 +4929,7 @@
           </svg>
           <p class="rest-screen__title">${t('today_rest_label')}</p>
           <p class="rest-screen__sub">${t('today_rest_sub')}</p>`;
-        $screen.appendChild(rest);
+        scrollEl.appendChild(rest);
       }
     }
 
@@ -4493,10 +4966,45 @@
       return footer;
     }
 
-    /* Exercice chronométré (ex. "45 sec") */
+    /* Exercice chronométré — détection explicite (timed) + repli sur l'ancien format "45 sec" */
     function parseTimedSeconds(scheme) {
-      const m = String(scheme || '').match(/(\d+)\s*sec/i);
-      return m ? parseInt(m[1], 10) : 0;
+      const matches = [...String(scheme || '').matchAll(/(\d+)\s*sec/gi)];
+      if (!matches.length) return 0;
+      return parseInt(matches[matches.length - 1][1], 10);
+    }
+
+    function isExerciseTimed(exo) {
+      if (!exo) return false;
+      if (exo.timed === true) return true;
+      if (exo.timed === false) return false;
+      return parseTimedSeconds(exo.scheme) > 0;
+    }
+
+    function resolveWorkSeconds(exo) {
+      if (!isExerciseTimed(exo)) return 0;
+      const fromSec = parseTimedSeconds(exo.scheme);
+      if (fromSec > 0) return fromSec;
+      const n = parseInt(String(exo.scheme || '').trim(), 10);
+      return (n > 0 && n <= 600) ? n : 0;
+    }
+
+    function highlightPendingSetCircle(exoIdx, setIdx) {
+      document.querySelectorAll('.set-circle--pending').forEach(el => {
+        el.classList.remove('set-circle--pending');
+      });
+      if (exoIdx < 0 || setIdx < 0) return;
+      const circle = document.querySelector(
+        `#exo-${exoIdx} .set-circle:nth-child(${setIdx + 1})`
+      );
+      circle?.classList.add('set-circle--pending');
+    }
+
+    function isWorkTimerPending(exoIdx, setIdx) {
+      return timerMode === 'work' &&
+        timerPending &&
+        timerPending.exoIdx === exoIdx &&
+        timerPending.setIdx === setIdx &&
+        timerEndAt != null;
     }
 
     /* ── Clic sur un cercle ───────────────────────────────── */
@@ -4506,13 +5014,20 @@
       if (!track[exoIdx]) track[exoIdx] = Array(exo.sets || 0).fill(false);
 
       const nowChecked = !track[exoIdx][setIdx];
-      const timedSec   = parseTimedSeconds(exo.scheme);
+      const timedSec   = resolveWorkSeconds(exo);
+
+      /* Second clic sur la même série : annule le chrono (clic accidentel) */
+      if (isWorkTimerPending(exoIdx, setIdx)) {
+        stopTimer();
+        return;
+      }
 
       /* Série en secondes : lancer le chrono avant de cocher */
-      if (!nowChecked && timedSec > 0) {
+      if (nowChecked && timedSec > 0) {
         if (timerExoIdx === exoIdx && timerMode === 'work') stopTimer();
         timerPending = { exoIdx, setIdx, exo, sessKey, session };
         startTimer(timedSec, exoIdx, 'work');
+        highlightPendingSetCircle(exoIdx, setIdx);
         return;
       }
 
@@ -4651,6 +5166,9 @@
       timerMode      = snap.mode || 'rest';
       timerPending   = snap.pending;
       $timerBar      = document.getElementById(`rest-${snap.exoIdx}`);
+      if (snap.mode === 'work' && snap.pending) {
+        highlightPendingSetCircle(snap.pending.exoIdx, snap.pending.setIdx);
+      }
       scheduleTimerTick();
       tickTimer();
       acquireWakeLock();
@@ -4788,6 +5306,7 @@
       timerEndAt = null;
       sessionStorage.removeItem(TIMER_STORAGE_KEY);
       releaseWakeLock();
+      highlightPendingSetCircle(-1, -1);
       if ($timerBar) {
         const $txt = $timerBar.querySelector('.rest-bar__text');
         if ($txt) $txt.textContent = ` ${t('timer_rest')} ${$timerBar.dataset.restSec || 90}S`;
@@ -4851,7 +5370,7 @@
       const done  = countDone(track, exos);
       const $cnt  = document.getElementById('todayProgressCount');
       const $fill = document.getElementById('todayProgressFill');
-      if ($cnt)  $cnt.textContent  = `${done} / ${total}`;
+      if ($cnt)  $cnt.textContent  = formatSetsPercent(done, total);
       if ($fill) $fill.style.width = total > 0 ? `${(done/total)*100}%` : '0%';
     }
 
@@ -4912,9 +5431,6 @@
     function countDone(track, exos) {
       return exos.reduce((t, e, i) => t + (track[i] || []).filter(Boolean).length, 0);
     }
-    function fmtDate(d) {
-      return `${t('days_short')[d.getDay()]}, ${d.getDate()} ${t('months_short')[d.getMonth()]}`;
-    }
 
     /* Formate le schéma sous la forme "3 × 12"
        Si scheme contient déjà "×", on extrait la partie reps (après ×).
@@ -4923,7 +5439,8 @@
       if (!exo.sets) return exo.scheme || '';
       const raw  = (exo.scheme || '').trim();
       const reps = raw.includes('×') ? raw.split('×')[1].trim() : raw;
-      return `${exo.sets} × ${reps || '?'}`;
+      const suffix = isExerciseTimed(exo) && reps && !/sec/i.test(reps) ? ' sec' : '';
+      return `${exo.sets} × ${reps || '?'}${suffix}`;
     }
 
     function mkEl(tag, cls) {
@@ -5044,17 +5561,98 @@
     const ACCENT_CYCLE = ['gold', 'rust', 'blue'];
 
     /* Accent automatique : or → rouille → bleu (reboucle), gris pour repos */
-    function assignSessionAccents() {
+    function assignSessionAccentsOnProgram(program) {
       let i = 0;
-      Object.keys(draft.sessions).sort().forEach(k => {
+      Object.keys(program.sessions || {}).sort().forEach(k => {
         if (k === '_tmp_') return;
-        const s = draft.sessions[k];
+        const s = program.sessions[k];
+        if (!s) return;
         if (s.type === 'rest') s.accent = 'gray';
         else {
           s.accent = ACCENT_CYCLE[i % ACCENT_CYCLE.length];
           i++;
         }
       });
+    }
+
+    function assignSessionAccents() {
+      assignSessionAccentsOnProgram(draft);
+    }
+
+    function newEntityId(prefix) {
+      return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    }
+
+    /* Clone profond d'un programme : nouvel id, clés de séances et ids exercices remappés. */
+    function cloneProgram(source) {
+      if (!source || typeof source !== 'object') return null;
+
+      const copy = JSON.parse(JSON.stringify(source));
+
+      copy.id = newEntityId('prog');
+      copy.meta = {
+        label: '',
+        units: 'kg',
+        restDefaultSec: 90,
+        repsInReserve: '1 à 2 reps en réserve',
+        ...(copy.meta || {}),
+      };
+      const suffix = currentLang() === 'en' ? ' (copy)' : ' (copie)';
+      const baseLabel = (copy.meta.label || t('editor_no_name')).trim();
+      if (!/\((copie|copy)\)$/i.test(baseLabel)) {
+        copy.meta.label = baseLabel + suffix;
+      }
+
+      const oldSessions = copy.sessions || {};
+      const newSessions = {};
+      const keyMap = {};
+
+      Object.keys(oldSessions).sort().forEach(oldKey => {
+        if (oldKey === '_tmp_') return;
+        const sess = oldSessions[oldKey];
+        if (!sess || typeof sess !== 'object') return;
+        const newKey = newEntityId('sess');
+        keyMap[oldKey] = newKey;
+        newSessions[newKey] = sess;
+        (newSessions[newKey].exercises || []).forEach(exo => {
+          if (exo && typeof exo === 'object') exo.id = newEntityId('exo');
+        });
+      });
+
+      copy.sessions = newSessions;
+
+      const newSchedule = {};
+      Object.entries(copy.schedule || {}).forEach(([day, oldKey]) => {
+        const mapped = keyMap[oldKey];
+        if (mapped) newSchedule[day] = mapped;
+      });
+      copy.schedule = newSchedule;
+
+      if (!Array.isArray(copy.rules)) copy.rules = [];
+
+      assignSessionAccentsOnProgram(copy);
+      sanitizeProgram(copy);
+
+      return copy;
+    }
+
+    function duplicateProgramById(id) {
+      loadPrograms();
+      let src = programs.find(p => p.id === id);
+      if (!src) {
+        try {
+          src = (JSON.parse(localStorage.getItem(LS_PROGRAMS) || '[]')).find(p => p.id === id);
+        } catch { src = null; }
+      }
+      if (!src) return null;
+
+      const copy = cloneProgram(src);
+      if (!copy) return null;
+
+      loadPrograms();
+      programs.push(copy);
+      savePrograms();
+      return copy;
     }
 
     function syncActiveProgramFromDraft() {
@@ -5193,6 +5791,7 @@
     function showOnboarding() {
       initOnboardingBg();
       $onboarding.classList.remove('is-hidden');
+      syncAIVisibility();
     }
 
     function checkOnboarding() {
@@ -5209,6 +5808,10 @@
     document.getElementById('btnCreateAi').addEventListener('click', () => {
       $onboarding.classList.add('is-hidden');
       AiCoach.open();
+    });
+
+    document.getElementById('btnEditorAi').addEventListener('click', () => {
+      AiCoach.openModify(draft);
     });
 
     document.getElementById('btnImport').addEventListener('click', () => {
@@ -5230,14 +5833,24 @@
     const $edStepLabel = document.getElementById('editorStepLabel');
 
     function openEditor(programId) {
-      loadDraft();
       if (programId) {
-        const prog = programs.find(p => p.id === programId);
-        if (prog) { draft = JSON.parse(JSON.stringify(prog)); persistDraft(); }
+        loadPrograms();
+        let prog = programs.find(p => p.id === programId);
+        if (!prog) {
+          try {
+            prog = (JSON.parse(localStorage.getItem(LS_PROGRAMS) || '[]')).find(p => p.id === programId);
+          } catch { prog = null; }
+        }
+        draft = prog ? JSON.parse(JSON.stringify(prog)) : { ...makeFreshDraft(), id: programId };
+        localStorage.setItem(LS_DRAFT, JSON.stringify(draft));
+      } else {
+        draft = makeFreshDraft();
+        localStorage.setItem(LS_DRAFT, JSON.stringify(draft));
       }
       prevDisplayStep = 1;
       $editor.classList.remove('is-hidden');
       goToEditorStep(1, false);
+      syncAIVisibility();
     }
 
     function closeEditor(cancelled = true) {
@@ -5252,8 +5865,8 @@
 
     function openEditorWithProgram(program) {
       draft = JSON.parse(JSON.stringify(program));
-      if (!draft.id) draft.id = 'prog-' + Date.now();
-      persistDraft();
+      if (!draft.id) draft.id = newEntityId('prog');
+      localStorage.setItem(LS_DRAFT, JSON.stringify(draft));
       localStorage.setItem(LS_ONBOARDED, 'true');
       prevDisplayStep = 1;
       $editor.classList.remove('is-hidden');
@@ -5715,10 +6328,36 @@
     const $exoName  = document.getElementById('exoName');
     const $exoSets  = document.getElementById('exoSets');
     const $exoScheme = document.getElementById('exoScheme');
+    const $exoTimed     = document.getElementById('exoTimed');
+    const $exoTimedWrap = document.getElementById('exoTimedWrap');
     const $exoLoad  = document.getElementById('exoLoad');
     const $exoRest  = document.getElementById('exoRest');
     const $exoCue   = document.getElementById('exoCue');
     const $altList  = document.getElementById('altList');
+
+    function legacySchemeIsTimed(scheme) {
+      return /(\d+)\s*sec/i.test(String(scheme || ''));
+    }
+
+    function inferTimedFlag(exo) {
+      if (!exo) return false;
+      if (exo.timed === true) return true;
+      if (exo.timed === false) return false;
+      return legacySchemeIsTimed(exo.scheme);
+    }
+
+    function syncTimedCheckUI() {
+      $exoTimedWrap?.classList.toggle('timed-check--on', !!$exoTimed?.checked);
+    }
+
+    function syncSchemePlaceholder() {
+      $exoScheme.placeholder = $exoTimed.checked ? t('exo_scheme_ph_timed') : t('exo_scheme_ph');
+    }
+
+    $exoTimed?.addEventListener('change', () => {
+      syncTimedCheckUI();
+      syncSchemePlaceholder();
+    });
 
     function closeModal(el) {
       el.classList.add('is-closing');
@@ -5741,6 +6380,9 @@
       $exoName.value   = exo?.name   || '';
       $exoSets.value   = exo?.sets   || '';
       $exoScheme.value = exo?.scheme || '';
+      $exoTimed.checked = inferTimedFlag(exo);
+      syncTimedCheckUI();
+      syncSchemePlaceholder();
       $exoLoad.value   = exo?.load   || '';
       $exoRest.value   = exo?.restSec || '';
       $exoCue.value    = exo?.cue    || '';
@@ -5760,7 +6402,8 @@
           sets: parentExo?.sets ?? null,
           scheme: parentExo?.scheme ?? null,
           load: parentExo?.load ?? null,
-          restSec: parentExo?.restSec ?? null
+          restSec: parentExo?.restSec ?? null,
+          timed: parentExo?.timed ?? false
         };
       }
       return {
@@ -5768,43 +6411,54 @@
         sets: alt?.sets ?? parentExo?.sets ?? null,
         scheme: alt?.scheme ?? parentExo?.scheme ?? null,
         load: alt?.load ?? parentExo?.load ?? null,
-        restSec: alt?.restSec ?? parentExo?.restSec ?? null
+        restSec: alt?.restSec ?? parentExo?.restSec ?? null,
+        timed: alt?.timed ?? parentExo?.timed ?? false
       };
     }
 
     function readAltListFromDom(parentExo) {
       return Array.from($altList.querySelectorAll('.alt-card')).map(card => {
-        const ins = card.querySelectorAll('input');
+        const nameInp   = card.querySelector('.alt-name');
+        const setsInp   = card.querySelector('.alt-sets');
+        const schemeInp = card.querySelector('.alt-scheme');
+        const loadInp   = card.querySelector('.alt-load');
+        const restInp   = card.querySelector('.alt-rest');
+        const timedCb   = card.querySelector('.alt-timed');
         return {
-          name: (ins[0]?.value || '').trim(),
-          sets: parseInt(ins[1]?.value, 10) || null,
-          scheme: (ins[2]?.value || '').trim() || null,
-          load: (ins[3]?.value || '').trim() || null,
-          restSec: parseInt(ins[4]?.value, 10) || null
+          name: (nameInp?.value || '').trim(),
+          sets: parseInt(setsInp?.value, 10) || null,
+          scheme: (schemeInp?.value || '').trim() || null,
+          load: (loadInp?.value || '').trim() || null,
+          restSec: parseInt(restInp?.value, 10) || null,
+          timed: !!timedCb?.checked
         };
       }).filter(a => a.name);
     }
 
     function renderAltList(alts, parentExo) {
       $altList.innerHTML = '';
+      const unit = (draft.meta?.units || 'kg').toUpperCase();
       const normalized = (alts.length ? alts : []).map(a => normalizeAlt(a, parentExo));
 
       normalized.forEach((alt, i) => {
         const card = document.createElement('div');
         card.className = 'alt-card';
 
+        /* Ligne 1 : nom */
         const header = document.createElement('div');
         header.className = 'alt-card__header';
 
         const nameInp = document.createElement('input');
-        nameInp.className = 'input';
+        nameInp.className = 'input alt-name';
         nameInp.type = 'text';
         nameInp.placeholder = t('exo_alt_name_ph');
         nameInp.value = alt.name || '';
+        nameInp.autocomplete = 'off';
 
         const rmBtn = document.createElement('button');
         rmBtn.type = 'button';
         rmBtn.className = 'dynamic-item__remove';
+        rmBtn.title = t('plan_delete');
         rmBtn.innerHTML = '&times;';
         rmBtn.addEventListener('click', () => {
           const cur = readAltListFromDom(parentExo);
@@ -5814,42 +6468,101 @@
 
         header.append(nameInp, rmBtn);
 
-        const grid = document.createElement('div');
-        grid.className = 'alt-card__grid';
+        /* Ligne 2 : séries + répétitions (comme l'exercice principal) */
+        const rowSets = document.createElement('div');
+        rowSets.className = 'alt-card__row';
 
+        const setsField = document.createElement('div');
+        setsField.className = 'alt-field';
+        const setsLbl = document.createElement('span');
+        setsLbl.className = 'alt-field__label';
+        setsLbl.textContent = t('exo_sets_label');
         const setsInp = document.createElement('input');
-        setsInp.className = 'input input--sm';
+        setsInp.className = 'input alt-sets';
         setsInp.type = 'number';
         setsInp.inputMode = 'numeric';
-        setsInp.placeholder = t('exo_sets_label');
+        setsInp.placeholder = parentExo?.sets ? String(parentExo.sets) : '4';
         setsInp.min = '1';
         setsInp.max = '20';
         setsInp.value = alt.sets || '';
+        setsField.append(setsLbl, setsInp);
+
+        const repsField = document.createElement('div');
+        repsField.className = 'alt-field alt-field--wide';
+
+        const repsLblRow = document.createElement('div');
+        repsLblRow.className = 'input-label-row';
+        const repsLbl = document.createElement('span');
+        repsLbl.className = 'alt-field__label';
+        repsLbl.textContent = t('exo_scheme_label');
+        const timedWrap = document.createElement('label');
+        timedWrap.className = 'timed-check timed-check--sm';
+        if (inferTimedFlag(alt)) timedWrap.classList.add('timed-check--on');
+        const timedBox = document.createElement('span');
+        timedBox.className = 'timed-check__box';
+        const timedCb = document.createElement('input');
+        timedCb.type = 'checkbox';
+        timedCb.className = 'alt-timed';
+        timedCb.checked = inferTimedFlag(alt);
+        const timedSpan = document.createElement('span');
+        timedSpan.className = 'timed-check__label';
+        timedSpan.textContent = t('exo_timed_label');
+        timedBox.appendChild(timedCb);
+        timedWrap.append(timedBox, timedSpan);
+        repsLblRow.append(repsLbl, timedWrap);
 
         const schemeInp = document.createElement('input');
-        schemeInp.className = 'input input--sm';
+        schemeInp.className = 'input alt-scheme';
         schemeInp.type = 'text';
-        schemeInp.placeholder = t('exo_scheme_label');
+        schemeInp.inputMode = 'text';
+        schemeInp.placeholder = timedCb.checked
+          ? t('exo_scheme_ph_timed')
+          : (parentExo?.scheme || t('exo_scheme_ph'));
         schemeInp.value = alt.scheme || '';
+        timedCb.addEventListener('change', () => {
+          timedWrap.classList.toggle('timed-check--on', timedCb.checked);
+          schemeInp.placeholder = timedCb.checked
+            ? t('exo_scheme_ph_timed')
+            : (parentExo?.scheme || t('exo_scheme_ph'));
+        });
 
+        repsField.append(repsLblRow, schemeInp);
+        rowSets.append(setsField, repsField);
+
+        /* Ligne 3 : poids + repos */
+        const rowLoad = document.createElement('div');
+        rowLoad.className = 'alt-card__row';
+
+        const loadField = document.createElement('div');
+        loadField.className = 'alt-field alt-field--wide';
+        const loadLbl = document.createElement('span');
+        loadLbl.className = 'alt-field__label';
+        loadLbl.textContent = t('exo_load_label_fmt').replace('%s', unit);
         const loadInp = document.createElement('input');
-        loadInp.className = 'input input--sm';
+        loadInp.className = 'input alt-load';
         loadInp.type = 'text';
         loadInp.inputMode = 'decimal';
-        loadInp.placeholder = t('exo_load_label_fmt').replace('%s', (draft.meta?.units || 'kg').toUpperCase());
+        loadInp.placeholder = parentExo?.load || '—';
         loadInp.value = alt.load || '';
+        loadField.append(loadLbl, loadInp);
 
+        const restField = document.createElement('div');
+        restField.className = 'alt-field';
+        const restLbl = document.createElement('span');
+        restLbl.className = 'alt-field__label';
+        restLbl.textContent = t('exo_rest_label');
         const restInp = document.createElement('input');
-        restInp.className = 'input input--sm';
+        restInp.className = 'input alt-rest';
         restInp.type = 'number';
         restInp.inputMode = 'numeric';
-        restInp.placeholder = t('exo_rest_label');
+        restInp.placeholder = parentExo?.restSec ? String(parentExo.restSec) : '90';
         restInp.min = '0';
         restInp.max = '600';
         restInp.value = alt.restSec || '';
+        restField.append(restLbl, restInp);
 
-        grid.append(setsInp, schemeInp, loadInp, restInp);
-        card.append(header, grid);
+        rowLoad.append(loadField, restField);
+        card.append(header, rowSets, rowLoad);
         $altList.appendChild(card);
       });
     }
@@ -5885,6 +6598,7 @@
         name,
         scheme:       $exoScheme.value.trim() || String(sets),
         sets,
+        timed:        $exoTimed.checked,
         load:         $exoLoad.value.trim(),
         restSec:      parseInt($exoRest.value, 10) || (draft.meta.restDefaultSec || 90),
         cue:          $exoCue.value.trim() || null,
@@ -5971,6 +6685,7 @@
           exo.cue    = str(exo.cue,    300);
           exo.sets   = int(exo.sets,   1, 20, 1);
           exo.restSec = int(exo.restSec, 0, 600, 90);
+          exo.timed = exo.timed === true;
           if (Array.isArray(exo.alternatives)) {
             exo.alternatives = exo.alternatives.slice(0, 10).map(a => {
               if (typeof a === 'string') return str(a, 100);
@@ -5979,7 +6694,8 @@
                 sets: a.sets ? int(a.sets, 1, 20, null) : null,
                 scheme: a.scheme ? str(a.scheme, 50) : null,
                 load: a.load ? str(a.load, 100) : null,
-                restSec: a.restSec ? int(a.restSec, 0, 600, null) : null
+                restSec: a.restSec ? int(a.restSec, 0, 600, null) : null,
+                timed: a.timed === true
               };
             });
           }
@@ -6010,6 +6726,7 @@
 
       clearDraft();
       closeEditor(false);
+      AppBar.refresh();
       Today.refresh({ preserveViewDay: true });
       Plan.refresh();
       showToast(t('editor_saved'));
@@ -6067,6 +6784,7 @@
       localStorage.setItem(LS_ONBOARDED, 'true');
 
       closeImport();
+      AppBar.refresh();
       Today.refresh();
       Plan.refresh();
       showToast(t('editor_imported'));
@@ -6142,7 +6860,8 @@
 
     /* API publique (utilisée par d'autres modules) */
     return { openEditor, openEditorWithProgram, openImport, showToast,
-             getPrograms: () => programs,
+             duplicateProgram: duplicateProgramById,
+             getPrograms: () => { loadPrograms(); return programs; },
              getActiveId: () => localStorage.getItem(LS_ACTIVE) };
   })();
   </script>
@@ -6260,16 +6979,120 @@
     }
 
     /* ── Métriques ────────────────────────────────────────── */
-    function getStreak(logs) {
-      const logDates = new Set(logs.map(l => l.date));
+
+    function getActiveProgram() {
+      try {
+        const id  = localStorage.getItem('activeProgram');
+        const all = JSON.parse(localStorage.getItem('programs') || '[]');
+        return all.find(p => p.id === id) || null;
+      } catch { return null; }
+    }
+
+    /* Jours d'entraînement du planning (indices Date.getDay()) */
+    function getScheduledTrainDays(program) {
+      if (!program?.schedule) return [];
+      return Object.keys(program.schedule)
+        .map(d => parseInt(d, 10))
+        .filter(dow => {
+          const key = program.schedule[String(dow)];
+          return key && program.sessions?.[key];
+        })
+        .sort((a, b) => a - b);
+    }
+
+    function parseDateStr(dateStr) {
+      return new Date(dateStr + 'T12:00:00');
+    }
+
+    function getCompletedLogDates(logs) {
+      return new Set(
+        logs
+          .filter(l => {
+            if (l.completed === false) return false;
+            if ((l.setsCompleted || 0) > 0) return true;
+            return (l.exercises || []).some(e => (e.sets || 0) > 0);
+          })
+          .map(l => l.date)
+      );
+    }
+
+    /* Séance planifiée précédente (ignore les jours de repos) */
+    function prevScheduledSessionDate(fromDate, trainDays) {
+      if (!trainDays.length) return null;
+      for (let i = 1; i <= 7; i++) {
+        const d = new Date(fromDate);
+        d.setDate(d.getDate() - i);
+        if (trainDays.includes(d.getDay())) return d;
+      }
+      return null;
+    }
+
+    /* Une séance planifiée est passée sans log depuis la dernière séance faite */
+    function hasMissedScheduledSessionSince(lastLogDateStr, trainDays, logDates) {
+      const todayStr = toDateStr(new Date());
+      const d = parseDateStr(lastLogDateStr);
+      d.setDate(d.getDate() + 1);
+      const end = new Date();
+
+      while (d <= end) {
+        const ds  = toDateStr(d);
+        const dow = d.getDay();
+        if (trainDays.includes(dow) && !logDates.has(ds)) {
+          /* Grace : séance du jour encore possible */
+          if (ds === todayStr) return false;
+          return true;
+        }
+        d.setDate(d.getDate() + 1);
+      }
+      return false;
+    }
+
+    /* Repli : jours calendaires consécutifs avec log */
+    function getCalendarStreak(logDates) {
       const cursor = new Date();
-      /* Si pas de log aujourd'hui, on part d'hier (la journée n'est peut-être pas finie) */
       if (!logDates.has(toDateStr(cursor))) cursor.setDate(cursor.getDate() - 1);
       let streak = 0;
       while (logDates.has(toDateStr(cursor))) {
         streak++;
         cursor.setDate(cursor.getDate() - 1);
       }
+      return streak;
+    }
+
+    /*
+     * Streak = séances planifiées consécutives complétées (pas les jours de repos).
+     * Ex. planning Lun/Mer/Ven : Mer + Ven faits → 2 (même si Jeudi est entre les deux).
+     */
+    function getStreak(logs) {
+      const logDates  = getCompletedLogDates(logs);
+      if (!logDates.size) return 0;
+
+      const program   = getActiveProgram();
+      const trainDays = getScheduledTrainDays(program);
+      if (!trainDays.length) return getCalendarStreak(logDates);
+
+      const sessionDates = [...logDates]
+        .filter(ds => trainDays.includes(parseDateStr(ds).getDay()))
+        .sort()
+        .reverse();
+
+      if (!sessionDates.length) return 0;
+
+      const anchor = sessionDates[0];
+      if (hasMissedScheduledSessionSince(anchor, trainDays, logDates)) return 0;
+
+      let streak = 0;
+      let cursor = parseDateStr(anchor);
+
+      while (true) {
+        const ds = toDateStr(cursor);
+        if (!logDates.has(ds)) break;
+        streak++;
+        const prev = prevScheduledSessionDate(cursor, trainDays);
+        if (!prev) break;
+        cursor = prev;
+      }
+
       return streak;
     }
 
@@ -6757,6 +7580,11 @@
         buildLangRow(),
       ]));
 
+      /* ── FONCTIONNALITÉS EXPÉRIMENTALES ───────────────── */
+      body.appendChild(buildSection(t('profile_ai_section'), [
+        buildAIToggleRow(),
+      ]));
+
       /* ── ZONE DE DANGER ────────────────────────────────── */
       body.appendChild(buildSection(t('profile_danger'), [
         buildRow(t('profile_delete_logs'), t('profile_delete_logs_meta'), false, () => {
@@ -6840,6 +7668,44 @@
       badge.textContent = on ? 'ON' : 'OFF';
       badge.style.cssText = `font-size:11px;font-weight:700;color:${on ? 'var(--gold)' : 'var(--text-faint)'};`;
       row.appendChild(badge);
+      return row;
+    }
+
+    /* ── Toggle Coach IA ─────────────────────────────────── */
+    function buildAIToggleRow() {
+      const enabled = isAIEnabled();
+
+      const row = mkEl('div', 'ai-feature-row');
+
+      /* Colonne gauche : titre + description + hint */
+      const left  = mkEl('div', 'ai-feature-row__left');
+      const title = mkEl('p', 'ai-feature-row__title');
+      title.textContent = t('profile_ai_label');
+      const desc = mkEl('p', 'ai-feature-row__desc');
+      desc.textContent = t('profile_ai_desc');
+      const hint = mkEl('p', enabled ? 'ai-feature-row__hint ai-feature-row__hint--on'
+                                     : 'ai-feature-row__hint');
+      hint.textContent = enabled ? t('profile_ai_hint_on') : t('profile_ai_hint_off');
+      left.append(title, desc, hint);
+
+      /* Toggle pill */
+      const toggle = mkEl('div', enabled ? 'ai-toggle ai-toggle--on' : 'ai-toggle');
+      toggle.setAttribute('role', 'switch');
+      toggle.setAttribute('aria-checked', enabled ? 'true' : 'false');
+      toggle.setAttribute('aria-label', t('profile_ai_label'));
+      const track = mkEl('div', 'ai-toggle__track');
+      const thumb = mkEl('div', 'ai-toggle__thumb');
+      toggle.append(track, thumb);
+
+      toggle.addEventListener('click', () => {
+        const next = !isAIEnabled();
+        localStorage.setItem('aiEnabled', next ? 'true' : 'false');
+        render();              /* re-rendre l'écran Profil */
+        syncAIVisibility();    /* propager aux boutons statiques (onboarding, éditeur) */
+        if (typeof Plan !== 'undefined') Plan.refresh(); /* re-rendre les cartes Plan */
+      });
+
+      row.append(left, toggle);
       return row;
     }
 
@@ -7130,57 +7996,71 @@
       }
     }
 
-    async function doGenerate() {
-      const $btn    = document.getElementById('aiGenerate');
-      const $spin   = document.getElementById('aiSpinner');
-      const $err    = document.getElementById('aiError');
-      const $msgEl  = document.getElementById('aiGeneratingMsg');
+    /* Sérialisation partielle : exclut warmup/tips/cues/alternatives */
+    function slimProgram(prog) {
+      const s = { meta: prog.meta, sessions: {}, schedule: prog.schedule };
+      for (const [k, sess] of Object.entries(prog.sessions || {})) {
+        s.sessions[k] = {
+          type: sess.type, name: sess.name, accent: sess.accent, subtitle: sess.subtitle,
+          exercises: (sess.exercises || []).map(e => ({
+            id: e.id, name: e.name, scheme: e.scheme,
+            sets: e.sets, timed: e.timed ?? false, load: e.load, restSec: e.restSec,
+          })),
+          cardio: sess.cardio ?? null,
+        };
+      }
+      return s;
+    }
 
-      $err.classList.add('is-hidden');
-      $btn.classList.add('is-hidden');
-      $back.style.visibility = 'hidden';
-      $spin.classList.remove('is-hidden');
-      $msgEl.textContent = MSGS[0];
+    async function doGenerate(retryCount = 0) {
+      const $btn   = document.getElementById('aiGenerate');
+      const $spin  = document.getElementById('aiSpinner');
+      const $err   = document.getElementById('aiError');
+      const $msgEl = document.getElementById('aiGeneratingMsg');
 
-      let msgIdx = 0;
-      clearInterval(msgInterval);
-      msgInterval = setInterval(() => {
-        msgIdx = (msgIdx + 1) % MSGS.length;
-        $msgEl.textContent = MSGS[msgIdx];
-      }, 2000);
+      /* UI setup uniquement au premier appel ; les auto-retries sont transparents */
+      if (retryCount === 0) {
+        $err.classList.add('is-hidden');
+        $btn.classList.add('is-hidden');
+        $back.style.visibility = 'hidden';
+        $spin.classList.remove('is-hidden');
+        $msgEl.textContent = MSGS[0];
 
-      const antecedents = document.getElementById('aiAntecedents').value.trim() || null;
-      const poidsVal = document.getElementById('aiPoids').value;
-      const tailleVal = document.getElementById('aiTaille').value;
-      const poids  = poidsVal  ? parseInt(poidsVal, 10)  : null;
-      const taille = tailleVal ? parseInt(tailleVal, 10) : null;
-
-      /* Sérialisation partielle : exclut warmup/tips/cues/alternatives */
-      function slimProgram(prog) {
-        const s = { meta: prog.meta, sessions: {}, schedule: prog.schedule };
-        for (const [k, sess] of Object.entries(prog.sessions || {})) {
-          s.sessions[k] = {
-            type: sess.type, name: sess.name, accent: sess.accent, subtitle: sess.subtitle,
-            exercises: (sess.exercises || []).map(e => ({
-              id: e.id, name: e.name, scheme: e.scheme,
-              sets: e.sets, load: e.load, restSec: e.restSec,
-            })),
-            cardio: sess.cardio ?? null,
-          };
-        }
-        return s;
+        let msgIdx = 0;
+        clearInterval(msgInterval);
+        msgInterval = setInterval(() => {
+          msgIdx = (msgIdx + 1) % MSGS.length;
+          $msgEl.textContent = MSGS[msgIdx];
+        }, 2000);
       }
 
-      const isModify = aiMode === 'modify';
-      if (isModify && !aiBaseProgram) {
+      function showAiError(msg) {
         clearInterval(msgInterval);
         $spin.classList.add('is-hidden');
         $btn.classList.remove('is-hidden');
         $back.style.visibility = 'visible';
         $err.classList.remove('is-hidden');
-        document.getElementById('aiErrorMsg').textContent = "Programme de base introuvable. Relancez en mode création.";
+        document.getElementById('aiErrorMsg').textContent = msg;
+      }
+
+      const antecedents = document.getElementById('aiAntecedents').value.trim() || null;
+      const poidsVal    = document.getElementById('aiPoids').value;
+      const tailleVal   = document.getElementById('aiTaille').value;
+      const poids   = poidsVal  ? parseInt(poidsVal,  10) : null;
+      const taille  = tailleVal ? parseInt(tailleVal, 10) : null;
+
+      const isModify = aiMode === 'modify';
+      if (isModify && !aiBaseProgram) {
+        showAiError("Programme de base introuvable. Relance en mode création.");
         return;
       }
+
+      /* Vérification offline avant toute requête */
+      if (!navigator.onLine) {
+        showAiError("Pas de connexion internet. Vérifie ta connexion et réessaie.");
+        return;
+      }
+
       const endpoint = isModify ? '/api/modify-program' : '/api/generate-program';
       const payload  = isModify
         ? {
@@ -7201,46 +8081,86 @@
             antecedents,
           };
 
+      /* Timeout client 35s — laisse le serveur (30s) expirer en premier */
+      const controller = new AbortController();
+      const timeoutId  = setTimeout(() => controller.abort(), 35_000);
+
+      let res;
       try {
-        const res = await fetch(endpoint, {
-          method: 'POST',
+        res = await fetch(endpoint, {
+          method:  'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+          body:    JSON.stringify(payload),
+          signal:  controller.signal,
         });
-        if (!res.ok) {
-          let msg = 'Erreur inconnue';
-          try { const j = await res.json(); msg = j.error || msg; } catch {}
-          throw new Error(msg);
-        }
-        const json = await res.json();
-
-        if (!json.program || typeof json.program !== 'object') {
-          throw new Error('Réponse invalide du serveur');
-        }
-        aiGeneratedProgram = json.program;
-        /* En mode modify : conserver l'id existant pour remplacer en place */
-        aiGeneratedProgram.id = (isModify && aiBaseProgram?.id)
-          ? aiBaseProgram.id
-          : 'prog-' + Date.now();
-        clearInterval(msgInterval);
-        if (isModify) {
-          showDiff();
-        } else {
-          showPreview();
-        }
-
+        clearTimeout(timeoutId);
       } catch (err) {
-        clearInterval(msgInterval);
-        $spin.classList.add('is-hidden');
-        $btn.classList.remove('is-hidden');
-        $back.style.visibility = 'visible';
-        $err.classList.remove('is-hidden');
-        document.getElementById('aiErrorMsg').textContent = err.message;
+        clearTimeout(timeoutId);
+        if (err.name === 'AbortError') {
+          showAiError("L'IA met trop de temps à répondre. Réessaie dans un instant.");
+        } else {
+          showAiError("Erreur réseau. Vérifie ta connexion et réessaie.");
+        }
+        return;
+      }
+
+      if (!res.ok) {
+        const status = res.status;
+        if (status === 429) {
+          showAiError("Quota de génération dépassé. Réessaie dans quelques minutes.");
+          return;
+        }
+        if (status === 401 || status === 403) {
+          showAiError("Configuration serveur manquante. Contacte le développeur.");
+          return;
+        }
+        if (status === 504) {
+          showAiError("L'IA met trop de temps à répondre. Réessaie dans un instant.");
+          return;
+        }
+        /* 422 : programme généré invalide — auto-retry silencieux (max 2 fois) */
+        if (status === 422 && retryCount < 2) {
+          return doGenerate(retryCount + 1);
+        }
+        let msg = "Erreur inconnue. Réessaie.";
+        try { const j = await res.json(); msg = j.error || msg; } catch {}
+        showAiError(msg);
+        return;
+      }
+
+      let json;
+      try {
+        json = await res.json();
+      } catch {
+        if (retryCount < 2) return doGenerate(retryCount + 1);
+        showAiError("Réponse du serveur illisible. Réessaie.");
+        return;
+      }
+
+      if (!json.program || typeof json.program !== 'object') {
+        if (retryCount < 2) return doGenerate(retryCount + 1);
+        showAiError("Programme généré invalide. Réessaie.");
+        return;
+      }
+
+      aiGeneratedProgram = json.program;
+      aiGeneratedProgram.id = (isModify && aiBaseProgram?.id)
+        ? aiBaseProgram.id
+        : 'prog-' + Date.now();
+      clearInterval(msgInterval);
+      if (isModify) {
+        showDiff();
+      } else {
+        showPreview();
       }
     }
 
     document.getElementById('aiGenerate').addEventListener('click', doGenerate);
-    document.getElementById('aiRetry').addEventListener('click', doGenerate);
+    document.getElementById('aiRetry').addEventListener('click', () => doGenerate(0));
+    document.getElementById('aiManual').addEventListener('click', () => {
+      closeAiCoach();
+      App.openEditor(null);
+    });
 
     /* Calcule le diff entre deux programmes (avant/après).
        Retourne un tableau de { day, type, newSess, oldSess, exoDiffs }.
@@ -7412,6 +8332,7 @@
       localStorage.setItem(LS_ONBOARDED, 'true');
 
       closeAiCoach();
+      AppBar.refresh();
       if (typeof Plan  !== 'undefined') Plan.refresh();
       /* Navigation vers l'onglet Today */
       document.querySelector('[data-tab="0"]')?.click();

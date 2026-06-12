@@ -73,8 +73,9 @@
         {
           "id": "gainage-lb",
           "name": "Gainage",
-          "scheme": "3×45 sec",
+          "scheme": "45",
           "sets": 3,
+          "timed": true,
           "load": "Poids du corps",
           "restSec": 60,
           "cue": null,
@@ -173,7 +174,7 @@
     "bas-du-corps": {
       "type": "lift",
       "name": "BAS DU CORPS",
-      "accent": "rust",
+      "accent": "blue",
       "subtitle": "QUADS · ISCHIOS · MOLLETS · CORE",
       "note": null,
       "warmup": [
@@ -225,8 +226,9 @@
         {
           "id": "gainage-vend",
           "name": "Gainage",
-          "scheme": "3×45 sec",
+          "scheme": "45",
           "sets": 3,
+          "timed": true,
           "load": "Poids du corps",
           "restSec": 60,
           "cue": null,
@@ -239,37 +241,7 @@
       },
       "bonus": null,
       "tips": null
-    },
-
-    "repos": {
-      "type": "rest",
-      "name": "REPOS",
-      "accent": "gray",
-      "subtitle": "RÉCUPÈRE. MANGE. DORS.",
-      "note": null,
-      "warmup": null,
-      "exercises": [],
-      "cardio": null,
-      "bonus": null,
-      "tips": [
-        {
-          "title": "Le sommeil est de l'entraînement",
-          "body": "7 à 9 h — c'est là que l'hormone de croissance culmine et que le muscle se construit vraiment.",
-          "accent": "gold"
-        },
-        {
-          "title": "Protéines",
-          "body": "Ne pas baisser l'apport les jours de repos. Le muscle se répare en continu.",
-          "accent": "gold"
-        },
-        {
-          "title": "Prépare la prochaine séance",
-          "body": "Vérifie tes charges de la dernière fois. Vise +1 rep ou +2,5 kg sur au moins un exercice.",
-          "accent": "rust"
-        }
-      ]
     }
-
   },
 
   "schedule": {

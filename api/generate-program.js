@@ -1,4 +1,4 @@
-import { ValidationError, validateProgramJSON, resolveCorsOrigin } from './_shared.js';
+﻿import { ValidationError, validateProgramJSON, resolveCorsOrigin } from './_shared.js';
 
 // api/generate-program.js — Vercel Serverless Function (Node.js)
 // Génère un programme d'entraînement personnalisé via Groq (Llama 3.3 70B).
@@ -30,6 +30,7 @@ const PROGRAM_SCHEMA = `{
           "name": "Nom de l'exercice",
           "scheme": "8-12",
           "sets": 4,
+          "timed": false,
           "load": "charge suggérée",
           "restSec": 90,
           "cue": null,
@@ -57,7 +58,8 @@ Règles absolues :
 - Les id d'exercices sont en kebab-case, uniques, stables
 - Les restSec sont des entiers (60, 90, 120, 180)
 - Les sets sont des entiers entre 1 et 6
-- Le champ "scheme" contient UNIQUEMENT les reps (ex: "8", "8-12", "MAX", "45 sec") — JAMAIS le format "sets×reps"
+- Le champ "scheme" contient UNIQUEMENT les reps (ex: "8", "8-12", "MAX", "45") — JAMAIS le format "sets×reps"
+- Pour les exercices en durée (gainage, planche…), mets "timed": true et "scheme" = nombre de secondes (ex: "45")
 - Le schedule utilise les indices Date.getDay() (0=dim … 6=sam)
 - Les noms de séances ("name") sont en MAJUSCULES, choisis parmi : FULL BODY, HAUT DU CORPS, BAS DU CORPS, JAMBES, BRAS, DOS, PECS, ÉPAULES, CARDIO, MOBILITÉ, ÉTIREMENTS, RÉCUPÉRATION
 - accent : "gold" pour musculation principale, "rust" pour membres inférieurs / force, "blue" pour cardio, "gray" pour repos/mobilité
@@ -218,7 +220,7 @@ export default async function handler(req, res) {
   const { objectif, frequence, duree, materiel, niveau, poids, taille, antecedents } = body;
 
   // Clé API via variable d'environnement — jamais dans le code
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = (process.env.GROQ_API_KEY || '').replace(/^﻿/, '').trim();
   if (!apiKey) {
     return res.status(500).json({ error: 'Configuration serveur manquante (GROQ_API_KEY)' });
   }

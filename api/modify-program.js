@@ -1,4 +1,4 @@
-// api/modify-program.js — Modifie un programme existant via Groq (Llama 3.3 70B)
+﻿// api/modify-program.js — Modifie un programme existant via Groq (Llama 3.3 70B)
 // Reçoit le programme courant + instructions de modification, retourne le programme modifié.
 // Principe RGPD : aucune donnée stockée ni loggée côté serveur.
 
@@ -12,7 +12,8 @@ Règles absolues :
 - Réponds UNIQUEMENT avec le JSON complet du programme modifié, sans texte avant ni après
 - Conserve les exercices et la structure existants sauf si les instructions demandent un changement
 - Préserve les id d'exercices existants. Tout nouvel exercice a un id en kebab-case unique
-- Le champ "scheme" contient UNIQUEMENT les reps (ex: "8", "8-12", "MAX", "45 sec") — JAMAIS "sets×reps"
+- Le champ "scheme" contient UNIQUEMENT les reps (ex: "8", "8-12", "MAX", "45") — JAMAIS "sets×reps"
+- Exercices en durée (gainage, planche…) : "timed": true et "scheme" = secondes (ex: "45")
 - Les sets sont des entiers entre 1 et 6. Les restSec sont des entiers (60, 90, 120, 180)
 - Le schedule utilise les indices Date.getDay() (0=dim … 6=sam)
 - accent : "gold" pour musculation principale, "rust" pour membres inférieurs, "blue" pour cardio, "gray" pour repos`;
@@ -29,7 +30,7 @@ function serializeExistingProgram(program) {
       subtitle: sess.subtitle,
       exercises: (sess.exercises || []).map(e => ({
         id: e.id, name: e.name, scheme: e.scheme,
-        sets: e.sets, load: e.load, restSec: e.restSec,
+        sets: e.sets, timed: e.timed ?? false, load: e.load, restSec: e.restSec,
       })),
       cardio: sess.cardio ?? null,
     };
@@ -154,7 +155,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Paramètres invalides', details: validationErrors });
   }
 
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = (process.env.GROQ_API_KEY || '').replace(/^﻿/, '').trim();
   if (!apiKey) {
     return res.status(500).json({ error: 'Configuration serveur manquante (GROQ_API_KEY)' });
   }

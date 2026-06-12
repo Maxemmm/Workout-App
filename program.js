@@ -86,8 +86,9 @@ const PROGRAM = {
         {
           id:           "gainage",
           name:         "Gainage",
-          scheme:       "3×45 sec",
+          scheme:       "45",
           sets:         3,
+          timed:        true,
           load:         "poids du corps",
           restSec:      60,
           cue:          null,
@@ -252,8 +253,9 @@ const PROGRAM = {
           // Même exercice qu'en Full Body → même id
           id:           "gainage",
           name:         "Gainage",
-          scheme:       "3×45 sec",
+          scheme:       "45",
           sets:         3,
+          timed:        true,
           load:         "poids du corps",
           restSec:      60,
           cue:          null,
