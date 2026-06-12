@@ -2140,6 +2140,12 @@
       border-color: var(--gold);
     }
 
+    .prog-card--clickable {
+      cursor: pointer;
+      transition: border-color var(--duration-fast) var(--ease-out);
+    }
+    .prog-card--clickable:hover { border-color: var(--text-dim); }
+
     .prog-card__header {
       display: flex;
       align-items: center;
@@ -3906,15 +3912,17 @@
         meta.textContent = `${daysCount} ${daysCount > 1 ? t('plan_days') : t('plan_day')} · ${exoTotal} ${exoTotal > 1 ? t('plan_exercises') : t('plan_exercise')}`;
         card.appendChild(meta);
 
+        /* Carte cliquable pour activer (cartes inactives seulement) */
+        if (!isActive) {
+          card.classList.add('prog-card--clickable');
+          card.addEventListener('click', (e) => {
+            if (e.target.closest('button')) return;
+            activateProgram(prog.id);
+          });
+        }
+
         /* Actions */
         const actions = mkEl('div', 'prog-card__actions');
-
-        if (!isActive) {
-          const btnAct = mkEl('button', 'btn btn--primary btn--sm');
-          btnAct.textContent = t('plan_activate');
-          btnAct.addEventListener('click', () => activateProgram(prog.id));
-          actions.appendChild(btnAct);
-        }
 
         const btnEdit = mkEl('button', 'btn btn--secondary btn--sm');
         btnEdit.textContent = t('plan_edit');
