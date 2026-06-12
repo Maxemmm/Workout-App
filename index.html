@@ -3895,6 +3895,12 @@
         btnDup.addEventListener('click', () => duplicateProgram(prog.id));
         actions.appendChild(btnDup);
 
+        const btnModAi = mkEl('button', 'btn btn--ai btn--sm');
+        btnModAi.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2 14.4 9.6 22 12 14.4 14.4 12 22 9.6 14.4 2 12 9.6 9.6Z"/></svg> IA';
+        btnModAi.title = 'Modifier avec l\'IA';
+        btnModAi.addEventListener('click', () => AiCoach.openModify(prog));
+        actions.appendChild(btnModAi);
+
         if (programs.length > 1) {
           const btnDel = mkEl('button', 'btn btn--ghost btn--sm');
           btnDel.style.color = 'var(--red-danger)';
