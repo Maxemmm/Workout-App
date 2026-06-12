@@ -2049,9 +2049,13 @@
       padding: 0 var(--space-md) var(--space-md);
     }
 
-    @keyframes plan-body-in {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0);   }
+    @keyframes plan-slide-from-right {
+      from { opacity: 0; transform: translateX(32px); }
+      to   { opacity: 1; transform: translateX(0);    }
+    }
+    @keyframes plan-slide-from-left {
+      from { opacity: 0; transform: translateX(-32px); }
+      to   { opacity: 1; transform: translateX(0);     }
     }
 
     /* Corps sous-vue */
@@ -2059,7 +2063,6 @@
       padding: 0 var(--space-md);
       display: flex;
       flex-direction: column;
-      animation: plan-body-in .18s var(--ease-out);
       gap: var(--space-sm);
       padding-bottom: calc(var(--tab-height) + var(--safe-bottom) + var(--space-md));
     }
@@ -3745,7 +3748,8 @@
 
     const TODAY = new Date().getDay();
 
-    let view = 'week'; /* 'week' | 'programs' */
+    let view      = 'week'; /* 'week' | 'programs' */
+    let slideDir  = null;   /* 'left' | 'right' | null (premier rendu) */
 
     const $screen = document.getElementById('screen-plan');
 
@@ -3783,8 +3787,18 @@
       btnProgs.textContent = t('plan_my_programs');
       if (view === 'programs') btnProgs.classList.add('segmented__btn--active');
 
-      btnWeek.addEventListener('click', () => { view = 'week'; render(); });
-      btnProgs.addEventListener('click', () => { view = 'programs'; render(); });
+      btnWeek.addEventListener('click', () => {
+        if (view === 'week') return;
+        slideDir = 'left'; /* programs → week : slide depuis la gauche */
+        view = 'week';
+        render();
+      });
+      btnProgs.addEventListener('click', () => {
+        if (view === 'programs') return;
+        slideDir = 'right'; /* week → programs : slide depuis la droite */
+        view = 'programs';
+        render();
+      });
 
       seg.append(btnWeek, btnProgs);
       tabWrap.appendChild(seg);
@@ -3792,6 +3806,10 @@
 
       /* Corps */
       const body = mkEl('div', 'plan-body');
+      if (slideDir) {
+        body.style.animation = `plan-slide-from-${slideDir} .22s var(--ease-out)`;
+        slideDir = null;
+      }
       if (view === 'week') buildWeekView(body, prog);
       else                 buildProgramsView(body);
       $screen.appendChild(body);
