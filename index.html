@@ -142,13 +142,15 @@
         profile_reset_today_toast: 'Séance du jour réinitialisée',
         profile_logs_deleted: 'Logs supprimés',
         profile_export_toast: 'Export téléchargé ✓',
+        profile_import_toast: 'Sauvegarde restaurée ✓',
+        profile_confirm_backup: 'Restaurer cette sauvegarde ?\nToutes les données actuelles seront remplacées.',
         profile_confirm_logs: "Supprimer tous les logs de séances ?\nCette action est irréversible.",
         profile_confirm_reset: "Réinitialiser complètement l'application ?\nToutes les données seront définitivement effacées. Cette action est irréversible.",
 
         /* Onboarding */
         onboarding_tagline: 'Entraîne-toi avec intention.',
         onboarding_create: 'CRÉER MON PROGRAMME',
-        onboarding_import: 'Importer un programme (JSON)',
+        onboarding_import: 'Importer un fichier JSON',
 
         /* Éditeur — étape 1 */
         editor_step1_title: 'Votre programme',
@@ -213,9 +215,18 @@
         modal_finish_cancel: 'Continuer la séance',
 
         /* Overlay import */
+        import_program_title: 'IMPORTER',
         import_body: 'Collez le JSON de votre programme, ou choisissez un fichier .json.',
         import_file_btn: 'Choisir un fichier .json',
         import_confirm_btn: 'IMPORTER CE PROGRAMME',
+        import_backup_title: 'RESTAURER',
+        import_backup_body: 'Choisissez le fichier JSON exporté depuis Profil → Exporter mes données.',
+        import_backup_confirm_btn: 'RESTAURER CETTE SAUVEGARDE',
+        import_backup_ph: 'Fichier workout-backup-YYYY-MM-DD.json',
+        import_backup_err: 'Fichier de sauvegarde invalide — utilisez un export Profil → Exporter mes données.',
+        import_auto_body: 'Programme seul (voir program.example.json) ou sauvegarde complète exportée depuis Profil → Exporter mes données.',
+        import_auto_confirm_btn: 'IMPORTER',
+        import_auto_ph: 'programme.json ou workout-backup-YYYY-MM-DD.json',
 
         /* Couleurs accent */
         accent_gold: 'Or', accent_rust: 'Rouille', accent_blue: 'Bleu', accent_gray: 'Gris',
@@ -328,13 +339,15 @@
         profile_reset_today_toast: "Today's session reset",
         profile_logs_deleted: 'Logs deleted',
         profile_export_toast: 'Export downloaded ✓',
+        profile_import_toast: 'Backup restored ✓',
+        profile_confirm_backup: 'Restore this backup?\nAll current data will be replaced.',
         profile_confirm_logs: 'Delete all session logs?\nThis action is irreversible.',
         profile_confirm_reset: 'Completely reset the application?\nAll data will be permanently erased. This action is irreversible.',
 
         /* Onboarding */
         onboarding_tagline: 'Train with intention.',
         onboarding_create: 'CREATE MY PROGRAM',
-        onboarding_import: 'Import a program (JSON)',
+        onboarding_import: 'Import a JSON file',
 
         /* Editor — step 1 */
         editor_step1_title: 'Your program',
@@ -399,9 +412,18 @@
         modal_finish_cancel: 'Continue session',
 
         /* Import overlay */
+        import_program_title: 'IMPORT',
         import_body: 'Paste your program JSON, or choose a .json file.',
         import_file_btn: 'Choose a .json file',
         import_confirm_btn: 'IMPORT THIS PROGRAM',
+        import_backup_title: 'RESTORE',
+        import_backup_body: 'Choose the JSON file exported from Profile → Export my data.',
+        import_backup_confirm_btn: 'RESTORE THIS BACKUP',
+        import_backup_ph: 'workout-backup-YYYY-MM-DD.json file',
+        import_backup_err: 'Invalid backup file — use an export from Profile → Export my data.',
+        import_auto_body: 'Single program (see program.example.json) or full backup exported from Profile → Export my data.',
+        import_auto_confirm_btn: 'IMPORT',
+        import_auto_ph: 'program.json or workout-backup-YYYY-MM-DD.json',
 
         /* Accent colors */
         accent_gold: 'Gold', accent_rust: 'Rust', accent_blue: 'Blue', accent_gray: 'Gray',
@@ -4019,11 +4041,11 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
       </button>
       <div style="flex: 1; padding: 0 var(--space-md);">
-        <p class="t-display t-display-sm">IMPORTER</p>
+        <p class="t-display t-display-sm" id="importTitle">IMPORTER</p>
       </div>
     </div>
     <div class="import-body">
-      <p class="t-body" style="color: var(--text-dim);" data-i18n="import_body">
+      <p class="t-body" style="color: var(--text-dim);" id="importBody">
         Collez le JSON de votre programme, ou choisissez un fichier .json.
       </p>
       <label style="cursor: pointer; display: block;">
@@ -4037,7 +4059,7 @@
                 placeholder='{"meta": {"label": "MON PROGRAMME", "units": "kg"}, ...}'
                 spellcheck="false" rows="8"></textarea>
       <div class="import-error is-hidden" id="importError"></div>
-      <button class="btn btn--primary btn--full" id="btnImportConfirm" data-i18n="import_confirm_btn">IMPORTER CE PROGRAMME</button>
+      <button class="btn btn--primary btn--full" id="btnImportConfirm">IMPORTER CE PROGRAMME</button>
     </div>
   </div>
 
@@ -5557,6 +5579,7 @@
     // Vrai si l'utilisateur avait 0 séance en quittant l'étape 1
     let startedEmpty   = false;
     let importFromOnboarding = false;
+    let importMode = 'auto'; /* 'auto' | 'program' | 'backup' */
 
     /* ──────────────────────────────────────────────────────
        HELPERS localStorage
@@ -6761,14 +6784,70 @@
     }
 
     /* ──────────────────────────────────────────────────────
-       IMPORT JSON
+       IMPORT JSON (programme unique ou sauvegarde complète)
     ────────────────────────────────────────────────────── */
     const $overlayImport = document.getElementById('overlayImport');
 
-    function openImport(fromOnboarding = false) {
+    /* Détecte un export Profil (dump localStorage) vs un programme seul */
+    function isBackupSnapshot(data) {
+      if (!data || typeof data !== 'object' || Array.isArray(data)) return false;
+      if (data.meta && data.sessions && !('programs' in data)) return false;
+      if (data._backupFormat === 1) return true;
+      if ('programs' in data || 'activeProgram' in data) return true;
+      return Object.keys(data).some(k => /^(weight|log|track|layout):/.test(k));
+    }
+
+    function restoreBackup(snapshot) {
+      if (!confirm(t('profile_confirm_backup'))) return false;
+      localStorage.clear();
+      Object.entries(snapshot).forEach(([k, v]) => {
+        if (k.startsWith('_')) return;
+        localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
+      });
+      location.reload();
+      return true;
+    }
+
+    function updateImportOverlayUI() {
+      const isBackup = importMode === 'backup';
+      const isAuto   = importMode === 'auto';
+      document.getElementById('importTitle').textContent =
+        t(isBackup ? 'import_backup_title' : 'import_program_title');
+      document.getElementById('importBody').textContent =
+        t(isBackup ? 'import_backup_body' : (isAuto ? 'import_auto_body' : 'import_body'));
+      document.getElementById('importTextarea').placeholder =
+        isBackup ? t('import_backup_ph') : (isAuto ? t('import_auto_ph') : '{"meta": {"label": "MON PROGRAMME", "units": "kg"}, ...}');
+      $overlayImport.setAttribute('aria-label',
+        isBackup ? t('import_backup_title') : t('import_program_title'));
+      syncImportConfirmLabel();
+    }
+
+    /* Adapte le libellé du bouton selon le contenu (programme vs sauvegarde) */
+    function syncImportConfirmLabel() {
+      const $btn = document.getElementById('btnImportConfirm');
+      if (importMode === 'backup') {
+        $btn.textContent = t('import_backup_confirm_btn');
+        return;
+      }
+      const raw = document.getElementById('importTextarea').value.trim();
+      if (!raw) {
+        $btn.textContent = t(importMode === 'auto' ? 'import_auto_confirm_btn' : 'import_confirm_btn');
+        return;
+      }
+      try {
+        $btn.textContent = t(isBackupSnapshot(JSON.parse(raw))
+          ? 'import_backup_confirm_btn' : 'import_confirm_btn');
+      } catch {
+        $btn.textContent = t(importMode === 'auto' ? 'import_auto_confirm_btn' : 'import_confirm_btn');
+      }
+    }
+
+    function openImport(fromOnboarding = false, mode = 'auto') {
       importFromOnboarding = fromOnboarding;
+      importMode = fromOnboarding ? 'auto' : mode;
       document.getElementById('importTextarea').value = '';
       document.getElementById('importError').classList.add('is-hidden');
+      updateImportOverlayUI();
       $overlayImport.classList.remove('is-hidden');
     }
 
@@ -6785,10 +6864,15 @@
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = ev => { document.getElementById('importTextarea').value = ev.target.result; };
+      reader.onload = ev => {
+        document.getElementById('importTextarea').value = ev.target.result;
+        syncImportConfirmLabel();
+      };
       reader.readAsText(file);
-      e.target.value = ''; // reset pour permettre re-sélection du même fichier
+      e.target.value = '';
     });
+
+    document.getElementById('importTextarea').addEventListener('input', syncImportConfirmLabel);
 
     document.getElementById('btnImportConfirm').addEventListener('click', () => {
       const $err = document.getElementById('importError');
@@ -6797,6 +6881,16 @@
       let data;
       try { data = JSON.parse(document.getElementById('importTextarea').value.trim()); }
       catch { showImportError(t('editor_import_err')); return; }
+
+      /* Sauvegarde complète — détectée automatiquement (accueil ou Profil) */
+      if (importMode === 'backup' || isBackupSnapshot(data)) {
+        if (!isBackupSnapshot(data)) {
+          showImportError(t('import_backup_err'));
+          return;
+        }
+        restoreBackup(data);
+        return;
+      }
 
       const errs = validateProgram(data);
       if (errs.length) { showImportError(errs.join('\n')); return; }
@@ -6887,7 +6981,7 @@
     init();
 
     /* API publique (utilisée par d'autres modules) */
-    return { openEditor, openEditorWithProgram, openImport, showToast,
+    return { openEditor, openEditorWithProgram, openImport, restoreBackup, isBackupSnapshot, showToast,
              duplicateProgram: duplicateProgramById,
              getPrograms: () => { loadPrograms(); return programs; },
              getActiveId: () => localStorage.getItem(LS_ACTIVE) };
@@ -7517,6 +7611,8 @@
         const k = localStorage.key(i);
         snapshot[k] = localStorage.getItem(k);
       }
+      snapshot._backupFormat = 1;
+      snapshot._exportedAt = new Date().toISOString();
       const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' });
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement('a');
@@ -7592,7 +7688,7 @@
           App.showToast(t('profile_export_toast'));
         }),
         buildRow(t('profile_import'), t('profile_import_meta'), true, () => {
-          App.openImport(false);
+          App.openImport(false, 'backup');
         }),
         buildRow(t('profile_reset_today'), null, false, resetToday),
       ]));
