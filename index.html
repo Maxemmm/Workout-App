@@ -13,6 +13,7 @@
     style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src    https://fonts.gstatic.com;
     img-src     'self' data:;
+    manifest-src 'self';
     connect-src 'self';
     frame-src   'none';
     object-src  'none';
@@ -526,10 +527,34 @@
     };
   </script>
 
-  <!-- Chart.js 4.4.1 via CDNJS (fichier statique, SRI garanti) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"
-          integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD"
-          crossorigin="anonymous"></script>
+  <!-- Chart.js 4.4.1 via CDNJS — chargé à la demande (pas au démarrage) :
+       seul l'écran Stats affiche des graphiques, inutile de bloquer le rendu
+       initial de l'app pour ~200 Ko qui ne servent qu'une fois l'onglet ouvert. -->
+  <script>
+    (function () {
+      const CHART_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+      const CHART_SRI = 'sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD';
+      window.__loadChartJs = function () {
+        if (window.__chartJsPromise) return window.__chartJsPromise;
+        window.__chartJsPromise = new Promise((resolve, reject) => {
+          if (window.Chart) { resolve(window.Chart); return; }
+          const s = document.createElement('script');
+          s.src = CHART_SRC;
+          s.integrity = CHART_SRI;
+          s.crossOrigin = 'anonymous';
+          s.onload  = () => resolve(window.Chart);
+          s.onerror = () => reject(new Error('Chart.js load failed'));
+          document.head.appendChild(s);
+        });
+        return window.__chartJsPromise;
+      };
+      /* Précharge pendant les temps morts pour que Chart.js soit déjà en
+         cache quand l'utilisateur ouvre l'onglet Stats. */
+      const prefetch = () => window.__loadChartJs().catch(() => {});
+      if ('requestIdleCallback' in window) requestIdleCallback(prefetch, { timeout: 4000 });
+      else setTimeout(prefetch, 2000);
+    })();
+  </script>
 
   <!-- Google Fonts : Barlow Condensed (display) + DM Sans (UI) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -1680,121 +1705,39 @@
       padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
     }
 
-    /* Fond ambiant : halos flous, boucles fermées linear (sans à-coups ni lignes droites) */
+    /* Fond animé — canvas gradient (halos lumineux, rendu professionnel) */
     .onboarding__bg {
       position: absolute;
       inset: 0;
       overflow: hidden;
       pointer-events: none;
+      background: var(--bg);
       isolation: isolate;
-      transform: translateZ(0);
-      background:
-        radial-gradient(ellipse 110% 75% at 50% -15%,
-          color-mix(in srgb, var(--gold) 8%, var(--bg)), var(--bg));
     }
 
-    /* Wash global — uniquement radial + blur (pas de linear-gradient = pas de lignes) */
+    /* Canvas injecté par JS — remplit tout le conteneur */
+    .onboarding__bg-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Grain pelliculaire — texture premium (SVG feTurbulence tilé) */
     .onboarding__bg::before {
       content: '';
       position: absolute;
-      width: 150%;
-      height: 150%;
-      top: -25%;
-      left: -25%;
-      background:
-        radial-gradient(ellipse 58% 48% at 32% 36%,
-          color-mix(in srgb, var(--gold) 22%, transparent) 0%,
-          color-mix(in srgb, var(--gold) 8%, transparent) 32%,
-          transparent 72%),
-        radial-gradient(ellipse 52% 44% at 70% 64%,
-          color-mix(in srgb, var(--rust) 16%, transparent) 0%,
-          color-mix(in srgb, var(--blue) 10%, transparent) 38%,
-          transparent 74%);
-      filter: blur(56px);
-      -webkit-filter: blur(56px);
-      opacity: .7;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      animation-name: var(--ob-wash-keyframes, none);
-      animation-duration: var(--ob-wash-duration, 26s);
-      animation-delay: var(--ob-wash-delay, 0s);
-      animation-timing-function: linear;
-      animation-iteration-count: infinite;
-      will-change: transform;
-    }
-
-    .onboarding__bg-blob {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(44px);
-      -webkit-filter: blur(44px);
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      transform: translate3d(0, 0, 0);
-      will-change: transform, opacity;
-    }
-
-    .onboarding__bg-blob--gold {
-      width: 95vmax;
-      height: 95vmax;
-      top: -40%;
-      left: -35%;
-      background: radial-gradient(circle at 48% 48%,
-        color-mix(in srgb, var(--gold) 35%, transparent) 0%,
-        color-mix(in srgb, var(--gold) 14%, transparent) 28%,
-        color-mix(in srgb, var(--gold) 4%, transparent) 52%,
-        transparent 78%);
-      opacity: .62;
-    }
-
-    .onboarding__bg-blob--rust {
-      width: 82vmax;
-      height: 82vmax;
-      bottom: -35%;
-      right: -30%;
-      background: radial-gradient(circle at 52% 52%,
-        color-mix(in srgb, var(--rust) 28%, transparent) 0%,
-        color-mix(in srgb, var(--rust) 10%, transparent) 30%,
-        color-mix(in srgb, var(--rust) 3%, transparent) 54%,
-        transparent 76%);
-      opacity: .54;
-    }
-
-    .onboarding__bg-blob--blue {
-      width: 65vmax;
-      height: 65vmax;
-      top: 48%;
-      right: -22%;
-      background: radial-gradient(circle at 50% 50%,
-        color-mix(in srgb, var(--blue) 22%, transparent) 0%,
-        color-mix(in srgb, var(--blue) 8%, transparent) 32%,
-        transparent 74%);
-      opacity: .48;
-    }
-
-    /* Vignette — transitions douces, stops intermédiaires anti-banding */
-    .onboarding__bg::after {
-      content: '';
-      position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse 100% 90% at 50% 45%,
-        transparent 38%,
-        color-mix(in srgb, var(--bg) 18%, transparent) 72%,
-        color-mix(in srgb, var(--bg) 42%, transparent) 100%);
+      z-index: 1;
       pointer-events: none;
+      opacity: .06;
+      mix-blend-mode: soft-light;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 256px 256px;
     }
 
-    /* Keyframes injectés par initOnboardingBg() — trajectoires aléatoires à chaque affichage */
-
-    [data-theme="light"] .onboarding__bg {
-      background:
-        radial-gradient(ellipse 110% 75% at 50% -15%,
-          color-mix(in srgb, var(--gold) 10%, var(--bg)), var(--bg));
-    }
-    [data-theme="light"] .onboarding__bg::before { opacity: .45; }
-    [data-theme="light"] .onboarding__bg-blob--gold { opacity: .4; }
-    [data-theme="light"] .onboarding__bg-blob--rust { opacity: .34; }
-    [data-theme="light"] .onboarding__bg-blob--blue { opacity: .3; }
+    [data-theme="light"] .onboarding__bg::before { opacity: .04; }
 
     .onboarding__content {
       position: relative;
@@ -2781,8 +2724,6 @@
     @media (prefers-reduced-motion: reduce) {
       .anim-onboarding-logo,
       .anim-onboarding-ctas,
-      .onboarding__bg::before,
-      .onboarding__bg-blob,
       .segmented--sliding .segmented__thumb,
       .editor-step,
       .modal-sheet,
@@ -3538,11 +3479,7 @@
        ONBOARDING (premier lancement — affiché si non onboardé)
   ============================================================ -->
   <div id="overlayOnboarding" class="overlay-full onboarding is-hidden" aria-label="Bienvenue">
-    <div class="onboarding__bg" aria-hidden="true">
-      <div class="onboarding__bg-blob onboarding__bg-blob--gold"></div>
-      <div class="onboarding__bg-blob onboarding__bg-blob--rust"></div>
-      <div class="onboarding__bg-blob onboarding__bg-blob--blue"></div>
-    </div>
+    <div class="onboarding__bg" aria-hidden="true"></div>
 
     <!-- Bouton langue — coin supérieur droit -->
     <button class="onboarding__lang-btn" id="btnOnboardingLang" aria-label="Change language">
@@ -5767,76 +5704,141 @@
     ────────────────────────────────────────────────────── */
     const $onboarding = document.getElementById('overlayOnboarding');
 
-    /* Trajectoires aléatoires (direction + amplitude) régénérées à chaque affichage */
+    /* ── Moteur de gradient canvas (sinusoïdes fluides, blend screen) ── */
+    (function() {
+      let _cv = null, _ctx = null, _raf = null, _running = false;
+
+      /* Deux halos gold opposés en diagonale — dérive + respiration indépendantes.
+         bx/by    = position de base (fraction écran)
+         ax/ay    = amplitude de dérive positionnelle
+         fx/fy    = fréquence angulaire de dérive (rad/ms) → période ≈ 2π/f
+         px/py    = phase de dérive
+         szBase   = rayon de base (fraction de la largeur écran)
+         szAmp    = amplitude de respiration (fraction de szBase, ex. .10 = ±10 %)
+         pf/pp    = fréquence & phase de la respiration (pulse)
+         a        = alpha de base                                                   */
+      const ORBS = [
+        /* Halo A — coin haut-gauche */
+        { r:212, g:162, b:60,
+          bx:.12, by:.14, ax:.06, ay:.05,
+          fx:2.1e-4, fy:1.8e-4, px:0,   py:.8,
+          szBase:.75, szAmp:.18, pf:5.8e-4, pp:0,
+          a:.90 },
+        /* Halo B — coin bas-droite (fréquences & phases différentes → indépendant) */
+        { r:212, g:162, b:60,
+          bx:.88, by:.86, ax:.06, ay:.05,
+          fx:1.8e-4, fy:2.6e-4, px:2.3, py:1.4,
+          szBase:.75, szAmp:.18, pf:6.4e-4, pp:3.1,
+          a:.90 },
+      ];
+
+      function _ensureCanvas(bg) {
+        if (_cv) return;
+        _cv = document.createElement('canvas');
+        _cv.className = 'onboarding__bg-canvas';
+        bg.innerHTML = '';
+        bg.appendChild(_cv);
+        _ctx = _cv.getContext('2d');
+        _resize();
+        window.addEventListener('resize', _resize, { passive: true });
+      }
+
+      function _resize() {
+        if (!_cv) return;
+        const dpr = Math.min(devicePixelRatio || 1, 2);
+        const w = _cv.offsetWidth, h = _cv.offsetHeight;
+        if (!w || !h) return;
+        _cv.width  = w * dpr;
+        _cv.height = h * dpr;
+        _ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function _drawFrame(t) {
+        const w = _cv.offsetWidth, h = _cv.offsetHeight;
+        if (!w || !h) return;
+
+        /* Redimensionner si buffer désynchronisé (premier rendu après display:none) */
+        const dpr = Math.min(devicePixelRatio || 1, 2);
+        const bw = Math.round(w * dpr), bh = Math.round(h * dpr);
+        if (_cv.width !== bw || _cv.height !== bh) {
+          _cv.width = bw; _cv.height = bh;
+          _ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        const isLight = document.documentElement.dataset.theme === 'light';
+
+        /* Fond */
+        if (isLight) {
+          _ctx.clearRect(0, 0, w, h);
+          _ctx.globalCompositeOperation = 'source-over';
+        } else {
+          _ctx.fillStyle = '#0a0a0a';
+          _ctx.fillRect(0, 0, w, h);
+          _ctx.globalCompositeOperation = 'screen';
+        }
+
+        /* Facteur alpha thème clair */
+        const lf = isLight ? .22 : 1;
+
+        for (const o of ORBS) {
+          /* Position — dérive sinusoïdale lente */
+          const x = (o.bx + Math.sin(t * o.fx + o.px) * o.ax) * w;
+          const y = (o.by + Math.cos(t * o.fy + o.py) * o.ay) * h;
+
+          /* Respiration — taille + intensité pulsées indépendamment */
+          const breathe = Math.sin(t * o.pf + o.pp);
+          const r = w * o.szBase * (1 + o.szAmp * breathe);
+          const a = o.a * lf * (1 + 0.15 * breathe);
+
+          /* Gradient : cœur lumineux → chute lente pour maximiser la zone visible */
+          const grd = _ctx.createRadialGradient(x, y, 0, x, y, r);
+          grd.addColorStop(0,   `rgba(${o.r},${o.g},${o.b},${a.toFixed(2)})`);
+          grd.addColorStop(.42, `rgba(${o.r},${o.g},${o.b},${(a * .62).toFixed(2)})`);
+          grd.addColorStop(.68, `rgba(${o.r},${o.g},${o.b},${(a * .26).toFixed(2)})`);
+          grd.addColorStop(.88, `rgba(${o.r},${o.g},${o.b},${(a * .06).toFixed(2)})`);
+          grd.addColorStop(1,   `rgba(${o.r},${o.g},${o.b},0)`);
+
+          _ctx.fillStyle = grd;
+          _ctx.beginPath();
+          _ctx.arc(x, y, r, 0, 6.283185);
+          _ctx.fill();
+        }
+
+        _ctx.globalCompositeOperation = 'source-over';
+      }
+
+      function _tick(t) {
+        /* Auto-stop quand l'overlay est caché */
+        if (!_running || !$onboarding || $onboarding.classList.contains('is-hidden')) {
+          _running = false; _raf = null; return;
+        }
+        _drawFrame(t);
+        _raf = requestAnimationFrame(_tick);
+      }
+
+      /* Initié par initOnboardingBg() */
+      window._obBg = {
+        start(bg) {
+          _ensureCanvas(bg);
+          _running = true;
+          if (!_raf) _raf = requestAnimationFrame(_tick);
+        },
+        /* Reduced-motion : une frame statique à t=500 (offsets plaisants) */
+        once(bg) {
+          _ensureCanvas(bg);
+          requestAnimationFrame(() => { _drawFrame(500); });
+        },
+      };
+    })();
+
     function initOnboardingBg() {
       const bg = $onboarding.querySelector('.onboarding__bg');
       if (!bg) return;
-
-      const STYLE_ID = 'onboarding-bg-keyframes';
-      let styleEl = document.getElementById(STYLE_ID);
-      if (!styleEl) {
-        styleEl = document.createElement('style');
-        styleEl.id = STYLE_ID;
-        document.head.appendChild(styleEl);
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        window._obBg.once(bg);
+      } else {
+        window._obBg.start(bg);
       }
-
-      function randomLoop(count, minR, maxR) {
-        const pts = [];
-        for (let i = 0; i < count; i++) {
-          const angle = Math.random() * Math.PI * 2;
-          const radius = minR + Math.random() * (maxR - minR);
-          pts.push({
-            x: +(Math.cos(angle) * radius).toFixed(1),
-            y: +(Math.sin(angle) * radius).toFixed(1),
-            scale: +(0.88 + Math.random() * 0.24).toFixed(3),
-            opacity: +(0.42 + Math.random() * 0.24).toFixed(2),
-          });
-        }
-        return pts;
-      }
-
-      function buildKeyframes(name, pts, unit, baseOpacity, withOpacity) {
-        const step = 100 / pts.length;
-        let css = `0%,100%{transform:translate3d(0,0,0) scale(1)`;
-        if (withOpacity) css += `;opacity:${baseOpacity}`;
-        css += '}';
-        pts.forEach((p, i) => {
-          const pct = +((i + 1) * step).toFixed(2);
-          css += `${pct}%{transform:translate3d(${p.x}${unit},${p.y}${unit},0) scale(${p.scale})`;
-          if (withOpacity) css += `;opacity:${p.opacity}`;
-          css += '}';
-        });
-        return `@keyframes ${name}{${css}}`;
-      }
-
-      const uid = Math.random().toString(36).slice(2, 7);
-      const washName = `ob-w-${uid}`;
-      const goldName = `ob-g-${uid}`;
-      const rustName = `ob-r-${uid}`;
-      const blueName = `ob-b-${uid}`;
-
-      styleEl.textContent = [
-        buildKeyframes(washName, randomLoop(5, 10, 28), '%', 1, false),
-        buildKeyframes(goldName, randomLoop(5, 22, 42), 'vmin', 0.55, true),
-        buildKeyframes(rustName, randomLoop(5, 20, 40), 'vmin', 0.48, true),
-        buildKeyframes(blueName, randomLoop(5, 18, 38), 'vmin', 0.42, true),
-      ].join('\n');
-
-      const washDur = 20 + Math.random() * 16;
-      bg.style.setProperty('--ob-wash-keyframes', washName);
-      bg.style.setProperty('--ob-wash-duration', `${washDur.toFixed(1)}s`);
-      bg.style.setProperty('--ob-wash-delay', `${(-Math.random() * washDur).toFixed(1)}s`);
-
-      const blobCfg = [
-        { name: goldName, min: 17, max: 26 },
-        { name: rustName, min: 19, max: 28 },
-        { name: blueName, min: 21, max: 32 },
-      ];
-      bg.querySelectorAll('.onboarding__bg-blob').forEach((el, i) => {
-        const dur = blobCfg[i].min + Math.random() * (blobCfg[i].max - blobCfg[i].min);
-        el.style.animation = `${blobCfg[i].name} ${dur.toFixed(1)}s linear infinite`;
-        el.style.animationDelay = `${(-Math.random() * dur).toFixed(1)}s`;
-      });
     }
 
     function showOnboarding() {
@@ -7002,6 +7004,19 @@
     let activeChart  = null;
     let monthChart   = null;
     let selectedExoId = null;
+    let chartLoadTriggered = false;
+    let chartLoadFailed    = false;
+
+    /* Chart.js est chargé à la demande (voir <head>) : si l'utilisateur
+       ouvre Stats avant la fin du préchargement, on relance un rendu complet
+       dès que la lib est prête, au lieu d'afficher une fausse erreur. */
+    function ensureChartLoaded() {
+      if (chartLoadTriggered || typeof Chart !== 'undefined') return;
+      chartLoadTriggered = true;
+      (window.__loadChartJs ? window.__loadChartJs() : Promise.reject())
+        .then(() => render())
+        .catch(() => { chartLoadFailed = true; render(); });
+    }
 
     /* Les noms de mois sont fournis par t('months_long') */
 
@@ -7309,6 +7324,7 @@
 
     /* ── RENDU PRINCIPAL ──────────────────────────────────── */
     function render() {
+      ensureChartLoaded();
       if (activeChart) { activeChart.destroy(); activeChart = null; }
       if (monthChart)  { monthChart.destroy();  monthChart  = null; }
       $screen.innerHTML = '';
@@ -7480,8 +7496,14 @@
 
           if (typeof Chart === 'undefined') {
             clearCanvas();
-            chartEmpty.textContent = t('stats_chart_error');
-            chartEmpty.style.display = 'block';
+            /* Chargement en cours (voir ensureChartLoaded) : pas de message
+               tant que ce n'est pas un échec confirmé, render() sera rappelé. */
+            if (chartLoadFailed) {
+              chartEmpty.textContent = t('stats_chart_error');
+              chartEmpty.style.display = 'block';
+            } else {
+              chartEmpty.style.display = 'none';
+            }
             return;
           }
 
