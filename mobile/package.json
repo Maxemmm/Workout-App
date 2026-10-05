@@ -6,6 +6,7 @@
     "@expo-google-fonts/barlow-condensed": "^0.4.1",
     "@expo-google-fonts/dm-sans": "^0.4.2",
     "@expo/ui": "~57.0.21",
+    "@expo/vector-icons": "^15.0.2",
     "@types/jest": "29.5.14",
     "drizzle-orm": "^0.45.3",
     "expo": "~57.0.26",
