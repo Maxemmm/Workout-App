@@ -36,6 +36,13 @@ describe('resolveDay', () => {
   });
 });
 
+describe('resolveDay (clé héritée)', () => {
+  it('traite un planning pointant vers "toString" comme un repos implicite', () => {
+    const bad = { ...program, schedule: { '1': 'toString' } } as unknown as typeof program;
+    expect(resolveDay(bad, 1)).toEqual({ kind: 'implicit-rest', weekday: 1 });
+  });
+});
+
 describe('weekStrip', () => {
   it('retourne 7 jours, dimanche → samedi, avec un seul jour courant', () => {
     const monday = new Date(2026, 9, 5, 9, 0); // lundi 5 octobre 2026, heure locale

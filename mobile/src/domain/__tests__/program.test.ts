@@ -110,4 +110,9 @@ describe('parseProgram', () => {
     const bad = makeExercise('x', 3, { alternatives: [{ sets: 3 }] });
     expect(parseProgram(makeProgramInput({}, { a: makeSession('A', [bad]) })).ok).toBe(false);
   });
+
+  it('rejette un planning qui référence une clé héritée (toString)', () => {
+    const r = parseProgram(makeProgramInput({ '1': 'toString' }, { a: makeSession('A') }));
+    expect(r.ok).toBe(false);
+  });
 });

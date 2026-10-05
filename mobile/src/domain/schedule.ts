@@ -16,7 +16,8 @@ export type WeekStripDay = { weekday: Weekday; isToday: boolean; plan: DayPlan }
 
 export function resolveDay(program: Program, weekday: Weekday): DayPlan {
   const key = program.schedule[String(weekday)];
-  const session = key != null ? program.sessions[key] : undefined;
+  // hasOwn : une clé héritée ("toString") ne doit jamais être prise pour une séance
+  const session = key != null && Object.hasOwn(program.sessions, key) ? program.sessions[key] : undefined;
   if (key == null || !session) return { kind: 'implicit-rest', weekday };
   return { kind: 'session', weekday, sessionKey: key, session };
 }

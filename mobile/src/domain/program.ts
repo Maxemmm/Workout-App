@@ -71,7 +71,7 @@ export const ProgramSchema = z
     for (const [day, key] of Object.entries(p.schedule)) {
       if (!/^[0-6]$/.test(day)) {
         ctx.addIssue({ code: 'custom', path: ['schedule', day], message: `jour "${day}" invalide (0-6 attendu)` });
-      } else if (key !== null && !(key in p.sessions)) {
+      } else if (key !== null && !Object.hasOwn(p.sessions, key)) {
         ctx.addIssue({ code: 'custom', path: ['schedule', day], message: `le jour ${day} référence la séance inconnue "${key}"` });
       }
     }
