@@ -1,19 +1,28 @@
 // Écran bloquant si une migration SQLite échoue : aucune perte, export brut possible
+import { useState } from 'react';
 import { Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import { dumpRawTables } from '@/db/client';
 
 export function MigrationErrorScreen({ error }: { error: Error }) {
-  const exportRaw = () => {
-    Share.share({ message: dumpRawTables() }).catch(() => {});
+  const [exportError, setExportError] = useState<string | null>(null);
+  // Tout l'export (lecture + partage) est protégé : un échec s'affiche au lieu de planter
+  const exportRaw = async () => {
+    try {
+      setExportError(null);
+      await Share.share({ message: dumpRawTables() });
+    } catch (e) {
+      setExportError(e instanceof Error ? e.message : String(e));
+    }
   };
   return (
     <View style={styles.root}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>Mise à jour des données impossible</Text>
         <Text style={styles.body}>
-          Vos données sont intactes. Exportez-les avant de réinstaller ou de contacter le support.
+          Vos données n'ont pas été supprimées. Exportez-les avant de réinstaller ou de contacter le support.
         </Text>
         <Text selectable style={styles.code}>{error.message}</Text>
+        {exportError && <Text selectable style={styles.code}>{`Export impossible : ${exportError}`}</Text>}
         <Pressable accessibilityRole="button" onPress={exportRaw} style={styles.button}>
           <Text style={styles.buttonText}>EXPORTER LES DONNÉES BRUTES</Text>
         </Pressable>
