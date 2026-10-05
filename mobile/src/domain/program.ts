@@ -10,16 +10,29 @@ const optText = z.string().nullish();
 /** Tableau optionnel : null/undefined → [] */
 const listOf = <T extends z.ZodType>(item: T) => z.array(item).nullish().transform((v) => v ?? []);
 
+/** Alternative d'exercice : nom seul (anciens programmes) ou objet écrit par l'éditeur de la PWA */
+export const AlternativeSchema = z.union([
+  z.string(),
+  z.looseObject({
+    name: z.string().trim().min(1, "nom d'alternative manquant"),
+    sets: z.coerce.number().int().min(1).optional(),
+    scheme: z.union([z.string(), z.number()]).nullish().transform((v) => (v == null ? '' : String(v))),
+    load: optText,
+    restSec: z.coerce.number().int().nonnegative().nullish(),
+    timed: z.boolean().optional(),
+  }),
+]);
+
 export const ExerciseSchema = z.looseObject({
   id: z.string().trim().min(1, "id d'exercice manquant"),
   name: z.string().trim().min(1, "nom d'exercice manquant"),
-  scheme: z.union([z.string(), z.number()]).transform(String).default(''),
+  scheme: z.union([z.string(), z.number()]).nullish().transform((v) => (v == null ? '' : String(v))),
   sets: z.coerce.number().int().min(1, 'sets doit être un entier ≥ 1'),
   timed: z.boolean().optional(),
   load: optText,
-  restSec: z.coerce.number().int().positive().nullish(),
+  restSec: z.coerce.number().int().nonnegative().nullish(),
   cue: optText,
-  alternatives: listOf(z.string()),
+  alternatives: listOf(AlternativeSchema),
 });
 
 export const SessionTypeSchema = z.enum(['lift', 'cardio', 'rest', 'mixed']);
@@ -78,6 +91,7 @@ export type Program = z.output<typeof ProgramSchema>;
 export type Session = z.output<typeof SessionSchema>;
 export type Exercise = z.output<typeof ExerciseSchema>;
 export type SessionType = z.output<typeof SessionTypeSchema>;
+export type Alternative = z.output<typeof AlternativeSchema>;
 export type Units = Program['meta']['units'];
 
 export type ProgramParseResult = { ok: true; program: Program } | { ok: false; errors: string[] };
@@ -90,4 +104,9 @@ export function parseProgram(input: unknown): ProgramParseResult {
     ok: false,
     errors: r.error.issues.map((i) => `${i.path.map(String).join('.') || '(racine)'} : ${i.message}`),
   };
+}
+
+/** Nom d'une alternative (chaîne ou objet) : c'est ce nom que `performed_name` et `swaps` mémorisent. */
+export function alternativeName(alt: Alternative): string {
+  return typeof alt === 'string' ? alt : alt.name;
 }

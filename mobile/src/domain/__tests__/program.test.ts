@@ -1,5 +1,5 @@
 import example from '@/data/program.example.json';
-import { parseProgram } from '../program';
+import { alternativeName, parseProgram } from '../program';
 import { makeExercise, makeProgramInput, makeSession, sevenDayLbsInput } from '../__fixtures__/builders';
 
 describe('parseProgram', () => {
@@ -87,5 +87,27 @@ describe('parseProgram', () => {
     expect(parseProgram(dupInSession).ok).toBe(false);
     const shared = makeProgramInput({}, { a: makeSession('A', [makeExercise('x')]), b: makeSession('B', [makeExercise('x')]) });
     expect(parseProgram(shared).ok).toBe(true);
+  });
+  it("accepte les alternatives objets écrites par l'éditeur PWA et restSec 0", () => {
+    const pwaExercise = makeExercise('presse', 4, {
+      scheme: null,
+      restSec: 0,
+      alternatives: [
+        'Presse inclinée',
+        { name: 'Hack squat', sets: 3, scheme: '3×10', load: null, restSec: 0, timed: false },
+      ],
+    });
+    const r = parseProgram(makeProgramInput({}, { a: makeSession('A', [pwaExercise]) }));
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    const ex = r.program.sessions.a.exercises[0];
+    expect(ex.restSec).toBe(0);
+    expect(ex.scheme).toBe('');
+    expect(ex.alternatives.map(alternativeName)).toEqual(['Presse inclinée', 'Hack squat']);
+  });
+
+  it('rejette une alternative objet sans nom', () => {
+    const bad = makeExercise('x', 3, { alternatives: [{ sets: 3 }] });
+    expect(parseProgram(makeProgramInput({}, { a: makeSession('A', [bad]) })).ok).toBe(false);
   });
 });

@@ -152,7 +152,7 @@ Contrainte : au plus un `workout` non supprimé par (`program_id`, `session_key`
 |---|---|
 | `workout_id` | FK `workouts.id` |
 | `exercise_id` | id de l'exercice **du programme** (stable, même en cas d'échange) |
-| `performed_name` | nullable ; nom de l'alternative réalisée si un échange a eu lieu (les `alternatives` du format programme sont des noms, pas des ids) |
+| `performed_name` | nullable ; nom de l'alternative réalisée si un échange a eu lieu (les `alternatives` du format programme sont soit des noms, soit des objets `{name, sets?, scheme?, load?, restSec?, timed?}` écrits par l'éditeur de la PWA ; dans les deux cas c'est le **nom** qui est mémorisé, pas un id) |
 | `set_index` | 0-based |
 | `done` | booléen |
 | `weight` | nullable, dans l'unité du programme |
@@ -171,7 +171,7 @@ Contrainte : au plus un `workout` non supprimé par (`program_id`, `session_key`
 |---|---|
 | `program_id`, `session_key` | unique ensemble |
 | `exercise_order` | JSON : liste d'ids d'exercices (`order` est un mot réservé SQL) |
-| `swaps` | JSON : `{ idExercice: nomAlternative }` |
+| `swaps` | JSON : `{ idExercice: nomAlternative }` (nom de l'alternative, objet ou chaîne) |
 
 **`settings`** : clé/valeur, propre à l'appareil, non synchronisé
 Clés : `activeProgramId`, `lang` (`fr`/`en`), `theme` (`dark`/`light`/`system`), `aiEnabled`, `keepAwake`, `onboarded`, `healthEnabled`, `programDraft` (brouillon de l'éditeur, JSON), `activeRest` (repos en cours : `{ workoutId, exerciseId, endAt }`, JSON).
