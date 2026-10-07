@@ -4,7 +4,7 @@
 // ============================================================
 import { defaultAccent, type AccentKey } from './accents';
 import { makeEntityId, type RandomSuffix } from './entityIds';
-import type { Exercise, Program, Session, SessionType, Units } from './program';
+import { SessionTypeSchema, type Exercise, type Program, type Session, type SessionType, type Units } from './program';
 import { moveId } from './reorder';
 import type { Weekday } from './schedule';
 
@@ -190,4 +190,23 @@ export function setBonusTitle(d: Draft, key: string, title: string | null): Draf
   const exercises = session.bonus?.exercises ?? [];
   const bonus = exercises.length === 0 && !title ? null : { ...(session.bonus ?? {}), title, exercises };
   return withSessions(d, { ...d.program.sessions, [key]: { ...session, bonus } });
+}
+
+/* ── Relecture (settings.programDraft) ────────────────── */
+const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
+
+/** Contrôle structurel d'un brouillon relu ; ne valide pas le programme (il peut être incomplet) */
+export function restoreDraft(value: unknown): Draft | null {
+  if (!isObj(value)) return null;
+  const { sourceProgramId, program, manualAccents } = value;
+  if (sourceProgramId !== null && typeof sourceProgramId !== 'string') return null;
+  if (!isObj(program) || !isObj(program.meta) || !isObj(program.sessions) || !isObj(program.schedule) || !Array.isArray(program.rules)) return null;
+  const meta = program.meta;
+  if (typeof meta.label !== 'string' || (meta.units !== 'kg' && meta.units !== 'lbs') || typeof meta.restDefaultSec !== 'number') return null;
+  for (const s of Object.values(program.sessions)) {
+    if (!isObj(s) || !SessionTypeSchema.safeParse(s.type).success || typeof s.name !== 'string') return null;
+    if (!Array.isArray(s.exercises) || !Array.isArray(s.warmup) || !Array.isArray(s.tips)) return null;
+  }
+  const accents = Array.isArray(manualAccents) ? manualAccents.filter((k): k is string => typeof k === 'string') : [];
+  return { sourceProgramId, program: program as Program, manualAccents: accents };
 }

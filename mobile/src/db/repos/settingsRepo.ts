@@ -3,6 +3,7 @@
 // ============================================================
 import { eq } from 'drizzle-orm';
 import type { Lang, ThemePref } from '@/domain/prefs';
+import type { Draft } from '@/domain/draft';
 import type { TimerState } from '@/domain/timer';
 import { settings } from '../schema';
 import type { RepoCtx } from '../types';
@@ -15,7 +16,7 @@ export interface SettingsMap {
   keepAwake: boolean;
   onboarded: boolean;
   healthEnabled: boolean;
-  programDraft: unknown;
+  programDraft: Draft;
   activeRest: TimerState;
 }
 export type SettingKey = keyof SettingsMap;

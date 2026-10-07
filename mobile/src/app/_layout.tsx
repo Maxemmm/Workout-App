@@ -13,6 +13,7 @@ import { useRepoCtx } from '@/db/DbContext';
 import { DbProvider } from '@/db/DbProvider';
 import { Toast } from '@/features/common/Toast';
 import { I18nProvider } from '@/i18n/I18nProvider';
+import { useDraftStore } from '@/state/draftStore';
 import { usePrefs } from '@/state/prefsStore';
 import { useTimerStore } from '@/state/timerStore';
 import { ThemeProvider, useTheme } from '@/theme/ThemeProvider';
@@ -46,6 +47,7 @@ function PrefsGate() {
   useEffect(() => {
     usePrefs.getState().hydrate(ctx);
     useTimerStore.getState().hydrate(ctx, Date.now());
+    useDraftStore.getState().hydrate(ctx);
     setHydrated(true);
   }, [ctx]);
 
