@@ -69,6 +69,8 @@ function ThemedStack() {
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="editor" options={{ presentation: 'fullScreenModal', gestureEnabled: false }} />
+        <Stack.Screen name="import" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="onboarding" />
       </Stack>
       <Toast />
     </>
