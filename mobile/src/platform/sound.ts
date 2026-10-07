@@ -3,21 +3,27 @@ import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-aud
 import type { Sound } from './types';
 
 let player: AudioPlayer | null = null;
+let modeReady: Promise<void> | null = null;
+
+/** Mode audio appliqué une seule fois, et toujours avant de jouer (sinon le 1er bip peut couper la musique) */
+function ensureAudioMode(): Promise<void> {
+  modeReady ??= setAudioModeAsync({ playsInSilentMode: false, interruptionMode: 'mixWithOthers' }).catch(() => {});
+  return modeReady;
+}
 
 function getPlayer(): AudioPlayer {
-  if (!player) {
-    setAudioModeAsync({ playsInSilentMode: false, interruptionMode: 'mixWithOthers' }).catch(() => {});
-    player = createAudioPlayer(require('../../assets/sounds/rest-done.wav'));
-  }
+  player ??= createAudioPlayer(require('../../assets/sounds/rest-done.wav'));
   return player;
 }
 
 export const sound: Sound = {
   playRestDone: () => {
-    try {
-      const p = getPlayer();
-      p.seekTo(0).catch(() => {});
-      p.play();
-    } catch { /* audio indisponible */ }
+    ensureAudioMode()
+      .then(() => {
+        const p = getPlayer();
+        p.seekTo(0).catch(() => {});
+        p.play();
+      })
+      .catch(() => { /* audio indisponible */ });
   },
 };
