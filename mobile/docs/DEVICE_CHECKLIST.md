@@ -49,3 +49,14 @@
 - [ ] Couleur choisie conservée après enregistrement ; type « Repos » met la séance en gris si la couleur était automatique.
 - [ ] Tuer l'app en pleine édition puis la rouvrir : bannière « Brouillon en cours », Reprendre retrouve les modifications.
 - [ ] Renommer un exercice : son poids mémorisé et « Dernière fois » sont conservés dans Today.
+
+## M3b — Onboarding + Import (build development à refaire : expo-document-picker)
+- [ ] Réinstaller l'app (ou effacer ses données) : l'onboarding s'affiche ; FR/EN s'applique immédiatement.
+- [ ] « Essayer avec le programme exemple » → Today avec le programme exemple.
+- [ ] « Créer mon programme » → éditeur ; Annuler → retour à l'onboarding ; Enregistrer → onglets.
+- [ ] « Importer un fichier JSON » → sélecteur iOS (Fichiers, iCloud Drive) / Android (Téléchargements, Drive) ; annuler ne fait rien.
+- [ ] Choisir `workout-backup-2026-10-07.json` : aperçu « 2 programmes, 8 séances, 115 séries, 10 poids » + ignorés (8).
+- [ ] « Restaurer » → confirmation → thème clair appliqué, Today affiche la séance du jour, « Dernière fois » présent, aucun bandeau « non terminée ».
+- [ ] Coller un programme JSON dans la zone de texte → aperçu → importé et activé (Plan → Mes programmes).
+- [ ] Plan → Mes programmes → « Importer » ouvre l'écran d'import.
+- [ ] Supprimer tous les programmes : Today propose « Créer » et « Importer » (pas d'onboarding).
