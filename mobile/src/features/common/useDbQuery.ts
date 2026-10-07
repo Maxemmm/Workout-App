@@ -9,13 +9,18 @@ import type { RepoCtx } from '@/db/types';
 import { usePrefs } from '@/state/prefsStore';
 
 /** Exécute la requête pour une version de données donnée (la version ne sert que de clé de rafraîchissement). */
-function readAtVersion<T>(query: (ctx: RepoCtx) => T, ctx: RepoCtx, _version: number): T {
-  return query(ctx);
+function readAtVersion<A extends unknown[], T>(
+  query: (ctx: RepoCtx, ...args: A) => T,
+  ctx: RepoCtx,
+  _version: number,
+  args: A,
+): T {
+  return query(ctx, ...args);
 }
 
-/** `query` doit être stable (fonction de module) et ne dépendre que de `ctx`. */
-export function useDbQuery<T>(query: (ctx: RepoCtx) => T): T {
+/** `query` doit être stable (fonction de module) ; ses arguments suivent `ctx`. */
+export function useDbQuery<A extends unknown[], T>(query: (ctx: RepoCtx, ...args: A) => T, ...args: A): T {
   const ctx = useRepoCtx();
   const dataVersion = usePrefs((s) => s.dataVersion);
-  return readAtVersion(query, ctx, dataVersion);
+  return readAtVersion(query, ctx, dataVersion, args);
 }

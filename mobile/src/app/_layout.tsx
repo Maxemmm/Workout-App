@@ -8,6 +8,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useRepoCtx } from '@/db/DbContext';
 import { DbProvider } from '@/db/DbProvider';
 import { I18nProvider } from '@/i18n/I18nProvider';
@@ -26,9 +27,11 @@ export default function RootLayout() {
 
   if (!ready) return null;
   return (
-    <DbProvider>
-      <PrefsGate />
-    </DbProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <DbProvider>
+        <PrefsGate />
+      </DbProvider>
+    </GestureHandlerRootView>
   );
 }
 
