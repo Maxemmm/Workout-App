@@ -66,13 +66,11 @@ describe('actions Today', () => {
     expect(useTimerStore.getState().timer).toBeNull();
   });
 
-  it('date null : la séance est datée du jour local de nowMs', () => {
-    const { ctx, program, env, ex } = setup();
-    const v = loadTodayView(ctx, program, 'fb', '2026-10-05');
-    pressSet({ ...env(), date: null }, v, ex('presse'), 0);
-    expect(useTimerStore.getState().timer).not.toBeNull();
+  it('la séance est datée du jour affiché, même si l\'horloge a changé de jour', () => {
+    const { ctx, env, view, ex } = setup();
+    pressSet(env(T0 + 24 * 3600_000), view(), ex('presse'), 0);
     const created = getWorkout(ctx, useTimerStore.getState().timer!.workoutId);
-    expect(created?.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(created?.date).toBe('2026-10-05');
   });
 
   it("chronométré : tap → chrono d'effort, second tap → annulation sans cocher", () => {

@@ -2,8 +2,8 @@
 // TODAY — séance du jour (ou du jour choisi), séance d'hier à reprendre,
 // barre de repos flottante. Aucune séance ni jour en dur : tout vient du programme.
 // ============================================================
-import { useRef, useState } from 'react';
-import type { ScrollView } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { AppState, type ScrollView } from 'react-native';
 import example from '@/data/program.example.json';
 import { useRepoCtx } from '@/db/DbContext';
 import { createProgram, setActiveProgram } from '@/db/repos/programsRepo';
@@ -30,14 +30,36 @@ import { WeekStrip } from './WeekStrip';
 
 const REST_BAR_SPACE = 150;
 
+/** Délai jusqu'au prochain minuit local (+1 s de marge) */
+function msUntilNextDay(now: Date): number {
+  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1);
+  return next.getTime() - now.getTime();
+}
+
 export function TodayScreen({ focused = true }: { focused?: boolean }) {
   const ctx = useRepoCtx();
   const program = useActiveProgram();
   const { t, tList } = useI18n();
+  const [todayKey, setTodayKey] = useState(() => localDateKey(new Date()));
   const today = new Date();
-  const todayKey = localDateKey(today);
   const [selected, setSelected] = useState<Weekday>(weekdayOf(today));
   const [resumedId, setResumedId] = useState<string | null>(null);
+
+  // Changement de jour (minuit app ouverte, ou retour au premier plan) : on bascule sur le jour courant ;
+  // une séance de la veille restée en cours est alors proposée par le bandeau.
+  useEffect(() => {
+    const refresh = () => {
+      const now = new Date();
+      const key = localDateKey(now);
+      if (key === todayKey) return;
+      setTodayKey(key);
+      setSelected(weekdayOf(now));
+      setResumedId(null);
+    };
+    const id = setTimeout(refresh, msUntilNextDay(new Date()));
+    const sub = AppState.addEventListener('change', (s) => { if (s === 'active') refresh(); });
+    return () => { clearTimeout(id); sub.remove(); };
+  }, [todayKey]);
   const [dragging, setDragging] = useState(false);
   const [names, setNames] = useState<Record<string, string>>({});
   const scrollRef = useRef<ScrollView>(null);
@@ -122,7 +144,6 @@ export function TodayScreen({ focused = true }: { focused?: boolean }) {
           sessionKey={plan.sessionKey}
           session={plan.session}
           date={date}
-          isToday={!resumed}
           focused={focused}
           onDragStateChange={setDragging}
           onCardLayout={(id, y) => { cardY.current[id] = y; }}

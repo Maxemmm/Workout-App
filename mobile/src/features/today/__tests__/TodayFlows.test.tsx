@@ -85,6 +85,23 @@ describe('Today — parcours', () => {
     expect(screen.getByTestId('rest-day')).toBeTruthy();
   });
 
+  it('passage de minuit app ouverte : nouveau jour affiché, séance de la veille à reprendre et complétée sur le même workout', async () => {
+    jest.setSystemTime(new Date(2026, 9, 5, 23, 50, 0));
+    await setup();
+    await fireEvent.press(screen.getByTestId('set-presse-0'));
+    expect(screen.getByText('1 / 3')).toBeTruthy();
+
+    // 00:05 le mardi — l'écran est resté monté
+    await act(async () => { jest.advanceTimersByTime(15 * 60_000); });
+    expect(screen.getByTestId('rest-day')).toBeTruthy();
+    expect(screen.getByText(/non terminée/)).toBeTruthy();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Reprendre' }));
+    await fireEvent.press(screen.getByTestId('set-presse-1'));
+    expect(screen.getByText('2 / 3')).toBeTruthy();
+    expect(screen.getByTestId('card-presse-complete')).toBeTruthy();
+  });
+
   it('extensibilité : 7 jours en lbs, sans changement de code', async () => {
     await setup(sevenDayLbsInput());
     expect(screen.getAllByText('SÉANCE 1').length).toBeGreaterThan(0);

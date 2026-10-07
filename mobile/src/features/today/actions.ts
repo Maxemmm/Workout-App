@@ -13,7 +13,6 @@ import type { RepoCtx } from '@/db/types';
 import { weightKey, type EffectiveExercise } from '@/domain/exerciseView';
 import { restDurationSec } from '@/domain/progress';
 import { moveId } from '@/domain/reorder';
-import { localDateKey } from '@/domain/schedule';
 import { isTimed, schemeReps, workSeconds } from '@/domain/scheme';
 import { FLASH_MS, startTimer, type TimerState } from '@/domain/timer';
 import { workoutExtensions } from '@/platform/extensions';
@@ -26,14 +25,14 @@ export type TodayEnv = {
   nowMs: number;
   program: StoredProgram;
   sessionKey: string;
-  /** Date de la séance affichée ; null = jour local de nowMs (séance du jour) */
-  date: string | null;
+  /** Date (jour local) de la séance affichée : toutes les écritures portent sur ce jour */
+  date: string;
 };
 
 const timerState = () => useTimerStore.getState();
 
 function workoutKey(env: TodayEnv) {
-  return { programId: env.program.id, sessionKey: env.sessionKey, date: env.date ?? localDateKey(new Date(env.nowMs)) };
+  return { programId: env.program.id, sessionKey: env.sessionKey, date: env.date };
 }
 
 function doneCount(view: TodayView, exerciseId: string): number {

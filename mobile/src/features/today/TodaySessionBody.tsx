@@ -45,8 +45,6 @@ export interface TodaySessionBodyProps {
   session: Session;
   /** Date de la séance affichée (jour local) */
   date: string;
-  /** true si la séance affichée est celle du jour (pas une reprise) */
-  isToday: boolean;
   focused: boolean;
   onDragStateChange(dragging: boolean): void;
   onCardLayout(exerciseId: string, y: number): void;
@@ -85,7 +83,7 @@ export function TodaySessionBody(p: TodaySessionBodyProps) {
   const namesKey = JSON.stringify(names);
   useEffect(() => { onExerciseNames(JSON.parse(namesKey) as Record<string, string>); }, [namesKey, onExerciseNames]);
 
-  const env = (): TodayEnv => ({ ctx, nowMs: Date.now(), program: p.program, sessionKey: p.sessionKey, date: p.isToday ? null : p.date });
+  const env = (): TodayEnv => ({ ctx, nowMs: Date.now(), program: p.program, sessionKey: p.sessionKey, date: p.date });
   const run = (fn: () => void) => {
     try {
       fn();
