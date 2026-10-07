@@ -38,7 +38,7 @@ function attempt(write: () => void, errorMessage: string): boolean {
   }
 }
 
-export function PlanScreen({ onOpenEditor }: { onOpenEditor(step: EditorStep): void }) {
+export function PlanScreen({ onOpenEditor, onOpenImport }: { onOpenEditor(step: EditorStep): void; onOpenImport(): void }) {
   const ctx = useRepoCtx();
   const { colors, fonts } = useTheme();
   const { t } = useI18n();
@@ -99,6 +99,7 @@ export function PlanScreen({ onOpenEditor }: { onOpenEditor(step: EditorStep): v
             onDuplicate={duplicate}
             onDelete={(id) => void remove(id)}
             onCreate={() => void open({ kind: 'new' }, 1)}
+            onImport={onOpenImport}
           />
         )}
       </Animated.View>

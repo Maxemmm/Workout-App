@@ -1,5 +1,6 @@
 // Enregistrement du brouillon : validation puis création (et activation) ou mise à jour
 import { createProgram, getProgram, setActiveProgram, updateProgram } from '@/db/repos/programsRepo';
+import { setSetting } from '@/db/repos/settingsRepo';
 import type { RepoCtx } from '@/db/types';
 import type { Draft } from '@/domain/draft';
 import { validateDraft, type DraftError } from '@/domain/programRules';
@@ -16,5 +17,6 @@ export function saveDraft(ctx: RepoCtx, draft: Draft): SaveResult {
   }
   const created = createProgram(ctx, v.program, 'manual');
   setActiveProgram(ctx, created.id);
+  setSetting(ctx, 'onboarded', true);
   return { ok: true, programId: created.id };
 }

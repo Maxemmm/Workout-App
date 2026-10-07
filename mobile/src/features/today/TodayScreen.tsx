@@ -4,14 +4,14 @@
 // ============================================================
 import { useEffect, useRef, useState } from 'react';
 import { AppState, type ScrollView } from 'react-native';
-import example from '@/data/program.example.json';
 import { useRepoCtx } from '@/db/DbContext';
-import { createProgram, setActiveProgram } from '@/db/repos/programsRepo';
 import { findStaleInProgress } from '@/db/repos/workoutsRepo';
 import { localDateKey, resolveDay, weekdayOf, weekStrip, type DayPlan, type Weekday } from '@/domain/schedule';
 import { Screen } from '@/features/common/Screen';
 import { useDbQuery } from '@/features/common/useDbQuery';
+import { prepareEditor } from '@/features/editor/openEditor';
 import { useI18n } from '@/i18n/I18nProvider';
+import { confirm } from '@/platform/confirm';
 import { usePrefs } from '@/state/prefsStore';
 import { useTimerStore } from '@/state/timerStore';
 import { useToastStore } from '@/state/toastStore';
@@ -36,7 +36,14 @@ function msUntilNextDay(now: Date): number {
   return next.getTime() - now.getTime();
 }
 
-export function TodayScreen({ focused = true }: { focused?: boolean }) {
+interface Props {
+  focused?: boolean;
+  /** Pas de programme : ouvrir l'éditeur (brouillon neuf déjà prêt) */
+  onOpenEditor?(): void;
+  onOpenImport?(): void;
+}
+
+export function TodayScreen({ focused = true, onOpenEditor, onOpenImport }: Props) {
   const ctx = useRepoCtx();
   const program = useActiveProgram();
   const { t, tList } = useI18n();
@@ -68,14 +75,14 @@ export function TodayScreen({ focused = true }: { focused?: boolean }) {
   const timerVisible = useTimerStore((s) => s.timer !== null || s.flash !== null);
 
   if (!program) {
-    const loadExample = () => {
-      const created = createProgram(ctx, example, 'example');
-      setActiveProgram(ctx, created.id);
-      usePrefs.getState().bumpData();
+    const create = async () => {
+      const ok = await prepareEditor(ctx, { kind: 'new' }, () =>
+        confirm({ title: t('editor_replace_draft_title'), confirmLabel: t('editor_discard'), cancelLabel: t('editor_keep'), destructive: true }));
+      if (ok) onOpenEditor?.();
     };
     return (
       <Screen>
-        <NoProgram onLoadExample={loadExample} />
+        <NoProgram onCreate={() => void create()} onImport={() => onOpenImport?.()} />
       </Screen>
     );
   }

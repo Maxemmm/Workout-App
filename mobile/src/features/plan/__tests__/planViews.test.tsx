@@ -46,7 +46,7 @@ describe('WeekView', () => {
 
 describe('ProgramsView', () => {
   it('cartes, badge Actif, actions', async () => {
-    const handlers = { onActivate: jest.fn(), onEdit: jest.fn(), onDuplicate: jest.fn(), onDelete: jest.fn(), onCreate: jest.fn() };
+    const handlers = { onActivate: jest.fn(), onEdit: jest.fn(), onDuplicate: jest.fn(), onDelete: jest.fn(), onCreate: jest.fn(), onImport: jest.fn() };
     await renderWithProviders(<ProgramsView programs={[stored('a', 'PROG A'), stored('b', 'PROG B')]} activeId="a" {...handlers} />);
     expect(screen.getByText('Actif')).toBeTruthy();
     expect(screen.getAllByText('2 jours · 3 exercices').length).toBe(2);
@@ -60,5 +60,7 @@ describe('ProgramsView', () => {
     expect(handlers.onDelete).toHaveBeenCalledWith('a');
     await fireEvent.press(screen.getByRole('button', { name: 'CRÉER UN NOUVEAU PROGRAMME' }));
     expect(handlers.onCreate).toHaveBeenCalled();
+    await fireEvent.press(screen.getByRole('button', { name: 'Importer' }));
+    expect(handlers.onImport).toHaveBeenCalled();
   });
 });

@@ -13,9 +13,10 @@ interface Props {
   onDuplicate(id: string): void;
   onDelete(id: string): void;
   onCreate(): void;
+  onImport(): void;
 }
 
-export function ProgramsView({ programs, activeId, onActivate, onEdit, onDuplicate, onDelete, onCreate }: Props) {
+export function ProgramsView({ programs, activeId, onActivate, onEdit, onDuplicate, onDelete, onCreate, onImport }: Props) {
   const { colors, fonts, radius } = useTheme();
   const { t } = useI18n();
   return (
@@ -34,6 +35,9 @@ export function ProgramsView({ programs, activeId, onActivate, onEdit, onDuplica
       ))}
       <Pressable accessibilityRole="button" onPress={onCreate} style={[styles.btn, { backgroundColor: colors.gold, borderRadius: radius.md }]}>
         <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('plan_create_new')}</Text>
+      </Pressable>
+      <Pressable accessibilityRole="button" onPress={onImport} style={[styles.btn, { borderColor: colors.gold, borderWidth: 1, borderRadius: radius.md }]}>
+        <Text style={{ color: colors.gold, fontFamily: fonts.uiBold }}>{t('plan_import')}</Text>
       </Pressable>
     </View>
   );

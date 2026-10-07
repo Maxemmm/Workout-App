@@ -18,7 +18,7 @@ async function setup() {
   ctx.advance(1000);
   setActiveProgram(ctx, a.id);
   const onOpenEditor = jest.fn();
-  await renderWithProviders(<PlanScreen onOpenEditor={onOpenEditor} />, { ctx });
+  await renderWithProviders(<PlanScreen onOpenEditor={onOpenEditor} onOpenImport={jest.fn()} />, { ctx });
   return { ctx, a, b, onOpenEditor };
 }
 

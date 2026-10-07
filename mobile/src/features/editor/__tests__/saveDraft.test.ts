@@ -3,6 +3,7 @@ import example from '@/data/program.example.json';
 import { createProgram, getActiveProgram, getProgram, listPrograms, setActiveProgram, softDeleteProgram } from '@/db/repos/programsRepo';
 import { createTestCtx } from '@/db/testing/createTestCtx';
 import { addSession, draftFromProgram, newDraft, setMeta, setSchedule, updateSession } from '@/domain/draft';
+import { getSetting } from '@/db/repos/settingsRepo';
 import { saveDraft } from '../saveDraft';
 
 function validNew() {
@@ -25,6 +26,7 @@ describe('saveDraft', () => {
     if (r.ok) {
       expect(getProgram(ctx, r.programId)).toMatchObject({ source: 'manual', definition: { meta: { label: 'NEUF' } } });
       expect(getActiveProgram(ctx)?.id).toBe(r.programId);
+      expect(getSetting(ctx, 'onboarded')).toBe(true);
     }
   });
 

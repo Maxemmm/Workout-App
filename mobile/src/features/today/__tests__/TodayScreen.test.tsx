@@ -1,24 +1,25 @@
 import { act, fireEvent, screen } from '@testing-library/react-native';
-import { TodayScreen } from '../TodayScreen';
 import { createTestCtx } from '@/db/testing/createTestCtx';
+import { DRAFT_INITIAL, useDraftStore } from '@/state/draftStore';
 import { PREFS_INITIAL, usePrefs } from '@/state/prefsStore';
-import { listPrograms } from '@/db/repos/programsRepo';
 import { renderWithProviders } from '@/test/renderWithProviders';
+import { TodayScreen } from '../TodayScreen';
 
-describe('TodayScreen — rafraîchissement après écriture', () => {
+describe('TodayScreen — pas de programme', () => {
   beforeEach(async () => {
-    await act(async () => { usePrefs.setState(PREFS_INITIAL); });
+    await act(async () => { usePrefs.setState(PREFS_INITIAL); useDraftStore.setState(DRAFT_INITIAL); });
   });
 
-  it('passe de « pas de programme » à la séance après « charger l\'exemple », sans doublon', async () => {
+  it('propose Créer (brouillon neuf + éditeur) et Importer', async () => {
     const ctx = createTestCtx();
-    await renderWithProviders(<TodayScreen />, { ctx });
-    expect(screen.getByText('CHARGER LE PROGRAMME EXEMPLE')).toBeTruthy();
-
-    await fireEvent.press(screen.getByRole('button', { name: 'CHARGER LE PROGRAMME EXEMPLE' }));
-
+    const onOpenEditor = jest.fn();
+    const onOpenImport = jest.fn();
+    await renderWithProviders(<TodayScreen onOpenEditor={onOpenEditor} onOpenImport={onOpenImport} />, { ctx });
     expect(screen.queryByText('CHARGER LE PROGRAMME EXEMPLE')).toBeNull();
-    expect(screen.getByText('TODAY')).toBeTruthy();
-    expect(listPrograms(ctx)).toHaveLength(1);
+    await fireEvent.press(screen.getByRole('button', { name: 'CRÉER MON PROGRAMME' }));
+    expect(useDraftStore.getState().draft).not.toBeNull();
+    expect(onOpenEditor).toHaveBeenCalled();
+    await fireEvent.press(screen.getByRole('button', { name: 'Importer un fichier JSON' }));
+    expect(onOpenImport).toHaveBeenCalled();
   });
 });

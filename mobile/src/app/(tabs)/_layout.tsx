@@ -1,7 +1,9 @@
 // Barre d'onglets : Today · Plan · Stats · Profil (REFONTE_V2 §3)
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 import type { ColorValue } from 'react-native';
+import { useDbQuery } from '@/features/common/useDbQuery';
+import { needsOnboarding } from '@/features/onboarding/needsOnboarding';
 import { useI18n } from '@/i18n/I18nProvider';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -11,6 +13,9 @@ const icon = (name: IconName) => ({ color, size }: { color: ColorValue; size: nu
 export default function TabsLayout() {
   const { colors, fonts } = useTheme();
   const { t } = useI18n();
+  // Premier lancement (aucun programme, onboarding jamais terminé) → onboarding
+  const firstLaunch = useDbQuery(needsOnboarding);
+  if (firstLaunch) return <Redirect href="/onboarding" />;
   return (
     <Tabs
       screenOptions={{
