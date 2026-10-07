@@ -7,6 +7,8 @@ import type { Program, Session } from './program';
 
 export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 export const WEEKDAYS: readonly Weekday[] = [0, 1, 2, 3, 4, 5, 6];
+/** Ordre d'affichage lundi → dimanche (PWA) */
+export const WEEK_ORDER: readonly Weekday[] = [1, 2, 3, 4, 5, 6, 0];
 
 export type DayPlan =
   | { kind: 'session'; weekday: Weekday; sessionKey: string; session: Session }
