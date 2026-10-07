@@ -1,6 +1,6 @@
 import {
   isExerciseComplete, isRestCritical, orderExercises, remainingSec,
-  restDurationSec, restEndAt, sessionProgress, totalSets,
+  restDurationSec, restEndAt, sessionProgress, sessionSummary, totalSets, trackFromEntries,
 } from '../progress';
 import { makeExercise, makeProgramInput, makeSession, parseOrThrow } from '../__fixtures__/builders';
 
@@ -71,5 +71,32 @@ describe('minuteur de repos', () => {
     expect(isRestCritical(10)).toBe(true);
     expect(isRestCritical(1)).toBe(true);
     expect(isRestCritical(0)).toBe(false);
+  });
+});
+
+describe('trackFromEntries / sessionSummary', () => {
+  const e = (exerciseId: string, setIndex: number, done: boolean, weight: number | null = null, reps: number | null = null) =>
+    ({ exerciseId, setIndex, done, weight, reps });
+
+  it('construit le suivi à partir des séries cochées seulement', () => {
+    const track = trackFromEntries([e('x', 0, true), e('x', 2, true), e('x', 1, false), e('y', 0, true)]);
+    expect(track).toEqual({ x: [true, false, true], y: [true] });
+  });
+
+  it('le suivi alimente sessionProgress', () => {
+    const p = sessionProgress(session, trackFromEntries([e('x', 0, true), e('x', 1, true), e('x', 2, true), e('x', 3, true)]));
+    expect(p.completeIds).toEqual(['x']);
+  });
+
+  it('récapitulatif : durée arrondie, séries faites, volume (poids × reps)', () => {
+    const s = sessionSummary(
+      [e('x', 0, true, 100, 8), e('x', 1, true, 102.5, 8), e('y', 0, true, null, 12), e('y', 1, false, 50, 10)],
+      '2026-10-05T10:00:00.000Z', '2026-10-05T10:47:40.000Z',
+    );
+    expect(s).toEqual({ durationMin: 48, setsDone: 3, volume: 1620 });
+  });
+
+  it('séance non terminée : durée 0', () => {
+    expect(sessionSummary([], '2026-10-05T10:00:00.000Z', null)).toEqual({ durationMin: 0, setsDone: 0, volume: 0 });
   });
 });

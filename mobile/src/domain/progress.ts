@@ -45,6 +45,36 @@ export function sessionProgress(session: Session, track: SetTrack): SessionProgr
   };
 }
 
+/* ── Séries enregistrées ─────────────────────────────── */
+export type SetEntryLike = {
+  exerciseId: string;
+  setIndex: number;
+  done: boolean;
+  weight: number | null;
+  reps: number | null;
+};
+
+export type SessionSummary = { durationMin: number; setsDone: number; volume: number };
+
+/** Lignes set_entries → suivi par exercice (séries cochées uniquement) */
+export function trackFromEntries(entries: readonly SetEntryLike[]): SetTrack {
+  const track: SetTrack = {};
+  for (const e of entries) {
+    if (!e.done) continue;
+    const row = (track[e.exerciseId] ??= []);
+    while (row.length < e.setIndex) row.push(false);
+    row[e.setIndex] = true;
+  }
+  return track;
+}
+
+export function sessionSummary(entries: readonly SetEntryLike[], startedAt: string, completedAt: string | null): SessionSummary {
+  const done = entries.filter((e) => e.done);
+  const volume = done.reduce((sum, e) => sum + (e.weight && e.reps ? e.weight * e.reps : 0), 0);
+  const durationMin = completedAt ? Math.max(0, Math.round((Date.parse(completedAt) - Date.parse(startedAt)) / 60000)) : 0;
+  return { durationMin, setsDone: done.length, volume };
+}
+
 /* ── Minuteur ────────────────────────────────────────── */
 export function restDurationSec(exercise: Exercise, meta: Program['meta']): number {
   return exercise.restSec ?? meta.restDefaultSec;
