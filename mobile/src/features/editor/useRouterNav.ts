@@ -2,7 +2,7 @@
 import { router } from 'expo-router';
 import type { EditorNav, EditorStep } from './nav';
 
-const STEP_ROUTES = { 1: '/editor', 2: '/editor/sessions', 3: '/editor/schedule' } as const;
+const STEP_ROUTES = { 1: '/editor/meta', 2: '/editor/sessions', 3: '/editor/schedule' } as const;
 
 const NAV: EditorNav = {
   goToStep: (step: EditorStep) => router.navigate(STEP_ROUTES[step]),
