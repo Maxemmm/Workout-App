@@ -14,3 +14,5 @@ jest.mock('@/platform/pickJsonFile', () => ({
   MAX_IMPORT_BYTES: 5 * 1024 * 1024,
   pickJsonFile: jest.fn(() => Promise.resolve({ kind: 'cancel' })),
 }));
+jest.mock('@/platform/shareJsonFile', () => ({ shareJsonFile: jest.fn(() => Promise.resolve('shared')) }));
+jest.mock('@/platform/appVersion', () => ({ appVersion: () => '1.0.0' }));

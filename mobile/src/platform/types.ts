@@ -30,3 +30,6 @@ export type Confirm = (opts: ConfirmOptions) => Promise<boolean>;
 
 /** Résultat du choix d'un fichier JSON à importer */
 export type PickedFile = { kind: 'ok'; text: string } | { kind: 'cancel' } | { kind: 'too_large' } | { kind: 'error' };
+
+/** Issue d'un partage de fichier. iOS/Android ne signalent pas l'annulation : 'shared' dès que la feuille se ferme sans erreur */
+export type ShareResult = 'shared' | 'cancelled';
