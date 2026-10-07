@@ -10,3 +10,7 @@ jest.mock('@/platform/haptics', () => ({ haptics: { light: jest.fn(), success: j
 jest.mock('@/platform/sound', () => ({ sound: { playRestDone: jest.fn() } }));
 jest.mock('@/platform/keepAwake', () => ({ keepAwake: { activate: jest.fn(), deactivate: jest.fn() } }));
 jest.mock('@/platform/confirm', () => ({ confirm: jest.fn(() => Promise.resolve(true)) }));
+jest.mock('@/platform/pickJsonFile', () => ({
+  MAX_IMPORT_BYTES: 5 * 1024 * 1024,
+  pickJsonFile: jest.fn(() => Promise.resolve({ kind: 'cancel' })),
+}));

@@ -27,3 +27,6 @@ export interface ConfirmOptions {
 }
 
 export type Confirm = (opts: ConfirmOptions) => Promise<boolean>;
+
+/** Résultat du choix d'un fichier JSON à importer */
+export type PickedFile = { kind: 'ok'; text: string } | { kind: 'cancel' } | { kind: 'too_large' } | { kind: 'error' };
