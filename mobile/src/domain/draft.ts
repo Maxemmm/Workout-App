@@ -4,7 +4,7 @@
 // ============================================================
 import { defaultAccent, type AccentKey } from './accents';
 import { makeEntityId, type RandomSuffix } from './entityIds';
-import type { Program, Session, SessionType, Units } from './program';
+import type { Exercise, Program, Session, SessionType, Units } from './program';
 import { moveId } from './reorder';
 import type { Weekday } from './schedule';
 
@@ -123,4 +123,71 @@ export function setSchedule(d: Draft, weekday: Weekday, key: string | null): Dra
   if (key === null) delete schedule[String(weekday)];
   else schedule[String(weekday)] = key;
   return withProgram(d, { ...d.program, schedule });
+}
+
+/* ── Exercices (principaux et bonus) ──────────────────── */
+export type ExerciseSection = 'main' | 'bonus';
+/** Champs d'un exercice hors id (Omit perdrait les champs connus à cause de la signature d'index « loose ») */
+export type ExerciseInput = Pick<Exercise, 'name' | 'scheme' | 'sets' | 'timed' | 'load' | 'restSec' | 'cue' | 'alternatives'> & Record<string, unknown>;
+
+export function sectionExercises(session: Session, section: ExerciseSection): Exercise[] {
+  return section === 'main' ? session.exercises : session.bonus?.exercises ?? [];
+}
+
+function withSectionExercises(session: Session, section: ExerciseSection, list: Exercise[]): Session {
+  if (section === 'main') return { ...session, exercises: list };
+  const title = session.bonus?.title ?? null;
+  if (list.length === 0 && !title) return { ...session, bonus: null };
+  return { ...session, bonus: { ...(session.bonus ?? {}), title, exercises: list } };
+}
+
+function updateSectionList(d: Draft, key: string, section: ExerciseSection, fn: (list: Exercise[]) => Exercise[]): Draft {
+  const session = d.program.sessions[key];
+  if (!session) return d;
+  const next = withSectionExercises(session, section, fn(sectionExercises(session, section)));
+  return withSessions(d, { ...d.program.sessions, [key]: next });
+}
+
+function allExerciseIds(program: Program): string[] {
+  return Object.values(program.sessions).flatMap((s) => [...s.exercises, ...(s.bonus?.exercises ?? [])].map((e) => e.id));
+}
+
+export function addExercise(d: Draft, key: string, section: ExerciseSection, input: ExerciseInput, suffix?: RandomSuffix): { draft: Draft; id: string } {
+  const id = makeEntityId(input.name, allExerciseIds(d.program), suffix);
+  return { draft: updateSectionList(d, key, section, (list) => [...list, { ...input, id } as Exercise]), id };
+}
+
+export function updateExercise(d: Draft, key: string, section: ExerciseSection, id: string, input: ExerciseInput): Draft {
+  return updateSectionList(d, key, section, (list) => list.map((e) => (e.id === id ? ({ ...e, ...input, id } as Exercise) : e)));
+}
+
+export function deleteExercise(d: Draft, key: string, section: ExerciseSection, id: string): Draft {
+  return updateSectionList(d, key, section, (list) => list.filter((e) => e.id !== id));
+}
+
+export function duplicateExercise(d: Draft, key: string, section: ExerciseSection, id: string, suffix?: RandomSuffix): { draft: Draft; id: string } {
+  const session = d.program.sessions[key];
+  const source = session ? sectionExercises(session, section).find((e) => e.id === id) : undefined;
+  if (!source) return { draft: d, id };
+  const newId = makeEntityId(source.name, allExerciseIds(d.program), suffix);
+  const draft = updateSectionList(d, key, section, (list) => {
+    const i = list.findIndex((e) => e.id === id);
+    return [...list.slice(0, i + 1), { ...clone(source), id: newId }, ...list.slice(i + 1)];
+  });
+  return { draft, id: newId };
+}
+
+export function moveExercise(d: Draft, key: string, section: ExerciseSection, from: number, to: number): Draft {
+  return updateSectionList(d, key, section, (list) => {
+    const order = moveId(list.map((e) => e.id), from, to);
+    return order.map((id) => list.find((e) => e.id === id)!);
+  });
+}
+
+export function setBonusTitle(d: Draft, key: string, title: string | null): Draft {
+  const session = d.program.sessions[key];
+  if (!session) return d;
+  const exercises = session.bonus?.exercises ?? [];
+  const bonus = exercises.length === 0 && !title ? null : { ...(session.bonus ?? {}), title, exercises };
+  return withSessions(d, { ...d.program.sessions, [key]: { ...session, bonus } });
 }
