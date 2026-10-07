@@ -195,6 +195,23 @@ export function setBonusTitle(d: Draft, key: string, title: string | null): Draf
 /* ── Relecture (settings.programDraft) ────────────────── */
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
 
+/** Exercice lisible par les écrans de l'éditeur (id et nom texte, séries numériques, alternatives en liste) */
+function isExerciseShape(e: unknown): boolean {
+  return isObj(e) && typeof e.id === 'string' && typeof e.name === 'string' && typeof e.sets === 'number'
+    && typeof e.scheme === 'string' && Array.isArray(e.alternatives);
+}
+
+/** Séance lisible par les écrans de l'éditeur, jusqu'aux exercices, bonus, cardio et conseils */
+function isSessionShape(s: unknown): boolean {
+  if (!isObj(s) || !SessionTypeSchema.safeParse(s.type).success || typeof s.name !== 'string') return false;
+  if (!Array.isArray(s.exercises) || !s.exercises.every(isExerciseShape)) return false;
+  if (!Array.isArray(s.warmup) || !s.warmup.every((w) => typeof w === 'string')) return false;
+  if (!Array.isArray(s.tips) || !s.tips.every((tip) => isObj(tip) && typeof tip.title === 'string' && typeof tip.body === 'string')) return false;
+  if (s.cardio != null && !(isObj(s.cardio) && typeof s.cardio.label === 'string')) return false;
+  if (s.bonus != null && !(isObj(s.bonus) && Array.isArray(s.bonus.exercises) && s.bonus.exercises.every(isExerciseShape))) return false;
+  return true;
+}
+
 /** Contrôle structurel d'un brouillon relu ; ne valide pas le programme (il peut être incomplet) */
 export function restoreDraft(value: unknown): Draft | null {
   if (!isObj(value)) return null;
@@ -204,8 +221,7 @@ export function restoreDraft(value: unknown): Draft | null {
   const meta = program.meta;
   if (typeof meta.label !== 'string' || (meta.units !== 'kg' && meta.units !== 'lbs') || typeof meta.restDefaultSec !== 'number') return null;
   for (const s of Object.values(program.sessions)) {
-    if (!isObj(s) || !SessionTypeSchema.safeParse(s.type).success || typeof s.name !== 'string') return null;
-    if (!Array.isArray(s.exercises) || !Array.isArray(s.warmup) || !Array.isArray(s.tips)) return null;
+    if (!isSessionShape(s)) return null;
   }
   const accents = Array.isArray(manualAccents) ? manualAccents.filter((k): k is string => typeof k === 'string') : [];
   return { sourceProgramId, program: program as Program, manualAccents: accents };
