@@ -11,8 +11,10 @@ import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useRepoCtx } from '@/db/DbContext';
 import { DbProvider } from '@/db/DbProvider';
+import { Toast } from '@/features/common/Toast';
 import { I18nProvider } from '@/i18n/I18nProvider';
 import { usePrefs } from '@/state/prefsStore';
+import { useTimerStore } from '@/state/timerStore';
 import { ThemeProvider, useTheme } from '@/theme/ThemeProvider';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -43,6 +45,7 @@ function PrefsGate() {
 
   useEffect(() => {
     usePrefs.getState().hydrate(ctx);
+    useTimerStore.getState().hydrate(ctx, Date.now());
     setHydrated(true);
   }, [ctx]);
 
@@ -62,6 +65,7 @@ function ThemedStack() {
     <>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }} />
+      <Toast />
     </>
   );
 }

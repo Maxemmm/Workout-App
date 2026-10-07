@@ -13,10 +13,11 @@ describe('settingsRepo', () => {
     setSetting(ctx, 'lang', 'en');
     setSetting(ctx, 'lang', 'fr');
     setSetting(ctx, 'aiEnabled', true);
-    setSetting(ctx, 'activeRest', { workoutId: 'w', exerciseId: 'x', endAt: 123 });
+    const rest = { mode: 'rest' as const, startedAt: 0, endAt: 123, workoutId: 'w', exerciseId: 'x', setIndex: 0, pending: null };
+    setSetting(ctx, 'activeRest', rest);
     expect(getSetting(ctx, 'lang')).toBe('fr');
     expect(getSetting(ctx, 'aiEnabled')).toBe(true);
-    expect(getSetting(ctx, 'activeRest')).toEqual({ workoutId: 'w', exerciseId: 'x', endAt: 123 });
+    expect(getSetting(ctx, 'activeRest')).toEqual(rest);
   });
 
   it('retourne undefined pour une valeur JSON corrompue', () => {
