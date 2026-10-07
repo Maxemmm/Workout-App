@@ -66,7 +66,10 @@ function ThemedStack() {
   return (
     <>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }} />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="editor" options={{ presentation: 'fullScreenModal', gestureEnabled: false }} />
+      </Stack>
       <Toast />
     </>
   );
