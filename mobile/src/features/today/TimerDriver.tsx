@@ -4,7 +4,7 @@ import { AppState } from 'react-native';
 import { useRepoCtx } from '@/db/DbContext';
 import { usePrefs } from '@/state/prefsStore';
 import { useTimerStore } from '@/state/timerStore';
-import { driveTimer, newDriverMemo } from './timerDriver';
+import { driveTimer, newDriverMemo } from './driveTimer';
 
 const TICK_MS = 250;
 

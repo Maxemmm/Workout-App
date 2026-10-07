@@ -33,13 +33,14 @@ export function RestBar({ exerciseName, onPressBar }: Props) {
   const flash = useTimerStore((s) => s.flash);
   const [now, setNow] = useState(() => Date.now());
 
+  // Un seul intervalle tant que la barre est visible : ne pas le relancer à chaque changement du minuteur
   const live = timer !== null || (flash !== null && now < flash.until);
   useEffect(() => {
     if (!live) return;
     setNow(Date.now());
     const id = setInterval(() => setNow(Date.now()), TICK_MS);
     return () => clearInterval(id);
-  }, [live, timer, flash]);
+  }, [live]);
 
   if (!timer && !(flash && now < flash.until)) return null;
 

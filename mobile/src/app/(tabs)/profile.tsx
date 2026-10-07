@@ -1,14 +1,19 @@
 // ============================================================
-// PROFIL (M1) — langue et thème. Le reste arrive en M4.
+// PROFIL (M1-M2) — langue, thème, écran allumé. Le reste arrive en M4.
 // ============================================================
 import { StyleSheet, Text, View } from 'react-native';
 import { useRepoCtx } from '@/db/DbContext';
+import { getSetting, setSetting } from '@/db/repos/settingsRepo';
+import type { RepoCtx } from '@/db/types';
 import type { Lang, ThemePref } from '@/domain/prefs';
 import { Screen } from '@/features/common/Screen';
+import { useDbQuery } from '@/features/common/useDbQuery';
 import { Segmented } from '@/features/profile/Segmented';
 import { useI18n } from '@/i18n/I18nProvider';
 import { usePrefs } from '@/state/prefsStore';
 import { useTheme } from '@/theme/ThemeProvider';
+
+const readKeepAwake = (ctx: RepoCtx) => getSetting(ctx, 'keepAwake') !== false;
 
 export default function ProfileScreen() {
   const ctx = useRepoCtx();
@@ -16,6 +21,7 @@ export default function ProfileScreen() {
   const { t } = useI18n();
   const lang = usePrefs((s) => s.lang);
   const theme = usePrefs((s) => s.theme);
+  const keepAwakeOn = useDbQuery(readKeepAwake);
   const label = [styles.label, { color: colors.textDim, fontFamily: fonts.uiBold }];
 
   return (
@@ -39,6 +45,15 @@ export default function ProfileScreen() {
           ]}
           value={theme}
           onChange={(v) => usePrefs.getState().setTheme(ctx, v)}
+        />
+      </View>
+      <View style={styles.group}>
+        <Text style={label}>{t('profile_keep_awake').toUpperCase()}</Text>
+        <Text style={{ color: colors.textDim, fontFamily: fonts.ui }}>{t('profile_keep_awake_meta')}</Text>
+        <Segmented<'on' | 'off'>
+          options={[{ value: 'on', label: 'ON' }, { value: 'off', label: 'OFF' }]}
+          value={keepAwakeOn ? 'on' : 'off'}
+          onChange={(v) => { setSetting(ctx, 'keepAwake', v === 'on'); usePrefs.getState().bumpData(); }}
         />
       </View>
     </Screen>

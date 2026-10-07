@@ -1,5 +1,5 @@
 import { act, fireEvent, screen } from '@testing-library/react-native';
-import TodayScreen from '@/app/(tabs)/today';
+import { TodayScreen } from '../TodayScreen';
 import { createTestCtx } from '@/db/testing/createTestCtx';
 import { PREFS_INITIAL, usePrefs } from '@/state/prefsStore';
 import { listPrograms } from '@/db/repos/programsRepo';

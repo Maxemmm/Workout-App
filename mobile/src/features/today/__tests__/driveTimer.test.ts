@@ -7,7 +7,7 @@ import { startTimer } from '@/domain/timer';
 import { haptics } from '@/platform/haptics';
 import { sound } from '@/platform/sound';
 import { TIMER_INITIAL, useTimerStore } from '@/state/timerStore';
-import { driveTimer, newDriverMemo } from '../timerDriver';
+import { driveTimer, newDriverMemo } from '../driveTimer';
 
 const T0 = 10_000_000;
 
