@@ -65,6 +65,7 @@ export function replaceAll(ctx: RepoCtx, bundle: ImportBundle): { activeProgramI
     if (s.theme) setSetting(tx, 'theme', s.theme);
     if (s.aiEnabled !== undefined) setSetting(tx, 'aiEnabled', s.aiEnabled);
     if (s.keepAwake !== undefined) setSetting(tx, 'keepAwake', s.keepAwake);
+    if (s.defaultUnits) setSetting(tx, 'defaultUnits', s.defaultUnits);
     setSetting(tx, 'onboarded', true);
     deleteSetting(tx, 'programDraft');
     deleteSetting(tx, 'activeRest');

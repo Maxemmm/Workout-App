@@ -1,6 +1,7 @@
 /** @jest-environment node */
 import example from '@/data/program.example.json';
 import { createProgram } from '@/db/repos/programsRepo';
+import { setSetting } from '@/db/repos/settingsRepo';
 import { createTestCtx } from '@/db/testing/createTestCtx';
 import { setMeta } from '@/domain/draft';
 import { DRAFT_INITIAL, useDraftStore } from '@/state/draftStore';
@@ -35,6 +36,16 @@ describe('prepareEditor', () => {
     expect(useDraftStore.getState().draft?.program.meta.label).toBe('NEUF');
     expect(await prepareEditor(ctx, { kind: 'edit', programId: p.id }, async () => true)).toBe(true);
     expect(useDraftStore.getState().draft?.sourceProgramId).toBe(p.id);
+  });
+
+  it('nouveau programme : unité du réglage defaultUnits (kg par défaut)', async () => {
+    const ctx = createTestCtx();
+    await prepareEditor(ctx, { kind: 'new' }, jest.fn());
+    expect(useDraftStore.getState().draft?.program.meta.units).toBe('kg');
+    useDraftStore.setState(DRAFT_INITIAL);
+    setSetting(ctx, 'defaultUnits', 'lbs');
+    await prepareEditor(ctx, { kind: 'new' }, jest.fn());
+    expect(useDraftStore.getState().draft?.program.meta.units).toBe('lbs');
   });
 
   it('programme introuvable → false', async () => {

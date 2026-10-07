@@ -22,6 +22,12 @@ const live = (ctx: ReturnType<typeof createTestCtx>) => ({
 });
 
 describe('importRepo.replaceAll', () => {
+  it('applique defaultUnits de la sauvegarde', () => {
+    const ctx = createTestCtx();
+    replaceAll(ctx, { ...bundle(), settings: { defaultUnits: 'lbs' } });
+    expect(getSetting(ctx, 'defaultUnits')).toBe('lbs');
+  });
+
   it('remplace toutes les données ; références remappées ; actif et réglages appliqués', () => {
     const ctx = createTestCtx();
     const old = createProgram(ctx, example, 'example');

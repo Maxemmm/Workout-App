@@ -4,6 +4,7 @@
 import { eq } from 'drizzle-orm';
 import type { Lang, ThemePref } from '@/domain/prefs';
 import type { Draft } from '@/domain/draft';
+import type { Units } from '@/domain/program';
 import type { TimerState } from '@/domain/timer';
 import { settings } from '../schema';
 import type { RepoCtx } from '../types';
@@ -18,6 +19,10 @@ export interface SettingsMap {
   healthEnabled: boolean;
   programDraft: Draft;
   activeRest: TimerState;
+  /** Unité proposée à la création d'un programme */
+  defaultUnits: Units;
+  /** Horodatage ISO du dernier export réussi */
+  lastExportAt: string;
 }
 export type SettingKey = keyof SettingsMap;
 

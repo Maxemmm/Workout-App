@@ -1,5 +1,6 @@
 // Ouverture de l'éditeur : reprise du brouillon ou nouveau brouillon (confirmation si une autre cible)
 import { getProgram } from '@/db/repos/programsRepo';
+import { getSetting } from '@/db/repos/settingsRepo';
 import type { RepoCtx } from '@/db/types';
 import { draftFromProgram, newDraft, type Draft } from '@/domain/draft';
 import { useDraftStore } from '@/state/draftStore';
@@ -17,6 +18,7 @@ export async function prepareEditor(ctx: RepoCtx, target: EditorTarget, confirmR
   const program = target.kind === 'edit' ? getProgram(ctx, target.programId) : null;
   if (target.kind === 'edit' && !program) return false;
   if (current && !(await confirmReplace())) return false;
-  store.start(ctx, program ? draftFromProgram(program.id, program.definition) : newDraft());
+  const units = getSetting(ctx, 'defaultUnits') === 'lbs' ? 'lbs' : 'kg';
+  store.start(ctx, program ? draftFromProgram(program.id, program.definition) : newDraft(units));
   return true;
 }
