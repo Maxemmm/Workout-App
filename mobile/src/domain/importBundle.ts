@@ -19,7 +19,7 @@ export type BundleSet = {
 };
 export type BundleWeight = { key: string; weight: number; unit: Units };
 export type BundleLayout = { programRef: string; sessionKey: string; order: string[]; swaps: Record<string, string> };
-export type BundleSettings = { lang?: Lang; theme?: ThemePref; aiEnabled?: boolean; keepAwake?: boolean };
+export type BundleSettings = { lang?: Lang; theme?: ThemePref; aiEnabled?: boolean; keepAwake?: boolean; defaultUnits?: Units };
 
 export type IgnoreReason =
   | 'unknown_key' | 'invalid_program' | 'unknown_program' | 'unknown_session'

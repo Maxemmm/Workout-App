@@ -119,6 +119,7 @@ export function parseNativeBackup(value: unknown): ParseResult {
   if (isThemePref(raw.theme)) settings.theme = raw.theme;
   if (typeof raw.aiEnabled === 'boolean') settings.aiEnabled = raw.aiEnabled;
   if (typeof raw.keepAwake === 'boolean') settings.keepAwake = raw.keepAwake;
+  if (raw.defaultUnits === 'kg' || raw.defaultUnits === 'lbs') settings.defaultUnits = raw.defaultUnits;
 
   const active = str(value.activeProgramId) && programIds.has(value.activeProgramId) ? value.activeProgramId : programs[0].sourceId;
   const body = { programs, activeProgramRef: active, workouts, sets, weights, layouts, settings };

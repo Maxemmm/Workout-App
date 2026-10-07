@@ -36,10 +36,10 @@ function insertAfter<T>(record: Record<string, T>, afterKey: string, key: string
 }
 
 /* ── Création ─────────────────────────────────────────── */
-export function newDraft(): Draft {
+export function newDraft(units: Units = 'kg'): Draft {
   return {
     sourceProgramId: null,
-    program: { meta: { label: '', units: 'kg', restDefaultSec: 90 }, sessions: {}, schedule: {}, rules: [] } as Program,
+    program: { meta: { label: '', units, restDefaultSec: 90 }, sessions: {}, schedule: {}, rules: [] } as Program,
     manualAccents: [],
   };
 }

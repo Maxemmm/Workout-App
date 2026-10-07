@@ -45,6 +45,17 @@ describe('format natif workout-native v1', () => {
     expect(r.bundle.report.ignored).toContainEqual({ key: 'workouts[8]', reason: 'invalid_value' });
   });
 
+  it('réglage defaultUnits : lu s\'il est valide, ignoré sinon', () => {
+    const ok = JSON.parse(JSON.stringify(toNativeBackup({ ...legacy.bundle, settings: { defaultUnits: 'lbs' } }, 'x')));
+    const r1 = parseNativeBackup(ok);
+    if (!r1.ok) throw new Error('attendu ok');
+    expect(r1.bundle.settings.defaultUnits).toBe('lbs');
+    const bad = { ...ok, settings: { defaultUnits: 'stone' } };
+    const r2 = parseNativeBackup(bad);
+    if (!r2.ok) throw new Error('attendu ok');
+    expect(r2.bundle.settings).not.toHaveProperty('defaultUnits');
+  });
+
   it('sans programme valide → refus', () => {
     expect(parseNativeBackup({ _format: 'workout-native', _version: 1, programs: [], workouts: [], setEntries: [], weights: [], layouts: [], settings: {} }))
       .toEqual({ ok: false, error: 'no_valid_program' });
