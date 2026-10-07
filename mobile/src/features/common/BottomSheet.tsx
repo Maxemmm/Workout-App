@@ -1,6 +1,7 @@
 // Feuille modale en bas d'écran (Modal RN : natif et web)
+// Hauteur bornée et contenu défilant : les formulaires longs restent utilisables clavier ouvert.
 import type { ReactNode } from 'react';
-import { KeyboardAvoidingView, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -18,9 +19,18 @@ export function BottomSheet({ visible, title, onClose, children }: Props) {
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <KeyboardAvoidingView behavior="padding" style={styles.flex}>
         <Pressable accessibilityRole="button" accessibilityLabel={title} onPress={onClose} style={[styles.flex, styles.backdrop]} />
-        <View style={[styles.sheet, { backgroundColor: colors.bgElevated, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, padding: spacing.md, paddingBottom: spacing.md + insets.bottom }]}>
-          <Text style={{ color: colors.text, fontFamily: fonts.display, fontSize: 24 }}>{title}</Text>
-          {children}
+        <View
+          testID="bottom-sheet"
+          style={[styles.sheet, { backgroundColor: colors.bgElevated, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingTop: spacing.md }]}
+        >
+          <Text style={{ color: colors.text, fontFamily: fonts.display, fontSize: 24, paddingHorizontal: spacing.md }}>{title}</Text>
+          <ScrollView
+            testID="bottom-sheet-scroll"
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ gap: 12, padding: spacing.md, paddingBottom: spacing.md + insets.bottom }}
+          >
+            {children}
+          </ScrollView>
         </View>
       </KeyboardAvoidingView>
     </Modal>
@@ -30,5 +40,5 @@ export function BottomSheet({ visible, title, onClose, children }: Props) {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   backdrop: { backgroundColor: 'rgba(0,0,0,0.5)' },
-  sheet: { gap: 12 },
+  sheet: { maxHeight: '90%', gap: 4 },
 });
