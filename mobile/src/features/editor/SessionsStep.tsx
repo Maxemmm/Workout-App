@@ -36,7 +36,7 @@ export function SessionsStep({ nav }: { nav: EditorNav }) {
 
   return (
     <EditorScreen nav={nav} step={2}>
-      {program ? (
+      {({ onDragStateChange }) => (program ? (
         <View style={styles.root}>
           <Text style={[styles.title, { color: colors.text, fontFamily: fonts.display }]}>{t('editor_step2_title').toUpperCase()}</Text>
           <Text style={{ color: colors.textDim, fontFamily: fonts.ui }}>
@@ -47,6 +47,7 @@ export function SessionsStep({ nav }: { nav: EditorNav }) {
             items={keys}
             keyOf={(k) => k}
             onMove={(from, to) => apply(ctx, (d) => moveSession(d, from, to))}
+            onDragStateChange={onDragStateChange}
             moveUpLabel={t('today_move_up')}
             moveDownLabel={t('today_move_down')}
             renderItem={(key, _i, handle) => (
@@ -66,7 +67,7 @@ export function SessionsStep({ nav }: { nav: EditorNav }) {
             <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('editor_configure_planning')}</Text>
           </Pressable>
         </View>
-      ) : null}
+      ) : null)}
     </EditorScreen>
   );
 }

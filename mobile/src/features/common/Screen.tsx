@@ -19,6 +19,7 @@ export function Screen({ children, scrollRef, scrollEnabled = true, overlay, bot
   return (
     <SafeAreaView edges={['top', 'left', 'right']} style={[styles.root, { backgroundColor: colors.bg }]}>
       <ScrollView
+        testID="screen-scroll"
         ref={scrollRef}
         scrollEnabled={scrollEnabled}
         keyboardShouldPersistTaps="handled"

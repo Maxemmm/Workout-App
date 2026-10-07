@@ -48,7 +48,7 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
   const field = [styles.input, { color: colors.text, fontFamily: fonts.ui, borderColor: colors.border, borderRadius: radius.sm }];
   const update = (patch: SessionPatch) => apply(ctx, (d) => updateSession(d, sessionKey, patch));
 
-  const exerciseList = (section: ExerciseSection) => {
+  const exerciseList = (section: ExerciseSection, onDragStateChange: (dragging: boolean) => void) => {
     if (!session) return null;
     const list = sectionExercises(session, section);
     return (
@@ -56,6 +56,7 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
         items={list}
         keyOf={(e) => e.id}
         onMove={(from, to) => apply(ctx, (d) => moveExercise(d, sessionKey, section, from, to))}
+        onDragStateChange={onDragStateChange}
         moveUpLabel={t('today_move_up')}
         moveDownLabel={t('today_move_down')}
         renderItem={(e, _i, handle) => (
@@ -78,7 +79,7 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
 
   return (
     <EditorScreen nav={nav}>
-      {session ? (
+      {({ onDragStateChange }) => (session ? (
         <View style={styles.root}>
           <Text style={[styles.title, { color: colors.text, fontFamily: fonts.display }]}>{t('editor_edit_session').toUpperCase()}</Text>
           <Text style={label}>{t('editor_sess_name_label').toUpperCase()}</Text>
@@ -101,7 +102,7 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
               <Text style={label}>{t('editor_warmup_section').toUpperCase()}</Text>
               <ListEditor items={session.warmup} onChange={(warmup) => update({ warmup })} placeholder={t('editor_warmup_ph')} addLabel={t('editor_add_warmup')} maxItems={20} maxLength={200} testID="warmup" />
               <Text style={label}>{t('editor_exercises_section').toUpperCase()}</Text>
-              {exerciseList('main')}
+              {exerciseList('main', onDragStateChange)}
               {addButton('main', t('editor_add_exercise'))}
               <Text style={label}>{t('editor_cardio_section').toUpperCase()}</Text>
               <TextInput
@@ -132,7 +133,7 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
                 onChangeText={(v) => apply(ctx, (d) => setBonusTitle(d, sessionKey, v || null))}
                 style={field}
               />
-              {exerciseList('bonus')}
+              {exerciseList('bonus', onDragStateChange)}
               {addButton('bonus', t('editor_add_bonus'))}
             </>
           ) : (
@@ -165,7 +166,7 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
             />
           ) : null}
         </View>
-      ) : null}
+      ) : null)}
     </EditorScreen>
   );
 }
