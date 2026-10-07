@@ -2,8 +2,8 @@
 import example from '@/data/program.example.json';
 import { programs } from '../schema';
 import {
-  createProgram, getActiveProgram, getProgram, listPrograms,
-  ProgramValidationError, setActiveProgram, softDeleteProgram,
+  createProgram, duplicateProgram, getActiveProgram, getProgram, listPrograms,
+  ProgramValidationError, setActiveProgram, softDeleteProgram, updateProgram,
 } from '../repos/programsRepo';
 import { getSetting } from '../repos/settingsRepo';
 import { createTestCtx } from '../testing/createTestCtx';
@@ -85,5 +85,42 @@ describe('programsRepo', () => {
       expect(getActiveProgram(ctx)).toBeNull();
       expect(getSetting(ctx, 'activeProgramId')).toBeUndefined();
     });
+  });
+});
+
+describe('updateProgram / duplicateProgram', () => {
+  it('updateProgram remplace la définition validée, sans changer le programme actif', () => {
+    const ctx = createTestCtx();
+    const a = createProgram(ctx, example, 'example');
+    const b = createProgram(ctx, example, 'import');
+    setActiveProgram(ctx, a.id);
+    ctx.advance(1000);
+    const updated = updateProgram(ctx, b.id, { ...example, meta: { ...example.meta, label: 'NOUVEAU' } });
+    expect(updated.definition.meta.label).toBe('NOUVEAU');
+    expect(updated.updatedAt).not.toBe(b.updatedAt);
+    expect(getProgram(ctx, b.id)?.definition.meta.label).toBe('NOUVEAU');
+    expect(getActiveProgram(ctx)?.id).toBe(a.id);
+  });
+
+  it('updateProgram refuse un programme invalide ou supprimé', () => {
+    const ctx = createTestCtx();
+    const a = createProgram(ctx, example, 'example');
+    expect(() => updateProgram(ctx, a.id, { meta: {} })).toThrow(ProgramValidationError);
+    expect(getProgram(ctx, a.id)?.definition.meta.label).toBe('PROGRAMME SALLE');
+    softDeleteProgram(ctx, a.id);
+    expect(() => updateProgram(ctx, a.id, example)).toThrow('programme introuvable');
+  });
+
+  it('duplicateProgram : libellé « (copie) » une seule fois, ids conservés, non activé', () => {
+    const ctx = createTestCtx();
+    const a = createProgram(ctx, example, 'example');
+    setActiveProgram(ctx, a.id);
+    const copy = duplicateProgram(ctx, a.id, ' (copie)')!;
+    expect(copy.definition.meta.label).toBe('PROGRAMME SALLE (copie)');
+    expect(copy.definition.sessions).toEqual(a.definition.sessions);
+    expect(copy.source).toBe('manual');
+    expect(getActiveProgram(ctx)?.id).toBe(a.id);
+    expect(duplicateProgram(ctx, copy.id, ' (copie)')!.definition.meta.label).toBe('PROGRAMME SALLE (copie)');
+    expect(duplicateProgram(ctx, 'nope', ' (copie)')).toBeNull();
   });
 });

@@ -82,3 +82,23 @@ export function getActiveProgram(ctx: RepoCtx): StoredProgram | null {
   else if (id !== undefined) deleteSetting(ctx, 'activeProgramId');
   return first;
 }
+
+export function updateProgram(ctx: RepoCtx, id: string, input: unknown): StoredProgram {
+  const parsed = parseProgram(input);
+  if (!parsed.ok) throw new ProgramValidationError(parsed.errors);
+  const existing = getProgram(ctx, id);
+  if (!existing) throw new Error('programme introuvable');
+  const now = ctx.now();
+  ctx.db.update(programs).set({ definition: JSON.stringify(parsed.program), updatedAt: now }).where(eq(programs.id, id)).run();
+  return { ...existing, definition: parsed.program, updatedAt: now };
+}
+
+/** Copie d'un programme (ids d'exercices et de séances conservés : les poids suivent) ; non activée */
+export function duplicateProgram(ctx: RepoCtx, id: string, copySuffix: string): StoredProgram | null {
+  const source = getProgram(ctx, id);
+  if (!source) return null;
+  const label = source.definition.meta.label.trim();
+  const already = label.endsWith(copySuffix.trim());
+  const definition = { ...source.definition, meta: { ...source.definition.meta, label: already ? label : `${label}${copySuffix}` } };
+  return createProgram(ctx, definition, 'manual');
+}
