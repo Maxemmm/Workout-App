@@ -1,4 +1,4 @@
-// Sélecteur de poids [−][valeur][+] — saisie libre validée à la sortie du champ
+// Sélecteur de poids [−][valeur][+] — saisie libre enregistrée à chaque frappe
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import type { Units } from '@/domain/program';
@@ -19,13 +19,17 @@ export function WeightStepper({ value, units, testID, onChange }: Props) {
   const step = weightStep(units);
   const shown = draft ?? (value !== null ? formatWeight(value) : '');
 
-  const commit = () => {
-    if (draft === null) return;
-    setDraft(null);
-    onChange(parseWeightInput(draft));
+  // Chaque frappe est enregistrée tout de suite : une série cochée sans quitter le champ prend le poids tapé
+  const edit = (text: string) => {
+    setDraft(text);
+    onChange(parseWeightInput(text));
   };
+  // Sortie du champ : l'affichage revient à la valeur normalisée
+  const commit = () => setDraft(null);
   const bump = (delta: number) => {
-    const next = Math.max(0, (value ?? 0) + delta);
+    const base = draft !== null ? parseWeightInput(draft) : value;
+    setDraft(null);
+    const next = Math.max(0, (base ?? 0) + delta);
     onChange(next > 0 ? next : null);
   };
 
@@ -42,7 +46,7 @@ export function WeightStepper({ value, units, testID, onChange }: Props) {
         placeholder="—"
         placeholderTextColor={colors.textDim}
         keyboardType="decimal-pad"
-        onChangeText={setDraft}
+        onChangeText={edit}
         onBlur={commit}
         onSubmitEditing={commit}
         style={[styles.input, { color: colors.text, fontFamily: fonts.uiBold, borderColor: colors.border, borderRadius: radius.sm }]}

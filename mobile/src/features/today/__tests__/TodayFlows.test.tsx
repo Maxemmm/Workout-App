@@ -1,5 +1,6 @@
 import { act, fireEvent, screen } from '@testing-library/react-native';
 import { createProgram, setActiveProgram } from '@/db/repos/programsRepo';
+import { listEntries } from '@/db/repos/workoutsRepo';
 import { createTestCtx } from '@/db/testing/createTestCtx';
 import { makeExercise, makeProgramInput, makeSession, sevenDayLbsInput } from '@/domain/__fixtures__/builders';
 import { confirm } from '@/platform/confirm';
@@ -70,6 +71,14 @@ describe('Today — parcours', () => {
     await act(async () => { jest.advanceTimersByTime(45_300); });
     expect(screen.getByText('1 / 3')).toBeTruthy();
     expect(useTimerStore.getState().timer).toMatchObject({ mode: 'rest', exerciseId: 'gainage' });
+  });
+
+  it('poids tapé puis série cochée sans quitter le champ : la série prend le poids tapé', async () => {
+    const ctx = await setup();
+    await fireEvent.changeText(screen.getByTestId('weight-presse'), '105');
+    await fireEvent.press(screen.getByTestId('set-presse-0'));
+    const workoutId = useTimerStore.getState().timer!.workoutId;
+    expect(listEntries(ctx, workoutId)[0]).toMatchObject({ exerciseId: 'presse', weight: 105 });
   });
 
   it('échange persisté (vue relue)', async () => {
