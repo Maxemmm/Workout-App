@@ -38,14 +38,26 @@ function attempt(write: () => void, errorMessage: string): boolean {
   }
 }
 
-export function PlanScreen({ onOpenEditor, onOpenImport }: { onOpenEditor(step: EditorStep): void; onOpenImport(): void }) {
+interface Props {
+  onOpenEditor(step: EditorStep): void;
+  onOpenImport(): void;
+  /** Demande d'onglet venue d'ailleurs (Profil › Gérer) ; chaque nouvel `at` l'applique */
+  tabRequest?: { tab: PlanTab; at: string };
+}
+
+export function PlanScreen({ onOpenEditor, onOpenImport, tabRequest }: Props) {
   const ctx = useRepoCtx();
   const { colors, fonts } = useTheme();
   const { t } = useI18n();
   const { programs, active } = useDbQuery(readPlan);
   const draft = useDraftStore((s) => s.draft);
   const lost = useDraftStore((s) => s.lost);
-  const [tab, setTab] = useState<PlanTab>('week');
+  const [tab, setTab] = useState<PlanTab>(tabRequest?.tab ?? 'week');
+  const requestTab = tabRequest?.tab;
+  const requestAt = tabRequest?.at;
+  useEffect(() => {
+    if (requestTab) setTab(requestTab);
+  }, [requestTab, requestAt]);
 
   useEffect(() => {
     if (!lost) return;

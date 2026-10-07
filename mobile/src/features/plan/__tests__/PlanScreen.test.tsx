@@ -76,3 +76,21 @@ describe('PlanScreen', () => {
     expect(useDraftStore.getState().lost).toBe(false);
   });
 });
+
+describe('PlanScreen — tabRequest', () => {
+  beforeEach(async () => {
+    await act(async () => { usePrefs.setState(PREFS_INITIAL); useDraftStore.setState(DRAFT_INITIAL); });
+  });
+
+  it('Review Focus 5 : tabRequest ouvre « Mes programmes », à chaque nouvelle demande', async () => {
+    const ctx = createTestCtx();
+    setActiveProgram(ctx, createProgram(ctx, example, 'example').id);
+    const props = { onOpenEditor: jest.fn(), onOpenImport: jest.fn() };
+    const { rerender } = await renderWithProviders(<PlanScreen {...props} tabRequest={{ tab: 'programs', at: '1' }} />, { ctx });
+    expect(screen.getByText('CRÉER UN NOUVEAU PROGRAMME')).toBeTruthy();
+    await fireEvent.press(screen.getByRole('tab', { name: 'Cette semaine' }));
+    expect(screen.queryByText('CRÉER UN NOUVEAU PROGRAMME')).toBeNull();
+    await rerender(<PlanScreen {...props} tabRequest={{ tab: 'programs', at: '2' }} />);
+    expect(screen.getByText('CRÉER UN NOUVEAU PROGRAMME')).toBeTruthy();
+  });
+});
