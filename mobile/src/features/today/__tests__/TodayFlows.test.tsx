@@ -7,7 +7,9 @@ import { confirm } from '@/platform/confirm';
 import { keepAwake } from '@/platform/keepAwake';
 import { PREFS_INITIAL, usePrefs } from '@/state/prefsStore';
 import { TIMER_INITIAL, useTimerStore } from '@/state/timerStore';
+import { useToastStore } from '@/state/toastStore';
 import { renderWithProviders } from '@/test/renderWithProviders';
+import * as actions from '../actions';
 import { TodayScreen } from '../TodayScreen';
 
 // Lundi 5 octobre 2026, 10 h locale
@@ -79,6 +81,15 @@ describe('Today — parcours', () => {
     await fireEvent.press(screen.getByTestId('set-presse-0'));
     const workoutId = useTimerStore.getState().timer!.workoutId;
     expect(listEntries(ctx, workoutId)[0]).toMatchObject({ exerciseId: 'presse', weight: 105 });
+  });
+
+  it('écriture ratée à « Terminer » : message d\'erreur, pas de « séance enregistrée »', async () => {
+    await setup();
+    await fireEvent.press(screen.getByTestId('set-presse-0'));
+    const spy = jest.spyOn(actions, 'finishToday').mockImplementation(() => { throw new Error('disk full'); });
+    await fireEvent.press(screen.getByRole('button', { name: 'TERMINER LA SÉANCE' }));
+    expect(useToastStore.getState().message).toBe('Action non enregistrée');
+    spy.mockRestore();
   });
 
   it('échange persisté (vue relue)', async () => {

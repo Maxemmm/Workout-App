@@ -39,6 +39,20 @@ import { WarmupBlock } from './WarmupBlock';
 
 const readKeepAwake = (ctx: RepoCtx) => getSetting(ctx, 'keepAwake') !== false;
 
+/** Exécute une écriture puis rafraîchit l'écran ; false (et toast d'erreur) si elle a échoué.
+ *  Fonction de module : un try/finally dans le composant empêcherait le React Compiler de l'optimiser. */
+function attempt(write: () => void, errorMessage: string): boolean {
+  try {
+    write();
+    return true;
+  } catch {
+    useToastStore.getState().show(errorMessage);
+    return false;
+  } finally {
+    usePrefs.getState().bumpData();
+  }
+}
+
 export interface TodaySessionBodyProps {
   program: StoredProgram;
   sessionKey: string;
@@ -84,29 +98,19 @@ export function TodaySessionBody(p: TodaySessionBodyProps) {
   useEffect(() => { onExerciseNames(JSON.parse(namesKey) as Record<string, string>); }, [namesKey, onExerciseNames]);
 
   const env = (): TodayEnv => ({ ctx, nowMs: Date.now(), program: p.program, sessionKey: p.sessionKey, date: p.date });
-  const run = (fn: () => void) => {
-    try {
-      fn();
-    } catch {
-      useToastStore.getState().show(t('error_not_saved'));
-    } finally {
-      usePrefs.getState().bumpData();
-    }
-  };
+  const run = (fn: () => void) => attempt(fn, t('error_not_saved'));
 
   const onFinish = async () => {
     if (progress.done < progress.total) {
       const ok = await confirm({ title: t('modal_finish_title'), message: t('modal_finish_body'), confirmLabel: t('modal_finish_confirm'), cancelLabel: t('modal_finish_cancel') });
       if (!ok) return;
     }
-    run(() => finishToday(env(), view));
-    useToastStore.getState().show(t('today_session_saved_toast'));
+    if (run(() => finishToday(env(), view))) useToastStore.getState().show(t('today_session_saved_toast'));
   };
   const onReset = async () => {
     const ok = await confirm({ title: t('profile_reset_today'), message: t('today_reset_confirm_body'), confirmLabel: t('today_reset_action'), cancelLabel: t('today_cancel'), destructive: true });
     if (!ok) return;
-    run(() => resetToday(env(), view));
-    useToastStore.getState().show(t('profile_reset_today_toast'));
+    if (run(() => resetToday(env(), view))) useToastStore.getState().show(t('profile_reset_today_toast'));
   };
   const onSwapSelect = async (name: string | null) => {
     const ex = swapping;
