@@ -151,8 +151,9 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
               key={sheet.exercise?.id ?? `new-${sheet.section}`}
               visible
               isNew={sheet.exercise === null}
-              initial={sheet.exercise ?? blankExercise(restDefault)}
+              initial={sheet.exercise ?? blankExercise()}
               units={units}
+              restDefault={restDefault}
               onClose={() => setSheet(null)}
               onSave={(input) => {
                 const target = sheet;

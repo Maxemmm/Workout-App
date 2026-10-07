@@ -10,8 +10,9 @@ import { useTheme } from '@/theme/ThemeProvider';
 import { TOUCH_MIN } from '@/theme/tokens';
 import { AlternativeEditor } from './AlternativeEditor';
 
-export function blankExercise(restSec: number): ExerciseInput {
-  return { name: '', sets: 3, scheme: '', timed: false, load: null, restSec, cue: null, alternatives: [] } as ExerciseInput;
+/** Nouvel exercice : restSec null = repos par défaut du programme (meta.restDefaultSec) */
+export function blankExercise(): ExerciseInput {
+  return { name: '', sets: 3, scheme: '', timed: false, load: null, restSec: null, cue: null, alternatives: [] } as ExerciseInput;
 }
 
 interface Props {
@@ -19,15 +20,17 @@ interface Props {
   initial: Exercise | ExerciseInput;
   isNew: boolean;
   units: Units;
+  /** Repos par défaut du programme, affiché tant que l'exercice n'a pas son propre repos */
+  restDefault: number;
   onSave(input: ExerciseInput): void;
   onClose(): void;
 }
 
-export function ExerciseSheet({ visible, initial, isNew, units, onSave, onClose }: Props) {
+export function ExerciseSheet({ visible, initial, isNew, units, restDefault, onSave, onClose }: Props) {
   const { colors, fonts, radius } = useTheme();
   const { t } = useI18n();
   const { id: _id, ...rest } = initial as Exercise;
-  const [form, setForm] = useState<ExerciseInput>({ ...rest, timed: rest.timed === true, restSec: rest.restSec ?? 90 } as ExerciseInput);
+  const [form, setForm] = useState<ExerciseInput>({ ...rest, timed: rest.timed === true, restSec: rest.restSec ?? null } as ExerciseInput);
   const set = (p: Partial<ExerciseInput>) => setForm((f) => ({ ...f, ...p }));
   const valid = form.name.trim().length > 0;
   const field = [styles.input, { color: colors.text, fontFamily: fonts.ui, borderColor: colors.border, borderRadius: radius.sm }];
@@ -65,7 +68,7 @@ export function ExerciseSheet({ visible, initial, isNew, units, onSave, onClose 
       <Text style={label}>{t('exo_load_label_fmt', units).toUpperCase()}</Text>
       <TextInput testID="exo-load" value={form.load ?? ''} maxLength={100} placeholderTextColor={colors.textDim} onChangeText={(load) => set({ load })} style={field} />
       <Text style={label}>{t('exo_rest_label').toUpperCase()}</Text>
-      <NumberStepper value={form.restSec ?? 90} min={0} max={600} step={15} label={t('exo_rest_label')} onChange={(restSec) => set({ restSec })} />
+      <NumberStepper value={form.restSec ?? restDefault} min={0} max={600} step={15} label={t('exo_rest_label')} onChange={(restSec) => set({ restSec })} />
       <Text style={label}>{t('exo_cue_label').toUpperCase()}</Text>
       <TextInput testID="exo-cue" value={form.cue ?? ''} maxLength={300} placeholder={t('exo_cue_ph')} placeholderTextColor={colors.textDim} onChangeText={(cue) => set({ cue })} style={field} />
       <Text style={label}>{t('exo_alt_label').toUpperCase()}</Text>

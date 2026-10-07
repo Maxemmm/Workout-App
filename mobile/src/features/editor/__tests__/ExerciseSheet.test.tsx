@@ -3,10 +3,30 @@ import type { Exercise } from '@/domain/program';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { blankExercise, ExerciseSheet } from '../ExerciseSheet';
 
+describe('ExerciseSheet — repos par défaut du programme', () => {
+  it('un exercice sans repos propre (null) le reste si on ne touche pas au stepper', async () => {
+    const onSave = jest.fn();
+    const initial = { id: 'dc', name: 'DC', scheme: '4×8', sets: 4, load: null, restSec: null, cue: null, alternatives: [] } as Exercise;
+    await renderWithProviders(<ExerciseSheet visible isNew={false} initial={initial} units="kg" restDefault={120} onSave={onSave} onClose={jest.fn()} />);
+    expect(screen.getByText('120')).toBeTruthy();
+    await fireEvent.changeText(screen.getByTestId('exo-name'), 'DC incliné');
+    await fireEvent.press(screen.getByRole('button', { name: "ENREGISTRER L'EXERCICE" }));
+    expect(onSave.mock.calls[0][0]).toMatchObject({ name: 'DC incliné', restSec: null });
+  });
+
+  it('nouvel exercice : repos par défaut du programme, explicite seulement si modifié', async () => {
+    const onSave = jest.fn();
+    await renderWithProviders(<ExerciseSheet visible isNew initial={blankExercise()} units="kg" restDefault={120} onSave={onSave} onClose={jest.fn()} />);
+    await fireEvent.changeText(screen.getByTestId('exo-name'), 'Squat');
+    await fireEvent.press(screen.getByRole('button', { name: "ENREGISTRER L'EXERCICE" }));
+    expect(onSave.mock.calls[0][0].restSec).toBeNull();
+  });
+});
+
 describe('ExerciseSheet', () => {
   it('nouvel exercice : nom requis, steppers, chronométré, alternatives', async () => {
     const onSave = jest.fn();
-    await renderWithProviders(<ExerciseSheet visible isNew initial={blankExercise(90)} units="kg" onSave={onSave} onClose={jest.fn()} />);
+    await renderWithProviders(<ExerciseSheet visible isNew initial={blankExercise()} units="kg" restDefault={90} onSave={onSave} onClose={jest.fn()} />);
     expect(screen.getByText('Nouvel exercice')).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: "ENREGISTRER L'EXERCICE" }));
     expect(onSave).not.toHaveBeenCalled();
@@ -28,7 +48,7 @@ describe('ExerciseSheet', () => {
   it('exercice existant : champs inconnus conservés, alternative détaillée → objet', async () => {
     const onSave = jest.fn();
     const initial = { id: 'dc', name: 'DC', scheme: '4×8', sets: 4, load: '60 kg', restSec: 120, cue: null, alternatives: [], custom: 1 } as Exercise;
-    await renderWithProviders(<ExerciseSheet visible isNew={false} initial={initial} units="kg" onSave={onSave} onClose={jest.fn()} />);
+    await renderWithProviders(<ExerciseSheet visible isNew={false} initial={initial} units="kg" restDefault={90} onSave={onSave} onClose={jest.fn()} />);
     expect(screen.getByText("Modifier l'exercice")).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Ajouter une alternative' }));
     await fireEvent.changeText(screen.getByTestId('alt-name-0'), 'DC haltères');
