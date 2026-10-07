@@ -37,3 +37,15 @@
 - [ ] « Dernière fois » affiché à la séance suivante du même exercice.
 - [ ] Laisser une séance en cours puis changer de jour (ou avancer l'heure du téléphone après minuit) : bandeau « Séance du … non terminée » avec Reprendre / Terminer.
 - [ ] Réinitialiser la séance du jour : séries effacées, poids et ordre conservés.
+
+## M3a — Plan + Éditeur (pas de nouveau build nécessaire)
+- [ ] Plan : onglets « Cette semaine » / « Mes programmes », l'indicateur glisse et le contenu coulisse ; aucune animation si « réduire les animations » est activé.
+- [ ] Cette semaine : lundi → dimanche, séance du jour badgée, repos atténués ; « Ajouter une séance » ouvre l'éditeur à l'étape 2.
+- [ ] Mes programmes : tap = activer (toast), Dupliquer (« (copie) »), Supprimer (confirmation) ; le programme actif supprimé bascule sur un autre.
+- [ ] Éditeur plein écran : Annuler (confirmation), Enregistrer depuis chaque étape ; erreurs listées, un tap ramène à l'étape.
+- [ ] Étape 2 / étape 4 : glisser-déposer des séances et des exercices (appui long sur le titre) ; actions VoiceOver « Monter / Descendre ».
+- [ ] Fenêtre d'exercice : clavier numérique ou texte selon le champ ; la feuille reste utilisable clavier ouvert (champs du bas visibles).
+- [ ] Steppers séries (1–20) et repos (pas de 15 s) ; chronométré change le placeholder.
+- [ ] Couleur choisie conservée après enregistrement ; type « Repos » met la séance en gris si la couleur était automatique.
+- [ ] Tuer l'app en pleine édition puis la rouvrir : bannière « Brouillon en cours », Reprendre retrouve les modifications.
+- [ ] Renommer un exercice : son poids mémorisé et « Dernière fois » sont conservés dans Today.
