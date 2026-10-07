@@ -68,9 +68,19 @@ describe('workoutsRepo', () => {
     expect(listEntries(ctx, w.id)).toHaveLength(2);
   });
 
+  it('findStaleInProgress ignore une séance de la veille sans aucune série cochée', () => {
+    const { ctx, key } = setup();
+    const empty = ensureWorkout(ctx, { ...key, date: '2026-10-03' });
+    expect(findStaleInProgress(ctx, '2026-10-05')).toBeNull();
+    upsertSet(ctx, empty.id, 'presse', 0, { done: true });
+    upsertSet(ctx, empty.id, 'presse', 0, { done: false });
+    expect(findStaleInProgress(ctx, '2026-10-05')).toBeNull();
+  });
+
   it("findStaleInProgress : séance en cours d'un jour précédent seulement", () => {
     const { ctx, key } = setup();
     const old = ensureWorkout(ctx, { ...key, date: '2026-10-03' });
+    upsertSet(ctx, old.id, 'presse', 0, { done: true });
     ensureWorkout(ctx, key);
     expect(findStaleInProgress(ctx, '2026-10-05')?.id).toBe(old.id);
     completeWorkout(ctx, old.id);

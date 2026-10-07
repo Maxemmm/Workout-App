@@ -2,7 +2,7 @@
 // Séances réalisées (workouts) et séries (set_entries)
 // Un workout par (programme, séance, date locale), créé au premier cercle coché.
 // ============================================================
-import { and, asc, desc, eq, isNull, lt } from 'drizzle-orm';
+import { and, asc, desc, eq, exists, isNull, lt } from 'drizzle-orm';
 import { setEntries, workouts } from '../schema';
 import { inTransaction } from '../transaction';
 import type { RepoCtx } from '../types';
@@ -103,11 +103,19 @@ export function resetWorkout(ctx: RepoCtx, id: string): void {
   });
 }
 
-/** Séance restée en cours un jour précédent (passage de minuit) */
+/** Séance restée en cours un jour précédent (passage de minuit) — avec au moins une série cochée */
 export function findStaleInProgress(ctx: RepoCtx, today: string): WorkoutRow | null {
+  const hasDoneSet = exists(
+    ctx.db.select({ id: setEntries.id }).from(setEntries).where(and(
+      eq(setEntries.workoutId, workouts.id),
+      eq(setEntries.done, true),
+      isNull(setEntries.deletedAt),
+    )),
+  );
   return ctx.db.select().from(workouts).where(and(
     eq(workouts.status, 'in_progress'),
     lt(workouts.date, today),
     isNull(workouts.deletedAt),
+    hasDoneSet,
   )).orderBy(desc(workouts.date)).get() ?? null;
 }
