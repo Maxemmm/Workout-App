@@ -6,7 +6,7 @@ import { alternativeName } from '@/domain/program';
 import { useI18n } from '@/i18n/I18nProvider';
 import { useTheme } from '@/theme/ThemeProvider';
 import { TOUCH_MIN } from '@/theme/tokens';
-import { BottomSheet } from './BottomSheet';
+import { BottomSheet } from '@/features/common/BottomSheet';
 
 interface Props {
   visible: boolean;
