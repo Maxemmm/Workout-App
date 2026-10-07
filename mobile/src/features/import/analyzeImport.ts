@@ -13,6 +13,15 @@ export type Analysis =
   | { kind: 'backup'; bundle: ImportBundle };
 
 export function analyzeImport(text: string, today: string): Analysis {
+  // Appelée pendant le rendu : une entrée imprévue ne doit jamais faire tomber l'écran
+  try {
+    return analyze(text, today);
+  } catch {
+    return { kind: 'error', message: 'import_err_unknown' };
+  }
+}
+
+function analyze(text: string, today: string): Analysis {
   const cleaned = text.replace(/^﻿/, '').trim();
   if (!cleaned) return { kind: 'empty' };
   let value: unknown;

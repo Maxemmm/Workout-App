@@ -40,6 +40,10 @@ export type ImportBundle = {
 
 export type ParseResult = { ok: true; bundle: ImportBundle } | { ok: false; error: 'invalid' | 'no_valid_program' };
 
+/** Date calendaire AAAA-MM-JJ réelle (rejette 2026-13-45, 2026-02-30…) */
+export const isIsoDay = (d: string) =>
+  /^\d{4}-\d{2}-\d{2}$/.test(d) && !Number.isNaN(Date.parse(d)) && new Date(`${d}T12:00:00Z`).toISOString().startsWith(d);
+
 export function makeReport(b: Omit<ImportBundle, 'report'>, ignored: IgnoredItem[]): ImportReport {
   return {
     programs: b.programs.length, workouts: b.workouts.length, sets: b.sets.length,

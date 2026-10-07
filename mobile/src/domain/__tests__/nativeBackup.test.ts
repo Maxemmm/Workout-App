@@ -35,6 +35,16 @@ describe('format natif workout-native v1', () => {
     ]));
   });
 
+  it('séance avec une date invalide → invalid_value', () => {
+    const json = toNativeBackup(legacy.bundle, 'x') as unknown as Record<string, unknown[]>;
+    const programId = (json.programs[0] as { id: string }).id;
+    (json.workouts as unknown[]).push({ id: 'w-bad', programId, sessionKey: 's', date: 'hier', status: 'completed', startedAt: 'x', completedAt: 'x' });
+    const r = parseNativeBackup(json);
+    if (!r.ok) throw new Error('attendu ok');
+    expect(r.bundle.workouts.map((w) => w.ref)).not.toContain('w-bad');
+    expect(r.bundle.report.ignored).toContainEqual({ key: 'workouts[8]', reason: 'invalid_value' });
+  });
+
   it('sans programme valide → refus', () => {
     expect(parseNativeBackup({ _format: 'workout-native', _version: 1, programs: [], workouts: [], setEntries: [], weights: [], layouts: [], settings: {} }))
       .toEqual({ ok: false, error: 'no_valid_program' });

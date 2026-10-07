@@ -92,4 +92,21 @@ describe('parseLegacyBackup — cas construits', () => {
   it('aucun programme valide → refus', () => {
     expect(parseLegacyBackup({ programs: JSON.stringify([{ meta: {} }]), 'weight:x': '10' }, TODAY)).toEqual({ ok: false, error: 'no_valid_program' });
   });
+
+  it('date invalide (log ou track) : ignorée comme invalid_value, pas de crash', () => {
+    const r = parseLegacyBackup({
+      programs: JSON.stringify([prog('prog-1')]), activeProgram: 'prog-1',
+      'log:x': log({ date: undefined, finishedAt: undefined }),
+      'log:2026-13-45': log({ date: '2026-13-45', finishedAt: undefined }),
+      'track:2026-0x-01:fb': JSON.stringify({ presse: [true] }),
+    }, TODAY);
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.bundle.workouts).toEqual([]);
+    expect(r.bundle.report.ignored).toEqual(expect.arrayContaining([
+      { key: 'log:x', reason: 'invalid_value' },
+      { key: 'log:2026-13-45', reason: 'invalid_value' },
+      { key: 'track:2026-0x-01:fb', reason: 'invalid_value' },
+    ]));
+  });
 });

@@ -3,7 +3,7 @@
 // Lecture au M3b ; l'export du M4 utilisera toNativeBackup.
 // ============================================================
 import {
-  makeReport, type BundleLayout, type BundleProgram, type BundleSet, type BundleSettings, type BundleSource,
+  isIsoDay, makeReport, type BundleLayout, type BundleProgram, type BundleSet, type BundleSettings, type BundleSource,
   type BundleWeight, type BundleWorkout, type IgnoredItem, type ImportBundle, type ParseResult, type WorkoutStatus,
 } from './importBundle';
 import { isLang, isThemePref } from './prefs';
@@ -70,7 +70,7 @@ export function parseNativeBackup(value: unknown): ParseResult {
 
   const workouts: BundleWorkout[] = [];
   list(value.workouts).forEach((w, i) => {
-    if (!isObj(w) || !str(w.id) || !str(w.programId) || !str(w.sessionKey) || !str(w.date) || !str(w.startedAt) || !STATUSES.includes(w.status as WorkoutStatus)) {
+    if (!isObj(w) || !str(w.id) || !str(w.programId) || !str(w.sessionKey) || !str(w.date) || !isIsoDay(w.date) || !str(w.startedAt) || !STATUSES.includes(w.status as WorkoutStatus)) {
       ignored.push({ key: `workouts[${i}]`, reason: 'invalid_value' });
       return;
     }

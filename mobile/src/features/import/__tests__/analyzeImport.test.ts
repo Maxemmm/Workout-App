@@ -31,3 +31,11 @@ describe('analyzeImport', () => {
     expect(analyzeImport('[1,2]', TODAY)).toEqual({ kind: 'error', message: 'import_err_unknown' });
   });
 });
+
+describe('analyzeImport — filet de sécurité', () => {
+  afterEach(() => jest.restoreAllMocks());
+  it('un parseur qui lève une exception → import_err_unknown, jamais de crash au rendu', () => {
+    jest.spyOn(require('@/domain/legacyImport'), 'parseLegacyBackup').mockImplementation(() => { throw new RangeError('Invalid time value'); });
+    expect(analyzeImport(JSON.stringify(backup), TODAY)).toEqual({ kind: 'error', message: 'import_err_unknown' });
+  });
+});

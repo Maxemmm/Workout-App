@@ -3,7 +3,7 @@
 // → ImportBundle. Règles : addendum M3b §2. Fonction pure.
 // ============================================================
 import {
-  makeReport, type BundleLayout, type BundleProgram, type BundleSet, type BundleSettings,
+  isIsoDay, makeReport, type BundleLayout, type BundleProgram, type BundleSet, type BundleSettings,
   type BundleWeight, type BundleWorkout, type IgnoredItem, type ParseResult,
 } from './importBundle';
 import { isLang, isThemePref } from './prefs';
@@ -91,6 +91,10 @@ export function parseLegacyBackup(raw: Record<string, unknown>, today: string): 
     }
     const sessionKey = entry.sessionKey;
     const date = typeof entry.date === 'string' ? entry.date : key.slice('log:'.length, 'log:'.length + 10);
+    if (!isIsoDay(date)) {
+      ignored.push({ key, reason: 'invalid_value' });
+      continue;
+    }
     const byProgramId = typeof entry.programId === 'string' ? byId.get(entry.programId) : undefined;
     const program = byProgramId ?? (hasSession(active, sessionKey) ? active : undefined);
     if (!program) {
@@ -128,6 +132,10 @@ export function parseLegacyBackup(raw: Record<string, unknown>, today: string): 
   for (const key of keys.filter((k) => k.startsWith('track:'))) {
     const date = key.slice('track:'.length, 'track:'.length + 10);
     const sessionKey = key.slice('track:'.length + 11);
+    if (!isIsoDay(date)) {
+      ignored.push({ key, reason: 'invalid_value' });
+      continue;
+    }
     if (!hasSession(active, sessionKey)) {
       ignored.push({ key, reason: 'unknown_session' });
       continue;
