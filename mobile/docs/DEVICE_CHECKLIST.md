@@ -60,3 +60,15 @@
 - [ ] Coller un programme JSON dans la zone de texte → aperçu → importé et activé (Plan → Mes programmes).
 - [ ] Plan → Mes programmes → « Importer » ouvre l'écran d'import.
 - [ ] Supprimer tous les programmes : Today propose « Créer » et « Importer » (pas d'onboarding).
+
+## M4a — Profil (build development à refaire : expo-sharing)
+- [ ] Profil affiche la carte du programme actif (nom, séances / semaine, unité) ; « Gérer mes programmes » ouvre Plan sur « Mes programmes », même après être revenu sur « Cette semaine ».
+- [ ] Unité par défaut sur lbs → Plan › « Créer un nouveau programme » : l'éditeur propose lbs.
+- [ ] Coach IA : l'interrupteur garde sa position après redémarrage de l'app.
+- [ ] « Exporter mes données » → feuille de partage iOS (Fichiers, iCloud Drive, AirDrop) / Android ; fichier `workout-backup-AAAA-MM-JJ.json` ; le rappel passe à « aujourd'hui ».
+- [ ] Le fichier exporté se réimporte via Profil › Importer : mêmes programmes, séances et poids.
+- [ ] Web : « Exporter mes données » télécharge le fichier.
+- [ ] Sans export depuis plus de 14 jours (ou jamais) : rappel en rouille.
+- [ ] Minuteur de repos lancé → « Supprimer l'historique » → minuteur arrêté, Today sans séries cochées, programme et poids conservés.
+- [ ] « Réinitialiser l'application » → onboarding ; langue et thème conservés.
+- [ ] « À propos » affiche la version de `app.json`.
