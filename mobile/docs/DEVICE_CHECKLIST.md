@@ -72,3 +72,13 @@
 - [ ] Minuteur de repos lancé → « Supprimer l'historique » → minuteur arrêté, Today sans séries cochées, programme et poids conservés.
 - [ ] « Réinitialiser l'application » → onboarding ; langue et thème conservés.
 - [ ] « À propos » affiche la version de `app.json`.
+
+## M4b — Stats (pas de nouveau build : react-native-svg est dans Expo Go)
+- [ ] Expo Go (iPhone) : sans séance terminée, Stats affiche « Termine ta première séance pour voir tes stats ».
+- [ ] Après restauration de la sauvegarde : dernière séance « BAS DU CORPS », records (Presse à cuisses 110 kg…), calendrier avec les séances visibles.
+- [ ] Période « Tout » : la courbe de Tirage vertical montre 3 points, le record (40 kg) en or ; bascule « 1RM estimé ».
+- [ ] La période choisie est conservée après redémarrage.
+- [ ] Terminer une séance avec une charge plus haute qu'avant → « 1 nouveau record » dans Dernière séance et badge « Nouveau » dans Records.
+- [ ] Planning Lun/Mer/Ven : un jour prévu manqué apparaît avec un contour rouille ; aujourd'hui n'est pas compté manqué.
+- [ ] Web : la courbe et le calendrier s'affichent, largeur adaptée à la fenêtre.
+- [ ] Thème clair : couleurs lisibles (courbe, calendrier, badges).
