@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import type { Lang, ThemePref } from '@/domain/prefs';
 import type { Draft } from '@/domain/draft';
 import type { Units } from '@/domain/program';
+import type { StatsPeriod } from '@/domain/stats/period';
 import type { TimerState } from '@/domain/timer';
 import { settings } from '../schema';
 import type { RepoCtx } from '../types';
@@ -23,6 +24,8 @@ export interface SettingsMap {
   defaultUnits: Units;
   /** Horodatage ISO du dernier export réussi */
   lastExportAt: string;
+  /** Période des stats */
+  statsPeriod: StatsPeriod;
 }
 export type SettingKey = keyof SettingsMap;
 
