@@ -7,7 +7,8 @@ import type { Lang, ThemePref } from './prefs';
 import type { Program, Units } from './program';
 
 export type BundleSource = 'manual' | 'ai' | 'import' | 'example';
-export type BundleProgram = { sourceId: string; definition: Program; source: BundleSource };
+/** deleted : programme supprimé conservé pour son historique (restauré masqué) */
+export type BundleProgram = { sourceId: string; definition: Program; source: BundleSource; deleted?: true };
 export type WorkoutStatus = 'in_progress' | 'completed' | 'abandoned';
 export type BundleWorkout = {
   ref: string; programRef: string; sessionKey: string; date: string;
@@ -46,7 +47,7 @@ export const isIsoDay = (d: string) =>
 
 export function makeReport(b: Omit<ImportBundle, 'report'>, ignored: IgnoredItem[]): ImportReport {
   return {
-    programs: b.programs.length, workouts: b.workouts.length, sets: b.sets.length,
+    programs: b.programs.filter((p) => !p.deleted).length, workouts: b.workouts.length, sets: b.sets.length,
     weights: b.weights.length, layouts: b.layouts.length, ignored,
   };
 }

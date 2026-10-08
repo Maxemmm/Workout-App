@@ -13,7 +13,7 @@ export type NativeBackup = {
   _format: 'workout-native';
   _version: 1;
   exportedAt: string;
-  programs: { id: string; source: BundleSource; definition: Program }[];
+  programs: { id: string; source: BundleSource; definition: Program; deleted?: true }[];
   activeProgramId: string | null;
   workouts: { id: string; programId: string; sessionKey: string; date: string; status: WorkoutStatus; startedAt: string; completedAt: string | null }[];
   setEntries: {
@@ -38,7 +38,7 @@ export function toNativeBackup(bundle: ImportBundle, exportedAt: string): Native
     _format: 'workout-native',
     _version: 1,
     exportedAt,
-    programs: bundle.programs.map((p) => ({ id: p.sourceId, source: p.source, definition: p.definition })),
+    programs: bundle.programs.map((p) => ({ id: p.sourceId, source: p.source, definition: p.definition, ...(p.deleted ? { deleted: true as const } : {}) })),
     activeProgramId: bundle.activeProgramRef,
     workouts: bundle.workouts.map((w) => ({
       id: w.ref, programId: w.programRef, sessionKey: w.sessionKey, date: w.date,
@@ -63,9 +63,10 @@ export function parseNativeBackup(value: unknown): ParseResult {
       return;
     }
     const source = SOURCES.includes(p.source as BundleSource) ? (p.source as BundleSource) : 'import';
-    programs.push({ sourceId: p.id, source, definition: parsed.program });
+    programs.push({ sourceId: p.id, source, definition: parsed.program, ...(p.deleted === true ? { deleted: true as const } : {}) });
   });
-  if (programs.length === 0) return { ok: false, error: 'no_valid_program' };
+  const visible = programs.filter((p) => !p.deleted);
+  if (visible.length === 0) return { ok: false, error: 'no_valid_program' };
   const programIds = new Set(programs.map((p) => p.sourceId));
 
   const workouts: BundleWorkout[] = [];
@@ -121,7 +122,7 @@ export function parseNativeBackup(value: unknown): ParseResult {
   if (typeof raw.keepAwake === 'boolean') settings.keepAwake = raw.keepAwake;
   if (raw.defaultUnits === 'kg' || raw.defaultUnits === 'lbs') settings.defaultUnits = raw.defaultUnits;
 
-  const active = str(value.activeProgramId) && programIds.has(value.activeProgramId) ? value.activeProgramId : programs[0].sourceId;
+  const active = str(value.activeProgramId) && visible.some((p) => p.sourceId === value.activeProgramId) ? value.activeProgramId : visible[0].sourceId;
   const body = { programs, activeProgramRef: active, workouts, sets, weights, layouts, settings };
   return { ok: true, bundle: { ...body, report: makeReport(body, ignored) } };
 }

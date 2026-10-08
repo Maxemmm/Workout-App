@@ -1,11 +1,13 @@
 // ============================================================
 // Export — relit toute la base (lignes non supprimées) en ImportBundle,
 // l'inverse de importRepo.replaceAll. Les ids natifs servent de références.
+// Les programmes supprimés qui portent encore de l'historique sont inclus, marqués `deleted`.
 // ============================================================
-import { asc, isNull } from 'drizzle-orm';
-import { makeReport, type BundleSettings, type ImportBundle } from '@/domain/importBundle';
+import { asc, isNotNull, isNull } from 'drizzle-orm';
+import { makeReport, type BundleProgram, type BundleSettings, type ImportBundle } from '@/domain/importBundle';
 import { isLang, isThemePref } from '@/domain/prefs';
-import { sessionLayouts, setEntries, workouts } from '../schema';
+import { parseProgram } from '@/domain/program';
+import { programs, sessionLayouts, setEntries, workouts } from '../schema';
 import type { RepoCtx } from '../types';
 import { getLayout } from './layoutsRepo';
 import { getActiveProgram, listPrograms } from './programsRepo';
@@ -27,14 +29,33 @@ function readSettings(ctx: RepoCtx): BundleSettings {
   return s;
 }
 
+/** Programmes supprimés encore référencés par l'historique : exportés marqués `deleted` (Last time, Stats) */
+function deletedWithHistory(ctx: RepoCtx, referenced: Set<string>): BundleProgram[] {
+  return ctx.db.select().from(programs).where(isNotNull(programs.deletedAt))
+    .orderBy(asc(programs.createdAt), asc(programs.id)).all()
+    .filter((row) => referenced.has(row.id))
+    .flatMap((row) => {
+      let raw: unknown;
+      try {
+        raw = JSON.parse(row.definition);
+      } catch {
+        return [];
+      }
+      const parsed = parseProgram(raw);
+      return parsed.ok ? [{ sourceId: row.id, definition: parsed.program, source: row.source, deleted: true as const }] : [];
+    });
+}
+
 export function readBundle(ctx: RepoCtx): ImportBundle {
   // listPrograms écarte déjà les programmes supprimés ou illisibles
-  const progs = listPrograms(ctx);
-  const programIds = new Set(progs.map((p) => p.id));
+  const visible: BundleProgram[] = listPrograms(ctx).map((p) => ({ sourceId: p.id, definition: p.definition, source: p.source }));
+  const liveWorkouts = ctx.db.select().from(workouts).where(isNull(workouts.deletedAt))
+    .orderBy(asc(workouts.date), asc(workouts.id)).all();
+  const progs = [...visible, ...deletedWithHistory(ctx, new Set(liveWorkouts.map((w) => w.programId)))];
+  const programIds = new Set(progs.map((p) => p.sourceId));
+  const visibleIds = new Set(visible.map((p) => p.sourceId));
 
-  const ws = ctx.db.select().from(workouts).where(isNull(workouts.deletedAt))
-    .orderBy(asc(workouts.date), asc(workouts.id)).all()
-    .filter((w) => programIds.has(w.programId));
+  const ws = liveWorkouts.filter((w) => programIds.has(w.programId));
   const workoutIds = new Set(ws.map((w) => w.id));
 
   const ss = ctx.db.select().from(setEntries).where(isNull(setEntries.deletedAt))
@@ -42,11 +63,11 @@ export function readBundle(ctx: RepoCtx): ImportBundle {
     .filter((s) => workoutIds.has(s.workoutId));
 
   const layouts = ctx.db.select().from(sessionLayouts).where(isNull(sessionLayouts.deletedAt)).all()
-    .filter((l) => programIds.has(l.programId))
+    .filter((l) => visibleIds.has(l.programId))
     .map((l) => ({ programRef: l.programId, sessionKey: l.sessionKey, ...getLayout(ctx, l.programId, l.sessionKey) }));
 
   const body = {
-    programs: progs.map((p) => ({ sourceId: p.id, definition: p.definition, source: p.source })),
+    programs: progs,
     activeProgramRef: getActiveProgram(ctx)?.id ?? null,
     workouts: ws.map((w) => ({
       ref: w.id, programRef: w.programId, sessionKey: w.sessionKey, date: w.date,

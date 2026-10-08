@@ -6,9 +6,10 @@ import backup from '@/domain/__fixtures__/pwa-backup.json';
 import { parseNativeBackup, toNativeBackup } from '@/domain/nativeBackup';
 import { readBundle } from '../repos/exportRepo';
 import { replaceAll } from '../repos/importRepo';
-import { createProgram, getActiveProgram, setActiveProgram, softDeleteProgram } from '../repos/programsRepo';
+import { lastPerformance } from '../repos/historyRepo';
+import { createProgram, getActiveProgram, listPrograms, setActiveProgram, softDeleteProgram } from '../repos/programsRepo';
 import { getSetting, setSetting } from '../repos/settingsRepo';
-import { ensureWorkout, upsertSet } from '../repos/workoutsRepo';
+import { completeWorkout, ensureWorkout, upsertSet } from '../repos/workoutsRepo';
 import { programs, setEntries, workouts } from '../schema';
 import { createTestCtx } from '../testing/createTestCtx';
 
@@ -38,19 +39,40 @@ describe('exportRepo.readBundle', () => {
     expect(getSetting(fresh, 'defaultUnits')).toBe('lbs');
   });
 
-  it('ignore les lignes supprimées et les séances d\'un programme supprimé', () => {
+  it('programme supprimé : son historique est exporté et restauré, le programme reste masqué', () => {
     const ctx = createTestCtx();
     const keep = createProgram(ctx, example, 'example');
     const gone = createProgram(ctx, { ...example, meta: { ...example.meta, label: 'GONE' } }, 'manual');
-    setActiveProgram(ctx, keep.id);
+    const unused = createProgram(ctx, { ...example, meta: { ...example.meta, label: 'UNUSED' } }, 'manual');
+    setActiveProgram(ctx, gone.id);
     const w = ensureWorkout(ctx, { programId: gone.id, sessionKey: 'full-body', date: '2026-10-06' });
-    upsertSet(ctx, w.id, 'presse-cuisses', 0, { done: true });
+    upsertSet(ctx, w.id, 'presse-cuisses', 0, { done: true, weight: 100 });
+    completeWorkout(ctx, w.id);
     softDeleteProgram(ctx, gone.id);
+    softDeleteProgram(ctx, unused.id);
+
     const b = readBundle(ctx);
-    expect(b.programs.map((p) => p.sourceId)).toEqual([keep.id]);
+    expect(b.programs.map((p) => [p.sourceId, p.deleted === true])).toEqual([[keep.id, false], [gone.id, true]]);
     expect(b.activeProgramRef).toBe(keep.id);
-    expect(b.workouts).toEqual([]);
-    expect(b.sets).toEqual([]);
+    expect(b.report.programs).toBe(1);
+
+    const back = parseNativeBackup(JSON.parse(JSON.stringify(toNativeBackup(b, 'x'))));
+    if (!back.ok) throw new Error('export illisible');
+    const fresh = createTestCtx();
+    replaceAll(fresh, back.bundle);
+    expect(listPrograms(fresh).map((p) => p.definition.meta.label)).toEqual([example.meta.label]);
+    expect(getActiveProgram(fresh)?.definition.meta.label).toBe(example.meta.label);
+    expect(fresh.db.select().from(workouts).where(isNull(workouts.deletedAt)).all()).toHaveLength(1);
+    expect(lastPerformance(fresh, 'presse-cuisses', null, '2026-10-07')?.maxWeight).toBe(100);
+  });
+
+  it('sauvegarde native dont tous les programmes sont supprimés → refusée', () => {
+    const ctx = createTestCtx();
+    const gone = createProgram(ctx, example, 'example');
+    ensureWorkout(ctx, { programId: gone.id, sessionKey: 'full-body', date: '2026-10-06' });
+    softDeleteProgram(ctx, gone.id);
+    const json = JSON.parse(JSON.stringify(toNativeBackup(readBundle(ctx), 'x')));
+    expect(parseNativeBackup(json)).toEqual({ ok: false, error: 'no_valid_program' });
   });
 
   it('Review Focus 2 : programme stocké illisible → exclu, ses séances aussi, pas d\'exception', () => {

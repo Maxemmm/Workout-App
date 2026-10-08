@@ -7,7 +7,7 @@ import type { ImportBundle } from '@/domain/importBundle';
 import { exerciseWeights, programs, sessionLayouts, setEntries, workouts } from '../schema';
 import { inTransaction } from '../transaction';
 import type { RepoCtx } from '../types';
-import { createProgram, setActiveProgram, type StoredProgram } from './programsRepo';
+import { createProgram, setActiveProgram, softDeleteProgram, type StoredProgram } from './programsRepo';
 import { deleteSetting, setSetting } from './settingsRepo';
 import { setWeight } from './weightsRepo';
 
@@ -25,7 +25,10 @@ export function replaceAll(ctx: RepoCtx, bundle: ImportBundle): { activeProgramI
     const programIds = new Map<string, string>();
     bundle.programs.forEach((p, i) => {
       const at = new Date(Date.parse(now) + i).toISOString();
-      programIds.set(p.sourceId, createProgram({ ...tx, now: () => at }, p.definition, p.source).id);
+      const created = createProgram({ ...tx, now: () => at }, p.definition, p.source);
+      // Programme supprimé : recréé puis masqué, pour garder son historique
+      if (p.deleted) softDeleteProgram(tx, created.id);
+      programIds.set(p.sourceId, created.id);
     });
 
     const workoutIds = new Map<string, string>();
@@ -70,7 +73,9 @@ export function replaceAll(ctx: RepoCtx, bundle: ImportBundle): { activeProgramI
     deleteSetting(tx, 'programDraft');
     deleteSetting(tx, 'activeRest');
 
-    const activeProgramId = (bundle.activeProgramRef && programIds.get(bundle.activeProgramRef)) || [...programIds.values()][0];
+    const visibleIds = bundle.programs.filter((p) => !p.deleted).map((p) => programIds.get(p.sourceId) as string);
+    const requested = bundle.activeProgramRef ? programIds.get(bundle.activeProgramRef) : undefined;
+    const activeProgramId = requested && visibleIds.includes(requested) ? requested : visibleIds[0];
     setActiveProgram(tx, activeProgramId);
     return { activeProgramId };
   });
