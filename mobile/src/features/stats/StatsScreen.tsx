@@ -7,13 +7,13 @@ import { useRepoCtx } from '@/db/DbContext';
 import { getSetting, setSetting } from '@/db/repos/settingsRepo';
 import { readHistory } from '@/db/repos/statsRepo';
 import type { RepoCtx } from '@/db/types';
-import { localDateKey } from '@/domain/schedule';
 import { displayUnits } from '@/domain/stats/exerciseSeries';
 import { DEFAULT_STATS_PERIOD, isStatsPeriod, periodStart, STATS_PERIODS, type StatsPeriod } from '@/domain/stats/period';
 import { personalRecords } from '@/domain/stats/records';
 import { currentStreak, lastSession, weekVolume } from '@/domain/stats/summary';
 import { Screen } from '@/features/common/Screen';
 import { useDbQuery } from '@/features/common/useDbQuery';
+import { useTodayKey } from '@/features/common/useTodayKey';
 import { Segmented } from '@/features/profile/Segmented';
 import { useI18n } from '@/i18n/I18nProvider';
 import { usePrefs } from '@/state/prefsStore';
@@ -39,12 +39,17 @@ function savePeriod(ctx: RepoCtx, period: StatsPeriod, errorMessage: string): vo
   usePrefs.getState().bumpData();
 }
 
-export function StatsScreen() {
+/** Onglet sans focus : rien n'est lu ni calculé (les séries cochées dans Today relancent bumpData) */
+export function StatsScreen({ focused = true }: { focused?: boolean }) {
+  return focused ? <StatsContent /> : null;
+}
+
+function StatsContent() {
   const ctx = useRepoCtx();
   const { colors, fonts } = useTheme();
   const { t } = useI18n();
   const { history, period } = useDbQuery(readStats);
-  const today = localDateKey(new Date());
+  const today = useTodayKey();
   const title = <Text style={[styles.title, { color: colors.text, fontFamily: fonts.display }]}>{t('stats_title')}</Text>;
 
   if (history.workouts.length === 0) {

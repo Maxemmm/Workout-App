@@ -10,6 +10,7 @@ import { localDateKey, resolveDay, weekdayOf, weekStrip, type DayPlan, type Week
 import { Screen } from '@/features/common/Screen';
 import { useDbQuery } from '@/features/common/useDbQuery';
 import { prepareEditor } from '@/features/editor/openEditor';
+import { msUntilNextDay } from '@/features/common/useTodayKey';
 import { useI18n } from '@/i18n/I18nProvider';
 import { confirm } from '@/platform/confirm';
 import { usePrefs } from '@/state/prefsStore';
@@ -30,11 +31,6 @@ import { WeekStrip } from './WeekStrip';
 
 const REST_BAR_SPACE = 150;
 
-/** Délai jusqu'au prochain minuit local (+1 s de marge) */
-function msUntilNextDay(now: Date): number {
-  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1);
-  return next.getTime() - now.getTime();
-}
 
 interface Props {
   focused?: boolean;

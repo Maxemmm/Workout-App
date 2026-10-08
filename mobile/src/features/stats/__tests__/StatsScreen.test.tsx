@@ -64,3 +64,32 @@ describe('StatsScreen', () => {
     expect(screen.getByText(/Aucune charge enregistrée/)).toBeTruthy();
   });
 });
+
+describe('StatsScreen — jour courant et focus', () => {
+  beforeEach(async () => {
+    jest.useFakeTimers();
+    await act(async () => { usePrefs.setState(PREFS_INITIAL); });
+  });
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  it('Revue : le jour courant suit minuit, onglet resté monté', async () => {
+    jest.setSystemTime(new Date(2026, 9, 11, 23, 59, 30)); // dimanche soir
+    await renderWithProviders(<StatsScreen />, { ctx: restoredCtx() });
+    expect(screen.getByTestId('cal-2026-10-11').props.accessibilityLabel).toBe('2026-10-11 today');
+    await act(async () => { jest.advanceTimersByTime(31_000); });
+    expect(screen.getByTestId('cal-2026-10-12').props.accessibilityLabel).toBe('2026-10-12 today');
+  });
+
+  it('Revue : onglet sans focus → aucune lecture de l\'historique, même après un changement de données', async () => {
+    jest.setSystemTime(new Date(2026, 9, 7, 10));
+    const ctx = restoredCtx();
+    const read = jest.spyOn(require('@/db/repos/statsRepo'), 'readHistory');
+    await renderWithProviders(<StatsScreen focused={false} />, { ctx });
+    await act(async () => { usePrefs.getState().bumpData(); });
+    expect(read).not.toHaveBeenCalled();
+    expect(screen.queryByText('STATS')).toBeNull();
+  });
+});
