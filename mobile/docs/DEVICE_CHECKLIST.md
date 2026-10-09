@@ -105,3 +105,15 @@
 - [ ] Feuilles du bas (série, exercice, jour, échange) : le voile sombre apparaît en fondu, la feuille glisse seule depuis le bas.
 - [ ] Thème sombre : le clavier iOS est sombre (poids, nom de programme, import) ; curseur doré.
 - [ ] Web : fond de page aux couleurs du thème (y compris en tirant la page au-delà du bord).
+
+## M6 — Notification de fin de repos (Expo Go)
+- [ ] Première série cochée : feuille « Être prévenu à la fin du repos » ; « Activer » → demande iOS ; « Plus tard » → plus jamais affichée.
+- [ ] Série cochée puis téléphone verrouillé : notification « Repos terminé — Presse à cuisses · série 2/4 · 100 kg » à la fin du repos.
+- [ ] Dernière série d'un exercice : « Suivant : … » ; tout fait : « Toutes les séries sont faites… ».
+- [ ] App ouverte à la fin du repos : pas de bannière (son et vibration de l'app seulement).
+- [ ] « +15 s » / « −15 s » / « Passer » dans la barre de repos : la notification suit (une seule, à la bonne heure, ou annulée).
+- [ ] Bouton « +15 s » sur la notification (sans ouvrir l'app) : nouveau repos de 15 s, nouvelle notification.
+- [ ] Série chronométrée (gainage) : notification « Série terminée » ; bouton « Valider la série » → série cochée, repos lancé.
+- [ ] App fermée (balayée) pendant le repos : la notification arrive quand même ; une action dessus est appliquée à la réouverture.
+- [ ] Profil › Minuteur : désactiver → plus de notification ; refuser dans Réglages iOS → « Refusées » + « Ouvrir les Réglages ».
+- [ ] Web : ni feuille ni section Minuteur.
