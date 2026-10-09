@@ -44,13 +44,13 @@ describe('resolveDay (clé héritée)', () => {
 });
 
 describe('weekStrip', () => {
-  it('retourne 7 jours, dimanche → samedi, avec un seul jour courant', () => {
+  it("retourne 7 jours, lundi → dimanche (comme Plan, l'éditeur et les Stats), avec un seul jour courant", () => {
     const monday = new Date(2026, 9, 5, 9, 0); // lundi 5 octobre 2026, heure locale
     const strip = weekStrip(program, monday);
-    expect(strip.map((d) => d.weekday)).toEqual([0, 1, 2, 3, 4, 5, 6]);
+    expect(strip.map((d) => d.weekday)).toEqual([1, 2, 3, 4, 5, 6, 0]);
     expect(strip.filter((d) => d.isToday).map((d) => d.weekday)).toEqual([1]);
-    expect(strip[1].plan.kind).toBe('session');
-    expect(strip[2].plan.kind).toBe('implicit-rest');
+    expect(strip[0].plan.kind).toBe('session'); // lundi
+    expect(strip[1].plan.kind).toBe('implicit-rest'); // mardi
   });
 });
 

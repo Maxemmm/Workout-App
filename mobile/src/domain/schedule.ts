@@ -30,7 +30,8 @@ export function weekdayOf(date: Date): Weekday {
 
 export function weekStrip(program: Program, today: Date): WeekStripDay[] {
   const current = weekdayOf(today);
-  return WEEKDAYS.map((weekday) => ({ weekday, isToday: weekday === current, plan: resolveDay(program, weekday) }));
+  // Lundi → dimanche, comme Plan, l'éditeur et les Stats
+  return WEEK_ORDER.map((weekday) => ({ weekday, isToday: weekday === current, plan: resolveDay(program, weekday) }));
 }
 
 /** Jour local au format YYYY-MM-DD (jamais toISOString, qui est en UTC) */
