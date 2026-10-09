@@ -12,7 +12,8 @@ import { useEditorActions } from './useEditorActions';
 export type EditorActions = { save(): void; onDragStateChange(dragging: boolean): void };
 type Children = ReactNode | ((actions: EditorActions) => ReactNode);
 
-export function EditorScreen({ nav, step, children }: { nav: EditorNav; step?: EditorStep; children: Children }) {
+/** onBack : écran d'une séance → « ‹ Séances » à la place d'« Annuler » */
+export function EditorScreen({ nav, step, onBack, children }: { nav: EditorNav; step?: EditorStep; onBack?(): void; children: Children }) {
   const { t } = useI18n();
   const draft = useDraftStore((s) => s.draft);
   const { save, cancel, errors, dismissErrors, goToError } = useEditorActions(nav);
@@ -28,7 +29,13 @@ export function EditorScreen({ nav, step, children }: { nav: EditorNav; step?: E
   const sessionName = (key: string) => draft.program.sessions[key]?.name || t('editor_no_name');
   return (
     <Screen safeBottom scrollEnabled={!dragging}>
-      <EditorHeader step={step} onCancel={() => void cancel()} onSave={save} />
+      <EditorHeader
+        step={step}
+        onCancel={() => void cancel()}
+        onSave={save}
+        onStep={step ? (s) => nav.goToStep(s, step) : undefined}
+        onBack={onBack}
+      />
       {typeof children === 'function' ? children({ save, onDragStateChange: setDragging }) : children}
       <SaveErrorsSheet errors={errors} sessionName={sessionName} onSelect={goToError} onClose={dismissErrors} />
     </Screen>

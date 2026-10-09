@@ -2,7 +2,8 @@
 export type EditorStep = 1 | 2 | 3;
 
 export interface EditorNav {
-  goToStep(step: EditorStep): void;
+  /** from : étape affichée. Avancer empile (retour possible), reculer revient à l'écran ouvert */
+  goToStep(step: EditorStep, from?: EditorStep): void;
   openSession(key: string): void;
   closeSession(): void;
   /** Sortie de l'éditeur (après enregistrement ou annulation) → Plan */

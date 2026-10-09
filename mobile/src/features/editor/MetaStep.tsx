@@ -62,7 +62,7 @@ export function MetaStep({ nav }: { nav: EditorNav }) {
             maxLength={200}
             testID="rules"
           />
-          <Pressable accessibilityRole="button" onPress={() => nav.goToStep(2)} style={[styles.next, { backgroundColor: colors.gold, borderRadius: radius.md }]}>
+          <Pressable accessibilityRole="button" onPress={() => nav.goToStep(2, 1)} style={[styles.next, { backgroundColor: colors.gold, borderRadius: radius.md }]}>
             <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('step_next')}</Text>
           </Pressable>
         </View>

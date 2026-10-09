@@ -78,7 +78,7 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
   );
 
   return (
-    <EditorScreen nav={nav}>
+    <EditorScreen nav={nav} onBack={closeSession}>
       {({ onDragStateChange }) => (session ? (
         <View style={styles.root}>
           <Text style={[styles.title, { color: colors.text, fontFamily: fonts.display }]}>{t('editor_edit_session').toUpperCase()}</Text>

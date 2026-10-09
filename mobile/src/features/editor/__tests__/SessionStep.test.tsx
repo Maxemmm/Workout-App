@@ -63,6 +63,19 @@ describe('SessionStep', () => {
     expect(session()).toMatchObject({ type: 'cardio', tips: [{ title: 'Cible', body: 'RPE 6-7' }] });
   });
 
+  it("en-tête : « Séances » revient à la liste sans abandonner le programme", async () => {
+    const ctx = createTestCtx();
+    await act(async () => { useDraftStore.getState().start(ctx, newDraft()); });
+    let key = '';
+    await act(async () => { useDraftStore.getState().apply(ctx, (d) => { const r = addSession(d); key = r.key; return r.draft; }); });
+    const n = nav();
+    await renderWithProviders(<SessionStep nav={n} sessionKey={key} />, { ctx });
+    expect(screen.queryByRole('button', { name: 'Annuler' })).toBeNull();
+    await fireEvent.press(screen.getByRole('button', { name: 'Séances' }));
+    expect(n.closeSession).toHaveBeenCalled();
+    expect(useDraftStore.getState().draft).not.toBeNull();
+  });
+
   it('séance introuvable : retour à la liste', async () => {
     const ctx = createTestCtx();
     await act(async () => { useDraftStore.getState().start(ctx, newDraft()); });

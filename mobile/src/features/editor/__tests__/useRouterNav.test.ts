@@ -35,3 +35,19 @@ describe('useRouterNav', () => {
     expect(router.dismissTo).toHaveBeenCalledWith('/plan');
   });
 });
+
+describe('useRouterNav — sens des transitions', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('avancer d\'une étape empile l\'écran (animation « avancer », retour possible)', () => {
+    useRouterNav().goToStep(2, 1);
+    expect(router.push).toHaveBeenCalledWith('/editor/sessions');
+    expect(router.dismissTo).not.toHaveBeenCalled();
+  });
+
+  it('reculer revient à l\'écran déjà ouvert (animation « reculer »)', () => {
+    useRouterNav().goToStep(1, 3);
+    expect(router.dismissTo).toHaveBeenCalledWith('/editor/meta');
+    expect(router.push).not.toHaveBeenCalled();
+  });
+});

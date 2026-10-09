@@ -26,7 +26,10 @@ describe('MetaStep', () => {
       rules: ['Technique avant tout'],
     });
     await fireEvent.press(screen.getByRole('button', { name: 'SUIVANT' }));
-    expect(n.goToStep).toHaveBeenCalledWith(2);
+    // Avancer depuis l'étape 1 : la navigation empile (retour possible)
+    expect(n.goToStep).toHaveBeenCalledWith(2, 1);
+    await fireEvent.press(screen.getByRole('button', { name: 'Étape 3' }));
+    expect(n.goToStep).toHaveBeenLastCalledWith(3, 1);
   });
 
   it("sans brouillon : sortie de l'éditeur", async () => {

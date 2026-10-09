@@ -49,7 +49,7 @@ describe('SessionsStep', () => {
     expect(useDraftStore.getState().draft!.program.schedule).toEqual({});
 
     await fireEvent.press(screen.getByRole('button', { name: 'CONFIGURER LE PLANNING' }));
-    expect(n.goToStep).toHaveBeenCalledWith(3);
+    expect(n.goToStep).toHaveBeenCalledWith(3, 2);
   });
 
   it("réordonner (action d'accessibilité)", async () => {

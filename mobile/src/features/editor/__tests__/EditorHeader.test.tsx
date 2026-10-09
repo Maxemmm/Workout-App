@@ -16,6 +16,27 @@ describe('EditorHeader', () => {
   });
 });
 
+describe('EditorHeader — navigation', () => {
+  it("étapes cliquables : aller directement à une étape, l'étape courante est sélectionnée", async () => {
+    const onStep = jest.fn();
+    await renderWithProviders(<EditorHeader step={2} onCancel={jest.fn()} onSave={jest.fn()} onStep={onStep} />);
+    expect(screen.getByRole('button', { name: 'Étape 2' }).props.accessibilityState).toMatchObject({ selected: true });
+    await fireEvent.press(screen.getByRole('button', { name: 'Étape 1' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Étape 3' }));
+    expect(onStep.mock.calls).toEqual([[1], [3]]);
+  });
+
+  it("écran d'une séance : « Séances » revient à la liste (pas d'abandon du programme)", async () => {
+    const onBack = jest.fn();
+    const onCancel = jest.fn();
+    await renderWithProviders(<EditorHeader onCancel={onCancel} onSave={jest.fn()} onBack={onBack} />);
+    expect(screen.queryByRole('button', { name: 'Annuler' })).toBeNull();
+    await fireEvent.press(screen.getByRole('button', { name: 'Séances' }));
+    expect(onBack).toHaveBeenCalled();
+    expect(onCancel).not.toHaveBeenCalled();
+  });
+});
+
 describe('SaveErrorsSheet', () => {
   it("liste les erreurs traduites ; un tap ouvre l'étape concernée", async () => {
     const onSelect = jest.fn();
