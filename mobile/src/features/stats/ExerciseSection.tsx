@@ -41,7 +41,7 @@ export function ExerciseSection({ history, since }: { history: StatsHistory; sin
               onPress={() => setSelected(e.key)}
               style={[styles.chip, { borderRadius: radius.full, borderColor: active ? colors.gold : colors.border, backgroundColor: active ? colors.gold : 'transparent' }]}
             >
-              <Text style={{ color: active ? '#0a0a0a' : colors.text, fontFamily: fonts.uiMedium }}>{e.name}</Text>
+              <Text style={{ color: active ? colors.onGold : colors.text, fontFamily: fonts.uiMedium }}>{e.name}</Text>
             </Pressable>
           );
         })}

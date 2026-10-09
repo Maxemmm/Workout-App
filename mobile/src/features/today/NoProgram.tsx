@@ -11,7 +11,7 @@ export function NoProgram({ onCreate, onImport }: { onCreate(): void; onImport()
       <Text style={[styles.title, { color: colors.text, fontFamily: fonts.display }]}>{t('today_no_program_title')}</Text>
       <Text style={{ color: colors.textDim, fontFamily: fonts.ui }}>{t('today_no_program_sub')}</Text>
       <Pressable accessibilityRole="button" onPress={onCreate} style={[styles.button, { backgroundColor: colors.gold, borderRadius: radius.md }]}>
-        <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('today_create_program')}</Text>
+        <Text style={{ color: colors.onGold, fontFamily: fonts.uiBold }}>{t('today_create_program')}</Text>
       </Pressable>
       <Pressable accessibilityRole="button" onPress={onImport} style={[styles.button, { borderColor: colors.gold, borderWidth: 1, borderRadius: radius.md }]}>
         <Text style={{ color: colors.gold, fontFamily: fonts.uiBold }}>{t('onboarding_import')}</Text>

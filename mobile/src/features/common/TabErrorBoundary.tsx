@@ -12,7 +12,7 @@ function Fallback({ onReload }: { onReload(): void }) {
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, backgroundColor: colors.bg, padding: 24 }}>
       <Text style={{ color: colors.text, fontFamily: fonts.uiBold }}>{t('error_tab')}</Text>
       <Pressable accessibilityRole="button" onPress={onReload} style={{ minHeight: TOUCH_MIN, paddingHorizontal: 20, justifyContent: 'center', backgroundColor: colors.gold, borderRadius: radius.md }}>
-        <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('error_reload_tab')}</Text>
+        <Text style={{ color: colors.onGold, fontFamily: fonts.uiBold }}>{t('error_reload_tab')}</Text>
       </Pressable>
     </View>
   );

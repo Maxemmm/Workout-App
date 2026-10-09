@@ -29,7 +29,7 @@ export function LineChart({ points, recordIndex, height = 160 }: Props) {
     <View onLayout={(e) => setWidth(Math.max(120, e.nativeEvent.layout.width))} style={{ height }}>
       <Svg width={width} height={height}>
         {points.length > 1 ? (
-          <Polyline points={points.map((p, i) => `${x(i)},${y(p.value)}`).join(' ')} fill="none" stroke={colors.goldDim} strokeWidth={2} />
+          <Polyline points={points.map((p, i) => `${x(i)},${y(p.value)}`).join(' ')} fill="none" stroke={colors.gold} strokeOpacity={0.6} strokeWidth={2} />
         ) : null}
         {points.map((p, i) => (
           <Circle
@@ -38,7 +38,7 @@ export function LineChart({ points, recordIndex, height = 160 }: Props) {
             cx={x(i)}
             cy={y(p.value)}
             r={i === recordIndex ? 6 : 4}
-            fill={i === recordIndex ? colors.gold : colors.goldDim}
+            fill={colors.gold}
             stroke={i === recordIndex ? colors.text : 'none'}
             strokeWidth={i === recordIndex ? 1.5 : 0}
           />

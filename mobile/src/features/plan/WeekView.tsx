@@ -23,7 +23,7 @@ export function WeekView({ program, today, onAddSession, onCreate }: Props) {
       <View style={{ gap: 12 }}>
         <Text style={{ color: colors.textDim, fontFamily: fonts.ui }}>{t('plan_no_active')}</Text>
         <Pressable accessibilityRole="button" onPress={onCreate} style={primary}>
-          <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('plan_create_program')}</Text>
+          <Text style={{ color: colors.onGold, fontFamily: fonts.uiBold }}>{t('plan_create_program')}</Text>
         </Pressable>
       </View>
     );

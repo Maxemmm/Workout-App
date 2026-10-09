@@ -42,14 +42,17 @@ export function ExerciseCard(p: ExerciseCardProps) {
   const ex = p.exercise;
   const fill = accentColors(colors, p.accent).fill;
   const complete = Array.from({ length: ex.sets }, (_, i) => p.done[i] === true).every(Boolean);
+  // Carte complète (fond vert) : tous les textes passent en couleur lisible sur le vert
+  const fg = complete ? colors.onDone : colors.text;
+  const dim = complete ? colors.onDone : colors.textDim;
 
   const title = (
     <View style={styles.header}>
       <View style={styles.titleCol}>
-        <Text style={[styles.name, { color: colors.text, fontFamily: fonts.uiBold }]}>{ex.name}</Text>
-        {ex.performedName ? <Text style={{ color: colors.textDim, fontFamily: fonts.ui, fontSize: 12 }}>{t('today_replaces', ex.originalName)}</Text> : null}
+        <Text style={[styles.name, { color: fg, fontFamily: fonts.uiBold }]}>{ex.name}</Text>
+        {ex.performedName ? <Text style={{ color: dim, fontFamily: fonts.ui, fontSize: 12 }}>{t('today_replaces', ex.originalName)}</Text> : null}
       </View>
-      <Text style={{ color: colors.textDim, fontFamily: fonts.uiBold }}>{formatScheme(ex)}</Text>
+      <Text style={{ color: dim, fontFamily: fonts.uiBold }}>{formatScheme(ex)}</Text>
     </View>
   );
 
@@ -62,18 +65,18 @@ export function ExerciseCard(p: ExerciseCardProps) {
         <View style={styles.flex}>{p.header ? p.header(title) : title}</View>
         {ex.alternatives.length > 0 && p.onSwap ? (
           <Pressable accessibilityRole="button" accessibilityLabel={t('today_swap_title')} onPress={p.onSwap} style={styles.iconBtn}>
-            <Ionicons name="swap-horizontal" size={20} color={colors.textDim} />
+            <Ionicons name="swap-horizontal" size={20} color={dim} />
           </Pressable>
         ) : null}
       </View>
-      {ex.cue ? <Text style={{ color: colors.textDim, fontFamily: fonts.ui, fontStyle: 'italic' }}>{ex.cue}</Text> : null}
-      <LastTimeLine last={p.last} units={p.units} />
+      {ex.cue ? <Text style={{ color: dim, fontFamily: fonts.ui, fontStyle: 'italic' }}>{ex.cue}</Text> : null}
+      <LastTimeLine last={p.last} units={p.units} color={dim} />
       <View style={styles.weightRow}>
-        <Text style={{ color: colors.textDim, fontFamily: fonts.uiBold, fontSize: 11, letterSpacing: 1.5 }}>{t('today_weight').toUpperCase()}</Text>
-        <WeightStepper testID={`weight-${ex.id}`} value={p.weight} units={p.units} onChange={p.onChangeWeight} />
-        <Text style={{ color: colors.textDim, fontFamily: fonts.ui }}>{p.units}</Text>
+        <Text style={{ color: dim, fontFamily: fonts.uiBold, fontSize: 11, letterSpacing: 1.5 }}>{t('today_weight').toUpperCase()}</Text>
+        <WeightStepper testID={`weight-${ex.id}`} value={p.weight} units={p.units} onChange={p.onChangeWeight} textColor={fg} />
+        <Text style={{ color: dim, fontFamily: fonts.ui }}>{p.units}</Text>
       </View>
-      {ex.load ? <Text style={{ color: colors.textDim, fontFamily: fonts.ui, fontSize: 12 }}>{ex.load}</Text> : null}
+      {ex.load ? <Text style={{ color: dim, fontFamily: fonts.ui, fontSize: 12 }}>{ex.load}</Text> : null}
       <View style={styles.circles}>
         {Array.from({ length: ex.sets }, (_, i) => (
           <SetCircle
@@ -90,8 +93,8 @@ export function ExerciseCard(p: ExerciseCardProps) {
         ))}
       </View>
       <Pressable accessibilityRole="button" onPress={p.onPressRest} style={styles.restRow}>
-        <Ionicons name="timer-outline" size={14} color={colors.textDim} />
-        <Text style={{ color: colors.textDim, fontFamily: fonts.uiBold, fontSize: 12, letterSpacing: 1 }}>{`${t('timer_rest')} ${p.restSec}S`}</Text>
+        <Ionicons name="timer-outline" size={14} color={dim} />
+        <Text style={{ color: dim, fontFamily: fonts.uiBold, fontSize: 12, letterSpacing: 1 }}>{`${t('timer_rest')} ${p.restSec}S`}</Text>
       </Pressable>
     </View>
   );

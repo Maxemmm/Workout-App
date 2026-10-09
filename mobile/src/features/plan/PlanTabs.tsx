@@ -18,7 +18,7 @@ export function PlanTabs({ value, onChange }: { value: PlanTab; onChange(v: Plan
   }));
   const tab = (key: PlanTab, label: string) => (
     <Pressable key={key} accessibilityRole="tab" accessibilityLabel={label} accessibilityState={{ selected: value === key }} onPress={() => onChange(key)} style={styles.tab}>
-      <Text style={{ color: value === key ? '#0a0a0a' : colors.text, fontFamily: fonts.uiBold }}>{label}</Text>
+      <Text style={{ color: value === key ? colors.onGold : colors.text, fontFamily: fonts.uiBold }}>{label}</Text>
     </Pressable>
   );
   return (

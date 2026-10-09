@@ -55,7 +55,7 @@ export function ScheduleStep({ nav }: { nav: EditorNav }) {
             );
           })}
           <Pressable accessibilityRole="button" onPress={save} style={[styles.save, { backgroundColor: colors.gold, borderRadius: radius.md }]}>
-            <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('editor_save_program_btn')}</Text>
+            <Text style={{ color: colors.onGold, fontFamily: fonts.uiBold }}>{t('editor_save_program_btn')}</Text>
           </Pressable>
           <DayPicker
             visible={picking !== null}

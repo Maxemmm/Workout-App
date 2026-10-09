@@ -23,7 +23,7 @@ export function Segmented<T extends string>({ options, value, onChange }: Props<
             onPress={() => onChange(o.value)}
             style={[styles.item, { borderRadius: radius.md, backgroundColor: active ? colors.gold : 'transparent' }]}
           >
-            <Text style={{ color: active ? '#0a0a0a' : colors.text, fontFamily: fonts.uiBold }}>{o.label}</Text>
+            <Text style={{ color: active ? colors.onGold : colors.text, fontFamily: fonts.uiBold }}>{o.label}</Text>
           </Pressable>
         );
       })}

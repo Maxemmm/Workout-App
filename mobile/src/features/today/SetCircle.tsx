@@ -1,6 +1,7 @@
 // Cercle de série — 44 pt, rempli à la couleur d'accent quand coché, bordé en attente
 import { Pressable, StyleSheet, Text } from 'react-native';
 import { useI18n } from '@/i18n/I18nProvider';
+import { readableOn } from '@/theme/resolve';
 import { useTheme } from '@/theme/ThemeProvider';
 import { TOUCH_MIN } from '@/theme/tokens';
 
@@ -36,7 +37,7 @@ export function SetCircle({ index, done, pending, disabled, fill, testID, onTogg
         },
       ]}
     >
-      <Text style={{ color: done ? '#0a0a0a' : colors.text, fontFamily: fonts.uiBold }}>{index + 1}</Text>
+      <Text style={{ color: done ? readableOn(fill) : colors.text, fontFamily: fonts.uiBold }}>{index + 1}</Text>
     </Pressable>
   );
 }

@@ -27,7 +27,7 @@ export function AttendanceSection({ history, today, since }: { history: StatsHis
       <View style={styles.legend}>
         {legend(colors.gold, 'stats_legend_done')}
         {legend(colors.rust, 'stats_legend_missed', true)}
-        {legend(colors.bgCardSoft, 'stats_legend_rest')}
+        {legend(colors.textFaint, 'stats_legend_rest')}
       </View>
     </View>
   );

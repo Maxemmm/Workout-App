@@ -115,7 +115,7 @@ export function ImportScreen({ onDone, onCancel }: { onDone(kind: 'program' | 'b
             {t('import_preview_program', analysis.program.meta.label, Object.keys(analysis.program.sessions).length, programSummary(analysis.program).days)}
           </Text>
           <Pressable accessibilityRole="button" onPress={confirmProgram} style={primary}>
-            <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('import_confirm_btn')}</Text>
+            <Text style={{ color: colors.onGold, fontFamily: fonts.uiBold }}>{t('import_confirm_btn')}</Text>
           </Pressable>
         </View>
       ) : null}
@@ -126,7 +126,7 @@ export function ImportScreen({ onDone, onCancel }: { onDone(kind: 'program' | 'b
           </Text>
           {ignored ? <Text style={{ color: colors.textDim, fontFamily: fonts.ui, fontSize: 12 }}>{ignored}</Text> : null}
           <Pressable accessibilityRole="button" onPress={() => void confirmBackup()} style={primary}>
-            <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('import_backup_confirm_btn')}</Text>
+            <Text style={{ color: colors.onGold, fontFamily: fonts.uiBold }}>{t('import_backup_confirm_btn')}</Text>
           </Pressable>
         </View>
       ) : null}

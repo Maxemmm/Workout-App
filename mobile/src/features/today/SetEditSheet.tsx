@@ -41,7 +41,7 @@ export function SetEditSheet({ visible, setIndex, units, initialWeight, initialR
         onPress={() => onSave({ weight: parseWeightInput(weight), reps: parseReps(reps) })}
         style={[styles.btn, { backgroundColor: colors.gold, borderRadius: radius.md }]}
       >
-        <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('today_save')}</Text>
+        <Text style={{ color: colors.onGold, fontFamily: fonts.uiBold }}>{t('today_save')}</Text>
       </Pressable>
     </View>
   );

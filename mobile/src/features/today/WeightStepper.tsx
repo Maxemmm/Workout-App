@@ -10,10 +10,12 @@ interface Props {
   value: number | null;
   units: Units;
   testID?: string;
+  /** Couleur du texte saisi (carte complète sur fond vert) */
+  textColor?: string;
   onChange(value: number | null): void;
 }
 
-export function WeightStepper({ value, units, testID, onChange }: Props) {
+export function WeightStepper({ value, units, testID, textColor, onChange }: Props) {
   const { colors, fonts, radius } = useTheme();
   const [draft, setDraft] = useState<string | null>(null);
   const step = weightStep(units);
@@ -49,7 +51,7 @@ export function WeightStepper({ value, units, testID, onChange }: Props) {
         onChangeText={edit}
         onBlur={commit}
         onSubmitEditing={commit}
-        style={[styles.input, { color: colors.text, fontFamily: fonts.uiBold, borderColor: colors.border, borderRadius: radius.sm }]}
+        style={[styles.input, { color: textColor ?? colors.text, fontFamily: fonts.uiBold, borderColor: textColor ?? colors.border, borderRadius: radius.sm }]}
       />
       <Pressable accessibilityRole="button" accessibilityLabel={`+ ${step} ${units}`} onPress={() => bump(step)} style={btn}>
         <Text style={btnText}>+</Text>

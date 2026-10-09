@@ -14,9 +14,9 @@ export function AttendanceCalendar({ weeks }: { weeks: CalendarDay[][] }) {
     switch (state) {
       case 'done': return { backgroundColor: colors.gold };
       case 'missed': return { borderWidth: 1.5, borderColor: colors.rust };
-      case 'today': return { borderWidth: 1.5, borderColor: colors.gold, backgroundColor: colors.bgCardSoft };
+      case 'today': return { borderWidth: 2, borderColor: colors.gold };
       case 'future': return { borderWidth: 1, borderColor: colors.border };
-      default: return { backgroundColor: colors.bgCardSoft };
+      default: return { backgroundColor: colors.textFaint };
     }
   };
 

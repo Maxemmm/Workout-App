@@ -11,20 +11,20 @@ export function CompletedSummary({ summary, units, onReopen }: { summary: Sessio
   const { t } = useI18n();
   const stat = (label: string, value: string) => (
     <View style={styles.stat}>
-      <Text style={{ color: colors.text, fontFamily: fonts.display, fontSize: 26 }}>{value}</Text>
-      <Text style={{ color: colors.textDim, fontFamily: fonts.uiBold, fontSize: 11, letterSpacing: 1.5 }}>{label.toUpperCase()}</Text>
+      <Text style={{ color: colors.onDone, fontFamily: fonts.display, fontSize: 26 }}>{value}</Text>
+      <Text style={{ color: colors.onDone, fontFamily: fonts.uiBold, fontSize: 11, letterSpacing: 1.5 }}>{label.toUpperCase()}</Text>
     </View>
   );
   return (
     <View testID="completed-summary" style={{ gap: 12, backgroundColor: colors.greenDone, borderRadius: radius.lg, padding: spacing.md }}>
-      <Text style={{ color: colors.text, fontFamily: fonts.display, fontSize: 28 }}>{t('today_summary_title')}</Text>
+      <Text style={{ color: colors.onDone, fontFamily: fonts.display, fontSize: 28 }}>{t('today_summary_title')}</Text>
       <View style={styles.row}>
         {stat(t('today_summary_duration'), t('today_summary_min', summary.durationMin))}
         {stat(t('today_summary_sets'), String(summary.setsDone))}
         {stat(t('today_summary_volume'), `${Math.round(summary.volume)} ${units}`)}
       </View>
-      <Pressable accessibilityRole="button" onPress={onReopen} style={[styles.btn, { borderColor: colors.text, borderRadius: radius.md }]}>
-        <Text style={{ color: colors.text, fontFamily: fonts.uiBold }}>{t('today_reopen')}</Text>
+      <Pressable accessibilityRole="button" onPress={onReopen} style={[styles.btn, { borderColor: colors.onDone, borderRadius: radius.md }]}>
+        <Text style={{ color: colors.onDone, fontFamily: fonts.uiBold }}>{t('today_reopen')}</Text>
       </Pressable>
     </View>
   );

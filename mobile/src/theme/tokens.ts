@@ -10,6 +10,10 @@ export interface Palette {
   greenDone: string; redTimer: string; redDanger: string;
   border: string; borderActive: string;
   goldFill: string; rustFill: string; blueFill: string;
+  /** Texte posé sur gold (boutons principaux, sélections) */
+  onGold: string;
+  /** Texte posé sur greenDone (carte complète, récapitulatif, fin de repos) */
+  onDone: string;
 }
 
 export const palettes: Record<ColorScheme, Palette> = {
@@ -20,14 +24,16 @@ export const palettes: Record<ColorScheme, Palette> = {
     greenDone: '#2e7d4f', redTimer: '#d23a3a', redDanger: '#a02020',
     border: '#2a2a2a', borderActive: '#d4a23c',
     goldFill: '#d4a23c', rustFill: '#c4561f', blueFill: '#5b9bd5',
+    onGold: '#0a0a0a', onDone: '#ffffff',
   },
   light: {
     bg: '#f4f1ec', bgCard: '#ffffff', bgCardSoft: '#ede9e2', bgElevated: '#e5e0d8',
     text: '#1c1a17', textDim: '#6b6560', textFaint: '#b5aea5',
     gold: '#9a6b08', goldDim: '#c9a852', rust: '#b54518', blue: '#2e6fa8',
-    greenDone: '#3a8a52', redTimer: '#c02828', redDanger: '#a01818',
+    greenDone: '#2f7a48', redTimer: '#c02828', redDanger: '#a01818',
     border: '#ddd8d0', borderActive: '#a07010',
     goldFill: '#d4920c', rustFill: '#c84018', blueFill: '#4a88c8',
+    onGold: '#ffffff', onDone: '#ffffff',
   },
 };
 

@@ -10,6 +10,7 @@ import { ADJUST_STEP_SEC, timerPhase, timerProgress } from '@/domain/timer';
 import { useI18n } from '@/i18n/I18nProvider';
 import { usePrefs } from '@/state/prefsStore';
 import { useTimerStore } from '@/state/timerStore';
+import { readableOn } from '@/theme/resolve';
 import { useTheme } from '@/theme/ThemeProvider';
 import { TOUCH_MIN } from '@/theme/tokens';
 import { completeWorkTimer } from './actions';
@@ -47,6 +48,8 @@ export function RestBar({ exerciseName, onPressBar }: Props) {
   const exerciseId = timer?.exerciseId ?? flash!.exerciseId;
   const phase = timer ? timerPhase(timer, now) : 'done';
   const bg = phase === 'done' ? colors.greenDone : phase === 'critical' ? colors.redTimer : colors.bgElevated;
+  // Fond vert / rouge : texte noir ou blanc selon le meilleur contraste
+  const fg = phase === 'running' ? colors.text : readableOn(bg);
   const label = timer?.mode === 'work' ? t('timer_work') : t('timer_rest');
   const clock = timer ? formatClock(remainingSec(timer.endAt, now)) : t('timer_done');
 
@@ -59,20 +62,20 @@ export function RestBar({ exerciseName, onPressBar }: Props) {
   const adjust = (delta: number) => useTimerStore.getState().adjust(ctx, delta, Date.now());
 
   const small = [styles.small, { backgroundColor: 'rgba(0,0,0,0.25)', borderRadius: radius.sm }];
-  const smallText = { color: colors.text, fontFamily: fonts.uiBold, fontSize: 13 };
+  const smallText = { color: fg, fontFamily: fonts.uiBold, fontSize: 13 };
   return (
     <View style={[styles.wrap, { backgroundColor: bg, borderColor: colors.border, borderRadius: radius.lg }]}>
       <Pressable testID="rest-bar" accessibilityRole="button" onPress={() => onPressBar(exerciseId)} style={styles.main}>
         <View style={styles.flex}>
-          <Text style={{ color: colors.text, fontFamily: fonts.uiBold, fontSize: 11, letterSpacing: 1.5 }}>{label}</Text>
-          <Text numberOfLines={1} style={{ color: colors.text, fontFamily: fonts.uiMedium }}>{exerciseName(exerciseId)}</Text>
+          <Text style={{ color: fg, fontFamily: fonts.uiBold, fontSize: 11, letterSpacing: 1.5 }}>{label}</Text>
+          <Text numberOfLines={1} style={{ color: fg, fontFamily: fonts.uiMedium }}>{exerciseName(exerciseId)}</Text>
         </View>
-        <Text style={{ color: colors.text, fontFamily: fonts.display, fontSize: 36 }}>{clock}</Text>
+        <Text style={{ color: fg, fontFamily: fonts.display, fontSize: 36 }}>{clock}</Text>
       </Pressable>
       {timer ? (
         <>
-          <View style={[styles.track, { backgroundColor: 'rgba(255,255,255,0.15)' }]}>
-            <View style={[styles.fill, { width: `${timerProgress(timer, now) * 100}%`, backgroundColor: colors.text }]} />
+          <View style={[styles.track, { backgroundColor: `${fg}33` }]}>
+            <View style={[styles.fill, { width: `${timerProgress(timer, now) * 100}%`, backgroundColor: fg }]} />
           </View>
           <View style={styles.actions}>
             <Pressable accessibilityRole="button" accessibilityLabel={t('timer_minus')} onPress={() => adjust(-ADJUST_STEP_SEC)} style={small}>

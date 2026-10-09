@@ -150,7 +150,7 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
           )}
 
           <Pressable accessibilityRole="button" onPress={closeSession} style={[styles.btn, { backgroundColor: colors.gold, borderRadius: radius.md }]}>
-            <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('editor_save_session_btn')}</Text>
+            <Text style={{ color: colors.onGold, fontFamily: fonts.uiBold }}>{t('editor_save_session_btn')}</Text>
           </Pressable>
 
           {sheet ? (

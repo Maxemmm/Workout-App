@@ -43,6 +43,16 @@ describe('ExerciseCard', () => {
     expect(props.onPressSet).not.toHaveBeenCalled();
   });
 
+  it('carte complète (fond vert) : tous les textes passent en couleur lisible sur le vert', async () => {
+    const { StyleSheet } = require('react-native') as typeof import('react-native');
+    const { palettes } = require('@/theme/tokens') as typeof import('@/theme/tokens');
+    await renderCard({ done: [true, true, true] });
+    const onDone = palettes.dark.onDone;
+    for (const text of ['Presse', 'Dos plaqué', 'Dernière fois : 3 × 8 · 95 kg', '100 à 120 kg', 'REPOS 90S', 'kg']) {
+      expect(StyleSheet.flatten(screen.getByText(text).props.style).color).toBe(onDone);
+    }
+  });
+
   it('carte complète marquée', async () => {
     await renderCard({ done: [true, true, true] });
     expect(screen.getByTestId('card-presse-complete')).toBeTruthy();

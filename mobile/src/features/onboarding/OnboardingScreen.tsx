@@ -50,7 +50,7 @@ export function OnboardingScreen({ onCreate, onImport, onStarted }: Props) {
           onChange={(v) => usePrefs.getState().setLang(ctx, v)}
         />
         <Pressable accessibilityRole="button" onPress={() => void create()} style={[styles.btn, { backgroundColor: colors.gold, borderRadius: radius.md }]}>
-          <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('onboarding_create')}</Text>
+          <Text style={{ color: colors.onGold, fontFamily: fonts.uiBold }}>{t('onboarding_create')}</Text>
         </Pressable>
         <Pressable accessibilityRole="button" onPress={onImport} style={[styles.btn, { borderColor: colors.gold, borderWidth: 1, borderRadius: radius.md }]}>
           <Text style={{ color: colors.gold, fontFamily: fonts.uiBold }}>{t('onboarding_import')}</Text>

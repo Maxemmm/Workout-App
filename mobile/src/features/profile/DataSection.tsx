@@ -57,7 +57,7 @@ export function DataSection({ onImport }: { onImport(): void }) {
         onPress={() => void onExport()}
         style={[styles.btn, { backgroundColor: colors.gold, borderRadius: radius.md, opacity: busy ? 0.6 : 1 }]}
       >
-        <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('profile_export')}</Text>
+        <Text style={{ color: colors.onGold, fontFamily: fonts.uiBold }}>{t('profile_export')}</Text>
       </Pressable>
       <Text style={{ color: alert ? colors.rust : colors.textDim, fontFamily: fonts.ui }}>{reminder(age, t)}</Text>
       <Pressable

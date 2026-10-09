@@ -64,7 +64,7 @@ export function SessionsStep({ nav }: { nav: EditorNav }) {
             <Text style={{ color: colors.gold, fontFamily: fonts.uiBold }}>{t('editor_add_session_btn')}</Text>
           </Pressable>
           <Pressable accessibilityRole="button" onPress={() => nav.goToStep(3, 2)} style={[styles.btn, { backgroundColor: colors.gold, borderRadius: radius.md }]}>
-            <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('editor_configure_planning')}</Text>
+            <Text style={{ color: colors.onGold, fontFamily: fonts.uiBold }}>{t('editor_configure_planning')}</Text>
           </Pressable>
         </View>
       ) : null)}

@@ -55,7 +55,7 @@ export function ExerciseSheet({ visible, initial, isNew, units, restDefault, onS
         <Text style={{ color: colors.text, fontFamily: fonts.uiBold }}>{t('exo_cancel')}</Text>
       </Pressable>
       <Pressable accessibilityRole="button" accessibilityState={{ disabled: !valid }} onPress={submit} style={[styles.btn, { backgroundColor: colors.gold, borderRadius: radius.md, opacity: valid ? 1 : 0.5 }]}>
-        <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('exo_save')}</Text>
+        <Text style={{ color: colors.onGold, fontFamily: fonts.uiBold }}>{t('exo_save')}</Text>
       </Pressable>
     </View>
   );

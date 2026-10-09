@@ -34,7 +34,7 @@ export function ProgramsView({ programs, activeId, onActivate, onEdit, onDuplica
         />
       ))}
       <Pressable accessibilityRole="button" onPress={onCreate} style={[styles.btn, { backgroundColor: colors.gold, borderRadius: radius.md }]}>
-        <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('plan_create_new')}</Text>
+        <Text style={{ color: colors.onGold, fontFamily: fonts.uiBold }}>{t('plan_create_new')}</Text>
       </Pressable>
       <Pressable accessibilityRole="button" onPress={onImport} style={[styles.btn, { borderColor: colors.gold, borderWidth: 1, borderRadius: radius.md }]}>
         <Text style={{ color: colors.gold, fontFamily: fonts.uiBold }}>{t('plan_import')}</Text>

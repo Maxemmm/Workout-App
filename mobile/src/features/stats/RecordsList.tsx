@@ -23,7 +23,7 @@ export function RecordsList({ records, units }: { records: PersonalRecord[]; uni
             </Text>
           </View>
           {r.isNew ? (
-            <Text style={[styles.badge, { color: '#0a0a0a', backgroundColor: colors.gold, borderRadius: radius.sm, fontFamily: fonts.uiBold }]}>
+            <Text style={[styles.badge, { color: colors.onGold, backgroundColor: colors.gold, borderRadius: radius.sm, fontFamily: fonts.uiBold }]}>
               {t('stats_new_badge').toUpperCase()}
             </Text>
           ) : null}

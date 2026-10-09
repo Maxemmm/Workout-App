@@ -34,3 +34,26 @@ describe('AttendanceCalendar', () => {
     expect(screen.getByText('Lun')).toBeTruthy();
   });
 });
+
+describe('graphiques — thème clair', () => {
+  it('trait de la courbe et cases « repos » visibles sur le fond clair', async () => {
+    const { StyleSheet } = require('react-native') as typeof import('react-native');
+    const { palettes } = require('@/theme/tokens') as typeof import('@/theme/tokens');
+    const { contrastRatio } = require('@/theme/resolve') as typeof import('@/theme/resolve');
+    const light = palettes.light;
+    await renderWithProviders(<LineChart points={[{ value: 1, label: '1' }, { value: 2, label: '2' }]} recordIndex={1} />, { theme: 'light' });
+    // react-native-svg transmet la couleur traitée ({ payload: 0xAARRGGBB }) au composant natif
+    const toHex = (fill: unknown) => (typeof fill === 'string' ? fill : `#${((fill as { payload: number }).payload & 0xffffff).toString(16).padStart(6, '0')}`);
+    const point = screen.getAllByTestId('chart-point')[0];
+    expect(contrastRatio(toHex(point.props.fill), light.bgCard)).toBeGreaterThanOrEqual(3);
+
+    await renderWithProviders(<AttendanceCalendar weeks={[[
+      { date: '2026-10-05', state: 'rest' as const }, { date: '2026-10-06', state: 'rest' as const },
+      { date: '2026-10-07', state: 'rest' as const }, { date: '2026-10-08', state: 'rest' as const },
+      { date: '2026-10-09', state: 'rest' as const }, { date: '2026-10-10', state: 'rest' as const },
+      { date: '2026-10-11', state: 'rest' as const },
+    ]]} />, { theme: 'light' });
+    const rest = StyleSheet.flatten(screen.getByTestId('cal-2026-10-05').props.style).backgroundColor as string;
+    expect(contrastRatio(rest, light.bg)).toBeGreaterThanOrEqual(1.8);
+  });
+});

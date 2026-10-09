@@ -37,3 +37,25 @@ describe('RestBar', () => {
     expect(useTimerStore.getState().timer).toBeNull();
   });
 });
+
+describe('RestBar — lisibilité', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-10-05T10:00:00.000Z'));
+    useTimerStore.setState(TIMER_INITIAL);
+  });
+  afterEach(() => jest.useRealTimers());
+
+  it('moins de 10 s (fond rouge) : texte lisible sur le rouge, en thème clair', async () => {
+    const { StyleSheet } = require('react-native') as typeof import('react-native');
+    const { palettes } = require('@/theme/tokens') as typeof import('@/theme/tokens');
+    const { contrastRatio } = require('@/theme/resolve') as typeof import('@/theme/resolve');
+    const ctx = createTestCtx();
+    await renderWithProviders(<RestBar exerciseName={() => 'Presse'} onPressBar={jest.fn()} />, { ctx, theme: 'light' });
+    await act(async () => {
+      useTimerStore.getState().start(ctx, startTimer({ mode: 'rest', nowMs: Date.now(), durationSec: 5, workoutId: 'w', exerciseId: 'x', setIndex: 0 }));
+    });
+    const color = StyleSheet.flatten(screen.getByText('0:05').props.style).color as string;
+    expect(contrastRatio(color, palettes.light.redTimer)).toBeGreaterThanOrEqual(4.5);
+  });
+});

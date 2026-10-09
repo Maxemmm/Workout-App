@@ -19,7 +19,7 @@ export function TodayFooter({ canFinish, showReset, onFinish, onReset }: Props) 
     <View style={styles.root}>
       {canFinish ? (
         <Pressable accessibilityRole="button" onPress={onFinish} style={[styles.primary, { backgroundColor: colors.gold, borderRadius: radius.md }]}>
-          <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('today_finish_session')}</Text>
+          <Text style={{ color: colors.onGold, fontFamily: fonts.uiBold }}>{t('today_finish_session')}</Text>
         </Pressable>
       ) : null}
       {showReset ? (
