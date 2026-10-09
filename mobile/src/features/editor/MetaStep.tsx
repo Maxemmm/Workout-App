@@ -1,5 +1,6 @@
 // Étape 1 — programme : nom, unité, repos par défaut, règles
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { TextField } from '@/features/common/TextField';
 import { useRepoCtx } from '@/db/DbContext';
 import { setMeta, setRules } from '@/domain/draft';
 import type { Units } from '@/domain/program';
@@ -28,7 +29,7 @@ export function MetaStep({ nav }: { nav: EditorNav }) {
           <Text style={[styles.title, { color: colors.text, fontFamily: fonts.display }]}>{t('editor_step1_title').toUpperCase()}</Text>
           <Text style={{ color: colors.textDim, fontFamily: fonts.ui }}>{t('editor_step1_sub')}</Text>
           <Text style={label}>{t('editor_prog_name_label').toUpperCase()}</Text>
-          <TextInput
+          <TextField
             testID="meta-label"
             value={program.meta.label}
             maxLength={100}

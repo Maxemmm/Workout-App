@@ -3,7 +3,8 @@
 // Sauvegarde : remplacement total en une transaction, après confirmation.
 // ============================================================
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { TextField } from '@/features/common/TextField';
 import { useRepoCtx } from '@/db/DbContext';
 import { importProgram, replaceAll } from '@/db/repos/importRepo';
 import type { RepoCtx } from '@/db/types';
@@ -92,7 +93,7 @@ export function ImportScreen({ onDone, onCancel }: { onDone(kind: 'program' | 'b
       </Pressable>
       {pickError ? <Text style={{ color: colors.redDanger, fontFamily: fonts.ui }}>{t(pickError)}</Text> : null}
       <Text style={{ color: colors.textDim, fontFamily: fonts.uiBold, fontSize: 11, letterSpacing: 1.5 }}>{t('import_paste_label').toUpperCase()}</Text>
-      <TextInput
+      <TextField
         testID="import-text"
         value={text}
         onChangeText={setText}

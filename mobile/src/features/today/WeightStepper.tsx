@@ -1,6 +1,7 @@
 // Sélecteur de poids [−][valeur][+] — saisie libre enregistrée à chaque frappe
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { TextField } from '@/features/common/TextField';
 import type { Units } from '@/domain/program';
 import { formatWeight, parseWeightInput, weightStep } from '@/domain/scheme';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -42,7 +43,7 @@ export function WeightStepper({ value, units, testID, textColor, onChange }: Pro
       <Pressable accessibilityRole="button" accessibilityLabel={`− ${step} ${units}`} onPress={() => bump(-step)} style={btn}>
         <Text style={btnText}>−</Text>
       </Pressable>
-      <TextInput
+      <TextField
         testID={testID}
         value={shown}
         placeholder="—"

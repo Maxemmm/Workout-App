@@ -1,6 +1,7 @@
 // Conseils des séances cardio / repos : titre + texte, ≤ 20
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { TextField } from '@/features/common/TextField';
 import { useI18n } from '@/i18n/I18nProvider';
 import { useTheme } from '@/theme/ThemeProvider';
 import { TOUCH_MIN } from '@/theme/tokens';
@@ -18,12 +19,12 @@ export function TipsEditor({ tips, onChange }: { tips: Tip[]; onChange(tips: Tip
       {tips.map((tip, i) => (
         <View key={i} style={[styles.card, { borderColor: colors.border, borderRadius: radius.md }]}>
           <View style={styles.row}>
-            <TextInput testID={`tip-title-${i}`} value={tip.title} maxLength={100} placeholder={t('editor_tip_title_ph')} placeholderTextColor={colors.textDim} onChangeText={(title) => patch(i, { title })} style={[field, styles.flex]} />
+            <TextField testID={`tip-title-${i}`} value={tip.title} maxLength={100} placeholder={t('editor_tip_title_ph')} placeholderTextColor={colors.textDim} onChangeText={(title) => patch(i, { title })} style={[field, styles.flex]} />
             <Pressable accessibilityRole="button" accessibilityLabel={`${t('editor_remove_item')} ${i + 1}`} onPress={() => onChange(tips.filter((_, j) => j !== i))} style={styles.icon}>
               <Ionicons name="close" size={18} color={colors.textDim} />
             </Pressable>
           </View>
-          <TextInput testID={`tip-body-${i}`} value={tip.body} maxLength={300} multiline placeholder={t('editor_tip_body_ph')} placeholderTextColor={colors.textDim} onChangeText={(body) => patch(i, { body })} style={field} />
+          <TextField testID={`tip-body-${i}`} value={tip.body} maxLength={300} multiline placeholder={t('editor_tip_body_ph')} placeholderTextColor={colors.textDim} onChangeText={(body) => patch(i, { body })} style={field} />
         </View>
       ))}
       {tips.length < MAX_TIPS ? (

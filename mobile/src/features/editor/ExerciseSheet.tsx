@@ -1,6 +1,7 @@
 // Fenêtre de détail d'un exercice : séries, chronométré, reps/secondes, charge, repos, consigne, alternatives
 import { useState } from 'react';
-import { Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { TextField } from '@/features/common/TextField';
 import type { ExerciseInput } from '@/domain/draft';
 import { alternativeName, type Exercise, type Units } from '@/domain/program';
 import { BottomSheet } from '@/features/common/BottomSheet';
@@ -63,7 +64,7 @@ export function ExerciseSheet({ visible, initial, isNew, units, restDefault, onS
   return (
     <BottomSheet visible={visible} title={isNew ? t('editor_new_exo') : t('editor_edit_exo')} onClose={onClose} footer={actions}>
       <Text style={label}>{t('exo_name_label').toUpperCase()}</Text>
-      <TextInput testID="exo-name" value={form.name} maxLength={100} placeholder={t('exo_name_ph')} placeholderTextColor={colors.textDim} onChangeText={(name) => set({ name })} style={field} />
+      <TextField testID="exo-name" value={form.name} maxLength={100} placeholder={t('exo_name_ph')} placeholderTextColor={colors.textDim} onChangeText={(name) => set({ name })} style={field} />
       <View style={styles.row}>
         <View style={styles.col}>
           <Text style={label}>{t('exo_sets_label').toUpperCase()}</Text>
@@ -75,13 +76,13 @@ export function ExerciseSheet({ visible, initial, isNew, units, restDefault, onS
         </View>
       </View>
       <Text style={label}>{t('exo_scheme_label').toUpperCase()}</Text>
-      <TextInput testID="exo-scheme" value={form.scheme} maxLength={50} placeholder={form.timed ? t('exo_scheme_ph_timed') : t('exo_scheme_ph')} placeholderTextColor={colors.textDim} onChangeText={(scheme) => set({ scheme })} style={field} />
+      <TextField testID="exo-scheme" value={form.scheme} maxLength={50} placeholder={form.timed ? t('exo_scheme_ph_timed') : t('exo_scheme_ph')} placeholderTextColor={colors.textDim} onChangeText={(scheme) => set({ scheme })} style={field} />
       <Text style={label}>{t('exo_load_label_fmt', units).toUpperCase()}</Text>
-      <TextInput testID="exo-load" value={form.load ?? ''} maxLength={100} placeholderTextColor={colors.textDim} onChangeText={(load) => set({ load })} style={field} />
+      <TextField testID="exo-load" value={form.load ?? ''} maxLength={100} placeholderTextColor={colors.textDim} onChangeText={(load) => set({ load })} style={field} />
       <Text style={label}>{t('exo_rest_label').toUpperCase()}</Text>
       <NumberStepper value={form.restSec ?? restDefault} min={0} max={600} step={15} label={t('exo_rest_label')} onChange={(restSec) => set({ restSec })} />
       <Text style={label}>{t('exo_cue_label').toUpperCase()}</Text>
-      <TextInput testID="exo-cue" value={form.cue ?? ''} maxLength={300} placeholder={t('exo_cue_ph')} placeholderTextColor={colors.textDim} onChangeText={(cue) => set({ cue })} style={field} />
+      <TextField testID="exo-cue" value={form.cue ?? ''} maxLength={300} placeholder={t('exo_cue_ph')} placeholderTextColor={colors.textDim} onChangeText={(cue) => set({ cue })} style={field} />
       <Text style={label}>{t('exo_alt_label').toUpperCase()}</Text>
       <AlternativeEditor value={form.alternatives} onChange={(alternatives) => set({ alternatives })} />
     </BottomSheet>

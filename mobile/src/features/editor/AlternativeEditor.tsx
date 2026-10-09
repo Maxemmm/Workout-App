@@ -1,7 +1,8 @@
 // Alternatives d'un exercice : nom seul, ou détail repliable (séries, schéma, charge, repos)
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { TextField } from '@/features/common/TextField';
 import { alternativeName, type Alternative } from '@/domain/program';
 import { useI18n } from '@/i18n/I18nProvider';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -40,7 +41,7 @@ export function AlternativeEditor({ value, onChange }: { value: Alternative[]; o
         return (
           <View key={i} style={styles.item}>
             <View style={styles.row}>
-              <TextInput
+              <TextField
                 testID={`alt-name-${i}`}
                 value={alternativeName(alt)}
                 maxLength={100}
@@ -58,7 +59,7 @@ export function AlternativeEditor({ value, onChange }: { value: Alternative[]; o
             </View>
             {open === i ? (
               <View style={styles.details}>
-                <TextInput
+                <TextField
                   testID={`alt-sets-${i}`}
                   keyboardType="number-pad"
                   value={obj.sets != null ? String(obj.sets) : ''}
@@ -70,9 +71,9 @@ export function AlternativeEditor({ value, onChange }: { value: Alternative[]; o
                   }}
                   style={field}
                 />
-                <TextInput testID={`alt-scheme-${i}`} maxLength={50} value={obj.scheme ?? ''} placeholder={t('exo_scheme_label')} placeholderTextColor={colors.textDim} onChangeText={(v) => patch(i, { scheme: v })} style={field} />
-                <TextInput testID={`alt-load-${i}`} maxLength={100} value={obj.load ?? ''} placeholder={t('exo_load_label_fmt', '')} placeholderTextColor={colors.textDim} onChangeText={(v) => patch(i, { load: v || null })} style={field} />
-                <TextInput
+                <TextField testID={`alt-scheme-${i}`} maxLength={50} value={obj.scheme ?? ''} placeholder={t('exo_scheme_label')} placeholderTextColor={colors.textDim} onChangeText={(v) => patch(i, { scheme: v })} style={field} />
+                <TextField testID={`alt-load-${i}`} maxLength={100} value={obj.load ?? ''} placeholder={t('exo_load_label_fmt', '')} placeholderTextColor={colors.textDim} onChangeText={(v) => patch(i, { load: v || null })} style={field} />
+                <TextField
                   testID={`alt-rest-${i}`}
                   keyboardType="number-pad"
                   value={obj.restSec != null ? String(obj.restSec) : ''}

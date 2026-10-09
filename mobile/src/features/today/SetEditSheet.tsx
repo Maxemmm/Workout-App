@@ -1,6 +1,7 @@
 // Saisie poids / reps d'une série (appui long sur un cercle)
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { TextField } from '@/features/common/TextField';
 import type { Units } from '@/domain/program';
 import { formatWeight, parseWeightInput } from '@/domain/scheme';
 import { useI18n } from '@/i18n/I18nProvider';
@@ -51,11 +52,11 @@ export function SetEditSheet({ visible, setIndex, units, initialWeight, initialR
       <View style={styles.row}>
         <View style={styles.col}>
           <Text style={label}>{`${t('today_weight').toUpperCase()} (${units})`}</Text>
-          <TextInput testID="set-edit-weight" value={weight} onChangeText={setWeight} keyboardType="decimal-pad" placeholder="—" placeholderTextColor={colors.textDim} style={field} />
+          <TextField testID="set-edit-weight" value={weight} onChangeText={setWeight} keyboardType="decimal-pad" placeholder="—" placeholderTextColor={colors.textDim} style={field} />
         </View>
         <View style={styles.col}>
           <Text style={label}>{t('today_reps').toUpperCase()}</Text>
-          <TextInput testID="set-edit-reps" value={reps} onChangeText={setReps} keyboardType="number-pad" placeholder="—" placeholderTextColor={colors.textDim} style={field} />
+          <TextField testID="set-edit-reps" value={reps} onChangeText={setReps} keyboardType="number-pad" placeholder="—" placeholderTextColor={colors.textDim} style={field} />
         </View>
       </View>
     </BottomSheet>

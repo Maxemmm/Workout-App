@@ -1,6 +1,7 @@
 // Liste de textes éditable (échauffement, règles) — plafond d'éléments et de longueur
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { TextField } from '@/features/common/TextField';
 import { useI18n } from '@/i18n/I18nProvider';
 import { useTheme } from '@/theme/ThemeProvider';
 import { TOUCH_MIN } from '@/theme/tokens';
@@ -23,7 +24,7 @@ export function ListEditor({ items, onChange, placeholder, addLabel, maxItems, m
     <View style={styles.root}>
       {items.map((item, i) => (
         <View key={i} style={styles.row}>
-          <TextInput
+          <TextField
             testID={`${testID}-${i}`}
             value={item}
             maxLength={maxLength}

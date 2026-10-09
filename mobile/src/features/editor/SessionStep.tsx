@@ -3,7 +3,8 @@
 // exercices (lift/mixte) ou conseils (cardio/repos).
 // ============================================================
 import { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { TextField } from '@/features/common/TextField';
 import { useRepoCtx } from '@/db/DbContext';
 import {
   addExercise, deleteExercise, duplicateExercise, moveExercise, sectionExercises, setBonusTitle,
@@ -89,11 +90,11 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
         <View style={styles.root}>
           <Text style={[styles.title, { color: colors.text, fontFamily: fonts.display }]}>{t('editor_edit_session').toUpperCase()}</Text>
           <Text style={label}>{t('editor_sess_name_label').toUpperCase()}</Text>
-          <TextInput testID="sess-name" value={session.name} maxLength={100} placeholder={t('editor_sess_name_ph')} placeholderTextColor={colors.textDim} onChangeText={(name) => update({ name })} style={field} />
+          <TextField testID="sess-name" value={session.name} maxLength={100} placeholder={t('editor_sess_name_ph')} placeholderTextColor={colors.textDim} onChangeText={(name) => update({ name })} style={field} />
           <Text style={label}>{t('editor_sess_subtitle_label').toUpperCase()}</Text>
-          <TextInput testID="sess-subtitle" value={session.subtitle ?? ''} maxLength={150} placeholder={t('editor_sess_subtitle_ph')} placeholderTextColor={colors.textDim} onChangeText={(v) => update({ subtitle: v || null })} style={field} />
+          <TextField testID="sess-subtitle" value={session.subtitle ?? ''} maxLength={150} placeholder={t('editor_sess_subtitle_ph')} placeholderTextColor={colors.textDim} onChangeText={(v) => update({ subtitle: v || null })} style={field} />
           <Text style={label}>{t('editor_sess_note_label').toUpperCase()}</Text>
-          <TextInput testID="sess-note" value={session.note ?? ''} maxLength={500} multiline placeholderTextColor={colors.textDim} onChangeText={(v) => update({ note: v || null })} style={field} />
+          <TextField testID="sess-note" value={session.note ?? ''} maxLength={500} multiline placeholderTextColor={colors.textDim} onChangeText={(v) => update({ note: v || null })} style={field} />
           <Text style={label}>{t('editor_sess_type_label').toUpperCase()}</Text>
           <Segmented<SessionType>
             options={TYPES.map((type) => ({ value: type, label: t(`session_type_${type}` as StringKey) }))}
@@ -111,7 +112,7 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
               {exerciseList('main', onDragStateChange)}
               {addButton('main', t('editor_add_exercise'))}
               <Text style={label}>{t('editor_cardio_section').toUpperCase()}</Text>
-              <TextInput
+              <TextField
                 testID="cardio-label"
                 value={session.cardio?.label ?? ''}
                 maxLength={100}
@@ -120,7 +121,7 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
                 onChangeText={(v) => update({ cardio: v ? { ...(session.cardio ?? {}), label: v, detail: session.cardio?.detail ?? null } : null })}
                 style={field}
               />
-              <TextInput
+              <TextField
                 testID="cardio-detail"
                 value={session.cardio?.detail ?? ''}
                 maxLength={200}
@@ -130,7 +131,7 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
                 style={field}
               />
               <Text style={label}>{t('editor_bonus_section').toUpperCase()}</Text>
-              <TextInput
+              <TextField
                 testID="bonus-title"
                 value={session.bonus?.title ?? ''}
                 maxLength={100}
