@@ -43,6 +43,11 @@ export function useEditorActions(nav: EditorNav) {
   };
 
   const cancel = async () => {
+    // Rien de modifié : rien à perdre, sortie directe
+    if (!useDraftStore.getState().dirty) {
+      useDraftStore.getState().discard(ctx);
+      return;
+    }
     const ok = await confirm({ title: t('editor_cancel_title'), message: t('editor_cancel_body'), confirmLabel: t('editor_discard'), cancelLabel: t('editor_keep'), destructive: true });
     if (!ok) return;
     useDraftStore.getState().discard(ctx);

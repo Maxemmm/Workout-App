@@ -48,6 +48,16 @@ describe('prepareEditor', () => {
     expect(useDraftStore.getState().draft?.program.meta.units).toBe('lbs');
   });
 
+  it('autre cible et brouillon non modifié : remplacé sans confirmation', async () => {
+    const ctx = createTestCtx();
+    const p = createProgram(ctx, example, 'example');
+    await prepareEditor(ctx, { kind: 'new' }, jest.fn());
+    const ask = jest.fn();
+    expect(await prepareEditor(ctx, { kind: 'edit', programId: p.id }, ask)).toBe(true);
+    expect(ask).not.toHaveBeenCalled();
+    expect(useDraftStore.getState().draft?.sourceProgramId).toBe(p.id);
+  });
+
   it('programme introuvable → false', async () => {
     expect(await prepareEditor(createTestCtx(), { kind: 'edit', programId: 'nope' }, jest.fn())).toBe(false);
   });

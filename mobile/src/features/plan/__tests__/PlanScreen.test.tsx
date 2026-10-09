@@ -61,7 +61,10 @@ describe('PlanScreen', () => {
 
   it("bannière de brouillon : reprendre ouvre l'étape 1, abandonner l'efface", async () => {
     const { ctx, onOpenEditor } = await setup();
-    await act(async () => { useDraftStore.getState().start(ctx, setMeta(newDraft(), { label: 'BROUILLON' })); });
+    await act(async () => { useDraftStore.getState().start(ctx, newDraft()); });
+    // Éditeur ouvert sans modification : pas de bannière en arrière-plan
+    expect(screen.queryByText(/Brouillon en cours/)).toBeNull();
+    await act(async () => { useDraftStore.getState().apply(ctx, (d) => setMeta(d, { label: 'BROUILLON' })); });
     expect(screen.getByText('Brouillon en cours : BROUILLON')).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Reprendre' }));
     expect(onOpenEditor).toHaveBeenCalledWith(1);
@@ -71,7 +74,7 @@ describe('PlanScreen', () => {
 
   it('abandonner le brouillon demande confirmation ; refus → brouillon conservé', async () => {
     const { ctx } = await setup();
-    await act(async () => { useDraftStore.getState().start(ctx, setMeta(newDraft(), { label: 'BROUILLON' })); });
+    await act(async () => { useDraftStore.getState().start(ctx, newDraft()); useDraftStore.getState().apply(ctx, (d) => setMeta(d, { label: 'BROUILLON' })); });
     jest.mocked(confirm).mockResolvedValueOnce(false);
     await fireEvent.press(screen.getByRole('button', { name: 'Abandonner' }));
     expect(confirm).toHaveBeenCalled();

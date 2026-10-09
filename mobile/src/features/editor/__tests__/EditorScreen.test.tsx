@@ -31,4 +31,31 @@ describe('EditorScreen', () => {
     await fireEvent.press(screen.getByText('end'));
     expect(screen.getByTestId('screen-scroll').props.scrollEnabled).toBe(true);
   });
+
+  it('Annuler sans aucune modification : sortie directe, sans confirmation', async () => {
+    const { confirm } = require('@/platform/confirm') as typeof import('@/platform/confirm');
+    jest.mocked(confirm).mockClear();
+    const ctx = createTestCtx();
+    await act(async () => { useDraftStore.getState().start(ctx, newDraft()); });
+    await renderWithProviders(<EditorScreen nav={nav}><Text>x</Text></EditorScreen>, { ctx });
+    await fireEvent.press(screen.getByRole('button', { name: 'Annuler' }));
+    expect(confirm).not.toHaveBeenCalled();
+    expect(useDraftStore.getState().draft).toBeNull();
+  });
+
+  it('Annuler après une modification : confirmation demandée', async () => {
+    const { confirm } = require('@/platform/confirm') as typeof import('@/platform/confirm');
+    const { setMeta } = require('@/domain/draft') as typeof import('@/domain/draft');
+    jest.mocked(confirm).mockClear();
+    const ctx = createTestCtx();
+    await act(async () => {
+      useDraftStore.getState().start(ctx, newDraft());
+      useDraftStore.getState().apply(ctx, (d) => setMeta(d, { label: 'P' }));
+    });
+    await renderWithProviders(<EditorScreen nav={nav}><Text>x</Text></EditorScreen>, { ctx });
+    jest.mocked(confirm).mockResolvedValueOnce(false);
+    await fireEvent.press(screen.getByRole('button', { name: 'Annuler' }));
+    expect(confirm).toHaveBeenCalled();
+    expect(useDraftStore.getState().draft).not.toBeNull();
+  });
 });

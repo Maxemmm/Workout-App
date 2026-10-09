@@ -51,6 +51,8 @@ export function PlanScreen({ onOpenEditor, onOpenImport, tabRequest }: Props) {
   const { t } = useI18n();
   const { programs, active } = useDbQuery(readPlan);
   const draft = useDraftStore((s) => s.draft);
+  // Bannière seulement si le brouillon a été modifié (pas pendant une simple ouverture de l'éditeur)
+  const dirty = useDraftStore((s) => s.dirty);
   const lost = useDraftStore((s) => s.lost);
   const [tab, setTab] = useState<PlanTab>(tabRequest?.tab ?? 'week');
   const requestTab = tabRequest?.tab;
@@ -90,7 +92,7 @@ export function PlanScreen({ onOpenEditor, onOpenImport, tabRequest }: Props) {
   return (
     <Screen>
       <Text style={[styles.title, { color: colors.text, fontFamily: fonts.display }]}>{t('plan_title')}</Text>
-      {draft ? (
+      {draft && dirty ? (
         <DraftBanner
           label={draft.program.meta.label}
           onResume={() => onOpenEditor(1)}

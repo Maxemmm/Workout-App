@@ -39,3 +39,35 @@ describe('draftStore', () => {
     expect(useDraftStore.getState().lost).toBe(false);
   });
 });
+
+describe('draftStore — brouillon modifié ou non', () => {
+  beforeEach(() => useDraftStore.setState(DRAFT_INITIAL));
+
+  it('ouvrir l\'éditeur ne crée pas de brouillon visible : non modifié, non enregistré (et remplace un ancien)', () => {
+    const ctx = createTestCtx();
+    setSetting(ctx, 'programDraft', setMeta(newDraft(), { label: 'ANCIEN' }));
+    useDraftStore.getState().start(ctx, newDraft());
+    expect(useDraftStore.getState().dirty).toBe(false);
+    expect(getSetting(ctx, 'programDraft')).toBeUndefined();
+  });
+
+  it('une vraie modification le rend « modifié » et l\'enregistre ; une opération sans effet non', () => {
+    const ctx = createTestCtx();
+    useDraftStore.getState().start(ctx, newDraft());
+    useDraftStore.getState().apply(ctx, (d) => setMeta(d, { units: 'kg' })); // déjà kg
+    expect(useDraftStore.getState().dirty).toBe(false);
+    expect(getSetting(ctx, 'programDraft')).toBeUndefined();
+    useDraftStore.getState().apply(ctx, (d) => setMeta(d, { label: 'P' }));
+    expect(useDraftStore.getState().dirty).toBe(true);
+    expect(getSetting(ctx, 'programDraft')?.program.meta.label).toBe('P');
+  });
+
+  it('un brouillon relu au démarrage est « modifié » (il n\'est enregistré qu\'après une modification)', () => {
+    const ctx = createTestCtx();
+    setSetting(ctx, 'programDraft', setMeta(newDraft(), { label: 'X' }));
+    useDraftStore.getState().hydrate(ctx);
+    expect(useDraftStore.getState().dirty).toBe(true);
+    useDraftStore.getState().discard(ctx);
+    expect(useDraftStore.getState().dirty).toBe(false);
+  });
+});

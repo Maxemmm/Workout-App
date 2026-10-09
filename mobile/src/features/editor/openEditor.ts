@@ -17,7 +17,8 @@ export async function prepareEditor(ctx: RepoCtx, target: EditorTarget, confirmR
   if (current && sameTarget(current, target)) return true;
   const program = target.kind === 'edit' ? getProgram(ctx, target.programId) : null;
   if (target.kind === 'edit' && !program) return false;
-  if (current && !(await confirmReplace())) return false;
+  // Confirmation seulement si le brouillon en cours contient des modifications
+  if (current && store.dirty && !(await confirmReplace())) return false;
   const units = getSetting(ctx, 'defaultUnits') === 'lbs' ? 'lbs' : 'kg';
   store.start(ctx, program ? draftFromProgram(program.id, program.definition) : newDraft(units));
   return true;
