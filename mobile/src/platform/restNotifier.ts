@@ -25,6 +25,8 @@ function toAction(r: Notifications.NotificationResponse | null): NoticeAction | 
     action,
     kind,
     target: { workoutId: data.workoutId, exerciseId: data.exerciseId, setIndex: data.setIndex },
+    // iOS fournit la date de livraison en secondes
+    deliveredAt: r.notification.date * 1000,
   };
 }
 
@@ -46,6 +48,8 @@ export const restNotifier = {
   },
   async cancel(): Promise<void> {
     await Notifications.cancelScheduledNotificationAsync(REST_NOTICE_ID);
+    // Notification déjà affichée retirée : un vieux « Repos terminé » ne reste pas actionnable
+    await Notifications.dismissNotificationAsync(REST_NOTICE_ID);
   },
   /** Libellés des boutons dans la langue de l'app */
   async configure(labels: { plus15: string; validate: string }): Promise<void> {

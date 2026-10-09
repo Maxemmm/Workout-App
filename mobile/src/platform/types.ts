@@ -40,5 +40,5 @@ export type NotifierPermission = 'granted' | 'denied' | 'undetermined' | 'unavai
 export type NoticeTarget = { workoutId: string; exerciseId: string; setIndex: number };
 export type NoticeKind = 'rest' | 'work';
 /** Réponse à une notification : bouton touché (ou notification ouverte) ; id unique pour ne l'appliquer qu'une fois */
-export type NoticeAction = { id: string; action: 'plus15' | 'validate' | 'open'; kind: NoticeKind; target: NoticeTarget };
+export type NoticeAction = { id: string; action: 'plus15' | 'validate' | 'open'; kind: NoticeKind; target: NoticeTarget; /** Livraison de la notification (ms) */ deliveredAt: number };
 export type ScheduledNotice = { endAt: number; title: string; body: string; kind: NoticeKind; target: NoticeTarget };

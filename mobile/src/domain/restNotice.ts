@@ -16,6 +16,8 @@ export interface NoticeInput {
   setIndex: number;
   /** Exercices affichés (ordre, alternatives), bonus exclu */
   exercises: EffectiveExercise[];
+  /** Exercices bonus : le minuteur peut porter sur l'un d'eux (jamais proposés comme « suivant ») */
+  bonus?: EffectiveExercise[];
   track: SetTrack;
   weightOf(ex: EffectiveExercise): number | null;
 }
@@ -32,7 +34,7 @@ const line = (type: 'same' | 'next', ex: EffectiveExercise, setIndex: number, we
 export function restNotice(input: NoticeInput): NoticeContent {
   const { exercises, track, weightOf } = input;
   const index = exercises.findIndex((e) => e.id === input.exerciseId);
-  const current = index >= 0 ? exercises[index] : undefined;
+  const current = index >= 0 ? exercises[index] : input.bonus?.find((e) => e.id === input.exerciseId);
 
   if (input.mode === 'work' && current) {
     return { kind: 'work', line: line('same', current, input.setIndex, weightOf) };

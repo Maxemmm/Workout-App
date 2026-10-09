@@ -9,6 +9,7 @@ jest.mock('expo-notifications', () => ({
   requestPermissionsAsync: jest.fn(() => Promise.resolve({ status: 'granted' })),
   scheduleNotificationAsync: jest.fn(() => Promise.resolve('rest-end')),
   cancelScheduledNotificationAsync: jest.fn(() => Promise.resolve()),
+  dismissNotificationAsync: jest.fn(() => Promise.resolve()),
   addNotificationResponseReceivedListener: jest.fn((cb: (r: unknown) => void) => { listeners.push(cb); return { remove: jest.fn() }; }),
   getLastNotificationResponseAsync: jest.fn(() => Promise.resolve(null)),
   SchedulableTriggerInputTypes: { DATE: 'date' },
@@ -47,6 +48,8 @@ describe('restNotifier (natif)', () => {
   it('annule par l\'identifiant fixe', async () => {
     await restNotifier.cancel();
     expect(Notifications.cancelScheduledNotificationAsync).toHaveBeenCalledWith(REST_NOTICE_ID);
+    // La notification déjà affichée est retirée : plus actionnable après coup
+    expect(Notifications.dismissNotificationAsync).toHaveBeenCalledWith(REST_NOTICE_ID);
   });
 
   it('état de l\'autorisation', async () => {
@@ -66,8 +69,8 @@ describe('restNotifier (natif)', () => {
     listeners.forEach((l) => l(response('plus15')));
     listeners.forEach((l) => l(response('expo.modules.notifications.actions.DEFAULT', 'work')));
     expect(got).toEqual([
-      { id: 'rest-end:1234:plus15', action: 'plus15', kind: 'rest', target },
-      { id: 'rest-end:1234:expo.modules.notifications.actions.DEFAULT', action: 'open', kind: 'work', target },
+      { id: 'rest-end:1234:plus15', action: 'plus15', kind: 'rest', target, deliveredAt: 1_234_000 },
+      { id: 'rest-end:1234:expo.modules.notifications.actions.DEFAULT', action: 'open', kind: 'work', target, deliveredAt: 1_234_000 },
     ]);
     off();
   });

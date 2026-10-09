@@ -22,7 +22,7 @@ describe('applyAction', () => {
 
   it('+15 s après la fin du repos : nouveau repos de 15 s sur la même série', () => {
     const { ctx, target } = setup();
-    expect(applyAction(ctx, { id: 'a', action: 'plus15', kind: 'rest', target }, NOW)).toBe(true);
+    expect(applyAction(ctx, { id: 'a', action: 'plus15', kind: 'rest', target, deliveredAt: NOW }, NOW)).toBe(true);
     expect(useTimerStore.getState().timer).toMatchObject({ mode: 'rest', endAt: NOW + 15_000, ...target });
   });
 
@@ -32,7 +32,7 @@ describe('applyAction', () => {
       mode: 'work', nowMs: NOW - 45_000, durationSec: 45, ...target,
       pending: { weight: null, reps: null, performedName: null, restSec: 60 },
     }));
-    expect(applyAction(ctx, { id: 'b', action: 'validate', kind: 'work', target }, NOW)).toBe(true);
+    expect(applyAction(ctx, { id: 'b', action: 'validate', kind: 'work', target, deliveredAt: NOW }, NOW)).toBe(true);
     expect(listEntries(ctx, w.id).find((e) => e.setIndex === 1)?.done).toBe(true);
     expect(useTimerStore.getState().timer).toMatchObject({ mode: 'rest' });
   });
@@ -40,20 +40,26 @@ describe('applyAction', () => {
   it('action périmée (le minuteur a changé) : ignorée', () => {
     const { ctx, target } = setup();
     useTimerStore.getState().start(ctx, startTimer({ mode: 'rest', nowMs: NOW, durationSec: 90, ...target, setIndex: 2 }));
-    expect(applyAction(ctx, { id: 'c', action: 'plus15', kind: 'rest', target }, NOW)).toBe(false);
-    expect(applyAction(ctx, { id: 'd', action: 'validate', kind: 'work', target }, NOW)).toBe(false);
+    expect(applyAction(ctx, { id: 'c', action: 'plus15', kind: 'rest', target, deliveredAt: NOW }, NOW)).toBe(false);
+    expect(applyAction(ctx, { id: 'd', action: 'validate', kind: 'work', target, deliveredAt: NOW }, NOW)).toBe(false);
   });
 
   it('Review Focus 1 : même réponse reçue deux fois → appliquée une seule fois', () => {
     const { ctx, target } = setup();
-    expect(applyAction(ctx, { id: 'same', action: 'plus15', kind: 'rest', target }, NOW)).toBe(true);
+    expect(applyAction(ctx, { id: 'same', action: 'plus15', kind: 'rest', target, deliveredAt: NOW }, NOW)).toBe(true);
     useTimerStore.getState().clear(ctx);
-    expect(applyAction(ctx, { id: 'same', action: 'plus15', kind: 'rest', target }, NOW + 1000)).toBe(false);
+    expect(applyAction(ctx, { id: 'same', action: 'plus15', kind: 'rest', target, deliveredAt: NOW }, NOW + 1000)).toBe(false);
     expect(useTimerStore.getState().timer).toBeNull();
   });
 
   it('notification simplement ouverte : rien à appliquer', () => {
     const { ctx, target } = setup();
-    expect(applyAction(ctx, { id: 'e', action: 'open', kind: 'rest', target }, NOW)).toBe(false);
+    expect(applyAction(ctx, { id: 'e', action: 'open', kind: 'rest', target, deliveredAt: NOW }, NOW)).toBe(false);
+  });
+
+  it('action ancienne (notification touchée longtemps après, ou traitée à la réouverture) : ignorée', () => {
+    const { ctx, target } = setup();
+    expect(applyAction(ctx, { id: 'old', action: 'plus15', kind: 'rest', target, deliveredAt: NOW - 20 * 60_000 }, NOW)).toBe(false);
+    expect(useTimerStore.getState().timer).toBeNull();
   });
 });

@@ -50,3 +50,21 @@ describe('restNotice', () => {
     expect(restNotice({ ...base, mode: 'rest', exerciseId: 'nope', setIndex: 0, track: {} }).line.type).toBe('next');
   });
 });
+
+describe('restNotice — exercices bonus', () => {
+  const bonusProgram = parseOrThrow(makeProgramInput({ '1': 's' }, {
+    s: makeSession('S', [makeExercise('presse', 2, { name: 'Presse' })], { bonus: { title: 'BONUS', exercises: [makeExercise('curl', 3, { name: 'Curl' })] } }),
+  }));
+  const main = bonusProgram.sessions.s.exercises.map((e) => effectiveExercise(e, null));
+  const bonus = bonusProgram.sessions.s.bonus!.exercises.map((e) => effectiveExercise(e, null));
+
+  it('repos après une série bonus : série suivante du même exercice bonus', () => {
+    const n = restNotice({ exercises: main, bonus, weightOf: () => null, mode: 'rest', exerciseId: 'curl', setIndex: 0, track: { presse: [false, false], curl: [true, false, false] } });
+    expect(n.line).toEqual({ type: 'same', name: 'Curl', set: 2, total: 3, weight: null });
+  });
+
+  it('série chronométrée bonus : la série en cours (pas « Suivant »)', () => {
+    const n = restNotice({ exercises: main, bonus, weightOf: () => null, mode: 'work', exerciseId: 'curl', setIndex: 1, track: { curl: [true, false, false] } });
+    expect(n).toEqual({ kind: 'work', line: { type: 'same', name: 'Curl', set: 2, total: 3, weight: null } });
+  });
+});

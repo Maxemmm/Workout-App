@@ -94,6 +94,18 @@ describe('RestNotificationDriver — planification', () => {
     expect(restNotifier.cancel).toHaveBeenCalled();
   });
 
+  it('course : repos passé pendant la lecture de l\'autorisation → aucune notification planifiée', async () => {
+    const { ctx, rest } = await setup();
+    let release: (p: 'granted') => void = () => {};
+    jest.mocked(restNotifier.permission).mockImplementationOnce(() => new Promise((r) => { release = r; }));
+    await act(async () => { useTimerStore.getState().start(ctx, rest()); });
+    await act(async () => { useTimerStore.getState().clear(ctx); });
+    await flush();
+    await act(async () => { release('granted'); });
+    await flush();
+    expect(restNotifier.schedule).not.toHaveBeenCalled();
+  });
+
   it('libellés des boutons configurés dans la langue de l\'app', async () => {
     await setup();
     await flush();
@@ -112,7 +124,7 @@ describe('RestNotificationDriver — actions', () => {
     expect(restNotifier.onAction).toHaveBeenCalled();
     expect(restNotifier.lastAction).toHaveBeenCalled();
     const cb = jest.mocked(restNotifier.onAction).mock.calls[0][0];
-    await act(async () => { cb({ id: 'x', action: 'plus15', kind: 'rest', target: { workoutId: w.id, exerciseId: 'presse', setIndex: 0 } }); });
+    await act(async () => { cb({ id: 'x', action: 'plus15', kind: 'rest', target: { workoutId: w.id, exerciseId: 'presse', setIndex: 0 }, deliveredAt: Date.now() }); });
     expect(useTimerStore.getState().timer).toMatchObject({ mode: 'rest', exerciseId: 'presse' });
   });
 });

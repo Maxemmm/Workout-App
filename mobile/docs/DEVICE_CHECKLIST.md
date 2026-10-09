@@ -112,7 +112,7 @@
 - [ ] Dernière série d'un exercice : « Suivant : … » ; tout fait : « Toutes les séries sont faites… ».
 - [ ] App ouverte à la fin du repos : pas de bannière (son et vibration de l'app seulement).
 - [ ] « +15 s » / « −15 s » / « Passer » dans la barre de repos : la notification suit (une seule, à la bonne heure, ou annulée).
-- [ ] Bouton « +15 s » sur la notification (sans ouvrir l'app) : nouveau repos de 15 s, nouvelle notification.
+- [ ] Bouton « +15 s » sur la notification juste après son arrivée : nouveau repos de 15 s. À vérifier : la nouvelle notification part-elle sans ouvrir l'app (iOS peut suspendre l'app aussitôt) ? Une action touchée plus de 60 s après l'arrivée est ignorée.
 - [ ] Série chronométrée (gainage) : notification « Série terminée » ; bouton « Valider la série » → série cochée, repos lancé.
 - [ ] App fermée (balayée) pendant le repos : la notification arrive quand même ; une action dessus est appliquée à la réouverture.
 - [ ] Profil › Minuteur : désactiver → plus de notification ; refuser dans Réglages iOS → « Refusées » + « Ouvrir les Réglages ».

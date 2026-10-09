@@ -8,6 +8,8 @@ import { usePrefs } from '@/state/prefsStore';
 import { useTimerStore } from '@/state/timerStore';
 
 const EXTRA_REST_SEC = 15;
+/** Au-delà, l'action est périmée (notification touchée longtemps après, ou traitée à la réouverture) */
+export const ACTION_MAX_AGE_MS = 60_000;
 const applied = new Set<string>();
 
 export function resetAppliedActions(): void {
@@ -15,7 +17,7 @@ export function resetAppliedActions(): void {
 }
 
 export function applyAction(ctx: RepoCtx, a: NoticeAction, nowMs: number): boolean {
-  if (a.action === 'open' || applied.has(a.id)) return false;
+  if (a.action === 'open' || applied.has(a.id) || nowMs - a.deliveredAt > ACTION_MAX_AGE_MS) return false;
   const timer = useTimerStore.getState().timer;
   const same = timer !== null && timer.workoutId === a.target.workoutId && timer.exerciseId === a.target.exerciseId && timer.setIndex === a.target.setIndex;
 
