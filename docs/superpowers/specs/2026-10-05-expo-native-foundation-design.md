@@ -310,6 +310,11 @@ Chaque jalon est livrable et testable sur téléphone (build de développement E
 | **M7 Live Activity** | Module Expo + widget Swift + config plugin | Build EAS iOS |
 | **M8 Santé** | `HealthSync` iOS/Android, réglage Profil | Capacité HealthKit sur l'App ID Apple |
 | **M9 Bascule web** | Export web Expo déployé à la place de la PWA ; PWA déplacée dans `legacy/` ; `CLAUDE.md` mis à jour pour la nouvelle architecture | Choix de l'hébergeur web (Vercel, où vivent déjà les fonctions `api/`) |
+| **M10 Bibliothèque d'exercices** | Base d'exercices embarquée hors ligne, dérivée de [exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset) (MIT pour les données et les textes) : nom, muscle principal et muscles secondaires, matériel, instructions (dont le français). Recherche et filtres (muscle, matériel), exercices personnalisés, choix d'un exercice depuis la bibliothèque dans l'éditeur. **Sans les images ni les GIF** (propriété de Gym visual, licence payante). | Aucun (données embarquées) |
+| **M11 Carte des muscles et création guidée** | Carte du corps interactive (face/dos) en SVG (`react-native-svg`), tracés repris de [MuscleMap](https://github.com/melihcolpan/MuscleMap) (MIT, attribution). Onboarding de création de séance : l'utilisateur touche les muscles à travailler → exercices proposés depuis la bibliothèque (M10) → séance générée, modifiable dans l'éditeur. Carte de chaleur des muscles travaillés dans Stats. | M10 |
+
+
+**Ordre d'exécution décidé (2026-10-09)** : M6 → M10 → M11 → M7 et M8 (dès qu'un compte Apple Developer est disponible) → M9 → **M5 Coach IA en dernier**. Inspiration fonctionnelle : [GymMane](https://github.com/InlitX/GymMane) (GPL-3.0 : idées seulement, aucun code repris).
 
 ---
 
