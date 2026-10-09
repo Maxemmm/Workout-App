@@ -4,8 +4,9 @@
 import { BarlowCondensed_800ExtraBold } from '@expo-google-fonts/barlow-condensed';
 import { DMSans_400Regular, DMSans_500Medium, DMSans_700Bold } from '@expo-google-fonts/dm-sans';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, ThemeProvider as NavigationThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import * as SystemUI from 'expo-system-ui';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -16,6 +17,7 @@ import { I18nProvider } from '@/i18n/I18nProvider';
 import { useDraftStore } from '@/state/draftStore';
 import { usePrefs } from '@/state/prefsStore';
 import { useTimerStore } from '@/state/timerStore';
+import { navigationTheme } from '@/theme/navigationTheme';
 import { ThemeProvider, useTheme } from '@/theme/ThemeProvider';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -63,8 +65,13 @@ function PrefsGate() {
 
 function ThemedStack() {
   const { colors, scheme } = useTheme();
+  // Fond de la fenêtre native (visible pendant l'ouverture / la fermeture des modales)
+  useEffect(() => {
+    SystemUI.setBackgroundColorAsync(colors.bg).catch(() => {});
+  }, [colors.bg]);
   return (
-    <>
+    // Fond des conteneurs de navigation (transitions, glissement retour) = fond de l'app
+    <NavigationThemeProvider value={navigationTheme(colors, scheme)}>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
         <Stack.Screen name="(tabs)" />
@@ -73,6 +80,6 @@ function ThemedStack() {
         <Stack.Screen name="onboarding" />
       </Stack>
       <Toast />
-    </>
+    </NavigationThemeProvider>
   );
 }
