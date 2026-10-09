@@ -79,7 +79,7 @@ export function ImportScreen({ onDone, onCancel }: { onDone(kind: 'program' | 'b
   const primary = [styles.btn, { backgroundColor: colors.gold, borderRadius: radius.md }];
   const ignored = analysis.kind === 'backup' ? ignoredLine(analysis.bundle) : null;
   return (
-    <Screen>
+    <Screen safeBottom>
       <View style={styles.header}>
         <Pressable accessibilityRole="button" onPress={onCancel} style={styles.back}>
           <Text style={{ color: colors.textDim, fontFamily: fonts.uiBold }}>{t('editor_cancel')}</Text>

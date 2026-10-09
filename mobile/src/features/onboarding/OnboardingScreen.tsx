@@ -40,7 +40,7 @@ export function OnboardingScreen({ onCreate, onImport, onStarted }: Props) {
   };
 
   return (
-    <Screen>
+    <Screen safeBottom>
       <View style={styles.root}>
         <Text style={[styles.title, { color: colors.gold, fontFamily: fonts.display }]}>{APP_NAME.toUpperCase()}</Text>
         <Text style={{ color: colors.text, fontFamily: fonts.uiMedium, fontSize: 18 }}>{t('onboarding_tagline')}</Text>

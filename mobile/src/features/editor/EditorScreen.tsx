@@ -27,7 +27,7 @@ export function EditorScreen({ nav, step, children }: { nav: EditorNav; step?: E
   if (!draft) return null;
   const sessionName = (key: string) => draft.program.sessions[key]?.name || t('editor_no_name');
   return (
-    <Screen scrollEnabled={!dragging}>
+    <Screen safeBottom scrollEnabled={!dragging}>
       <EditorHeader step={step} onCancel={() => void cancel()} onSave={save} />
       {typeof children === 'function' ? children({ save, onDragStateChange: setDragging }) : children}
       <SaveErrorsSheet errors={errors} sessionName={sessionName} onSelect={goToError} onClose={dismissErrors} />
