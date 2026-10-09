@@ -82,3 +82,17 @@
 - [ ] Planning Lun/Mer/Ven : un jour prévu manqué apparaît avec un contour rouille ; aujourd'hui n'est pas compté manqué.
 - [ ] Web : la courbe et le calendrier s'affichent, largeur adaptée à la fenêtre.
 - [ ] Thème clair : couleurs lisibles (courbe, calendrier, badges).
+
+## Passe UI / UX (Expo Go, thèmes sombre et clair)
+- [ ] Today : appui long sur un cercle → feuille « Série N » ; le clavier s'ouvre sans que le titre passe sous la barre d'état ; « Enregistrer » reste visible au-dessus du clavier.
+- [ ] Éditeur › séance › « Ajouter un exercice » : la feuille ne dépasse jamais en haut, même clavier ouvert ; Annuler / Enregistrer toujours visibles en bas de la feuille.
+- [ ] Un champ en bas de page (poids d'un exercice, règles de l'étape 1, zone « coller » de l'import) reste visible au-dessus du clavier ; glisser vers le bas ferme le clavier.
+- [ ] Barre de repos : la toucher fait défiler jusqu'à la bonne carte (titre visible, pas trop haut).
+- [ ] Toasts en haut de l'écran, sous la barre d'état ; ils ne recouvrent ni la barre de repos ni les onglets.
+- [ ] Éditeur : Suivant (1 → 2 → 3) anime vers l'avant ; toucher un point d'étape antérieure revient en arrière avec l'animation retour ; geste retour iOS possible après « Suivant ».
+- [ ] Éditeur › écran d'une séance : en-tête « ‹ Séances » (retour à la liste, le programme n'est pas abandonné).
+- [ ] Supprimer un exercice demande confirmation ; « Abandonner » le brouillon (Plan) aussi.
+- [ ] Import terminé : la modale se ferme vers le bas puis l'onglet visé s'affiche (pas de glissement latéral).
+- [ ] Onglets du bas : fondu court ; Plan « Cette semaine » / « Mes programmes » : fondu, sans saut.
+- [ ] Bas des écrans éditeur / import / onboarding : le dernier bouton ne touche pas la barre d'accueil.
+- [ ] Thème clair : boutons dorés (texte blanc), carte complète verte (textes blancs lisibles), barre de repos rouge < 10 s lisible, courbe et cases du calendrier visibles.
