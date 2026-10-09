@@ -393,5 +393,17 @@
   "stats_legend_missed": "Manqué",
   "stats_legend_rest": "Repos",
   "editor_back_sessions": "Séances",
+  "notif_rest_title": "Repos terminé",
+  "notif_work_title": "Série terminée",
+  "notif_same": "%s · série %s/%s",
+  "notif_next": "Suivant : %s · série %s/%s",
+  "notif_done": "Toutes les séries sont faites, termine ta séance",
+  "notif_action_plus15": "+15 s",
+  "notif_action_validate": "Valider la série",
+  "alerts_sheet_title": "Être prévenu à la fin du repos",
+  "alerts_sheet_body": "Une notification à la fin de chaque repos, même téléphone verrouillé, avec la série à faire.",
+  "alerts_enable": "Activer",
+  "alerts_later": "Plus tard",
+  "profile_open_settings": "Ouvrir les Réglages",
   "coming_soon": "Bientôt disponible"
 }

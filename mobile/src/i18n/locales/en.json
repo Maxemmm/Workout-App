@@ -393,5 +393,17 @@
   "stats_legend_missed": "Missed",
   "stats_legend_rest": "Rest",
   "editor_back_sessions": "Sessions",
+  "notif_rest_title": "Rest over",
+  "notif_work_title": "Set done",
+  "notif_same": "%s · set %s/%s",
+  "notif_next": "Next: %s · set %s/%s",
+  "notif_done": "All sets done, finish your session",
+  "notif_action_plus15": "+15 s",
+  "notif_action_validate": "Log the set",
+  "alerts_sheet_title": "Get notified when rest ends",
+  "alerts_sheet_body": "A notification at the end of each rest, even with the phone locked, showing the next set.",
+  "alerts_enable": "Enable",
+  "alerts_later": "Not now",
+  "profile_open_settings": "Open Settings",
   "coming_soon": "Coming soon"
 }

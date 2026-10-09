@@ -26,6 +26,8 @@ export interface SettingsMap {
   lastExportAt: string;
   /** Période des stats */
   statsPeriod: StatsPeriod;
+  /** Alertes de fin de repos : true activées, false refusées / désactivées ; absent = jamais demandé */
+  restAlerts: boolean;
 }
 export type SettingKey = keyof SettingsMap;
 
