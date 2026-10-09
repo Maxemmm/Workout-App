@@ -4,7 +4,7 @@
 // ============================================================
 import { useEffect, useState } from 'react';
 import { StyleSheet, Text } from 'react-native';
-import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { useRepoCtx } from '@/db/DbContext';
 import { duplicateProgram, getActiveProgram, listPrograms, setActiveProgram, softDeleteProgram } from '@/db/repos/programsRepo';
 import type { RepoCtx } from '@/db/types';
@@ -70,6 +70,10 @@ export function PlanScreen({ onOpenEditor, onOpenImport, tabRequest }: Props) {
       confirm({ title: t('editor_replace_draft_title'), confirmLabel: t('editor_discard'), cancelLabel: t('editor_keep'), destructive: true }));
     if (ok) onOpenEditor(step);
   };
+  const discardDraft = async () => {
+    const ok = await confirm({ title: t('editor_cancel_title'), message: t('editor_cancel_body'), confirmLabel: t('editor_discard'), cancelLabel: t('editor_keep'), destructive: true });
+    if (ok) useDraftStore.getState().discard(ctx);
+  };
   const activate = (id: string) => {
     if (attempt(() => setActiveProgram(ctx, id), t('error_not_saved'))) useToastStore.getState().show(t('plan_activated'));
   };
@@ -90,11 +94,11 @@ export function PlanScreen({ onOpenEditor, onOpenImport, tabRequest }: Props) {
         <DraftBanner
           label={draft.program.meta.label}
           onResume={() => onOpenEditor(1)}
-          onDiscard={() => useDraftStore.getState().discard(ctx)}
+          onDiscard={() => void discardDraft()}
         />
       ) : null}
       <PlanTabs value={tab} onChange={setTab} />
-      <Animated.View key={tab} entering={(tab === 'programs' ? SlideInRight : SlideInLeft).duration(220)}>
+      <Animated.View key={tab} entering={FadeIn.duration(150)}>
         {tab === 'week' ? (
           <WeekView
             program={active?.definition ?? null}

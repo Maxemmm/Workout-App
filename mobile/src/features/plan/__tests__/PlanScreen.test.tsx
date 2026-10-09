@@ -69,6 +69,15 @@ describe('PlanScreen', () => {
     expect(useDraftStore.getState().draft).toBeNull();
   });
 
+  it('abandonner le brouillon demande confirmation ; refus → brouillon conservé', async () => {
+    const { ctx } = await setup();
+    await act(async () => { useDraftStore.getState().start(ctx, setMeta(newDraft(), { label: 'BROUILLON' })); });
+    jest.mocked(confirm).mockResolvedValueOnce(false);
+    await fireEvent.press(screen.getByRole('button', { name: 'Abandonner' }));
+    expect(confirm).toHaveBeenCalled();
+    expect(useDraftStore.getState().draft?.program.meta.label).toBe('BROUILLON');
+  });
+
   it('brouillon illisible signalé une fois', async () => {
     await act(async () => { useDraftStore.setState({ draft: null, lost: true }); });
     await setup();
