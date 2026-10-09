@@ -61,3 +61,12 @@ describe('ExerciseSheet', () => {
     expect(saved.alternatives).toEqual([{ name: 'DC haltères', load: '24 kg' }]);
   });
 });
+
+describe('ExerciseSheet — actions toujours visibles', () => {
+  it('Annuler / Enregistrer dans le pied fixe de la feuille (pas sous le clavier en fin de défilement)', async () => {
+    const { within } = require('@testing-library/react-native') as typeof import('@testing-library/react-native');
+    await renderWithProviders(<ExerciseSheet visible isNew initial={blankExercise()} units="kg" restDefault={90} onSave={jest.fn()} onClose={jest.fn()} />);
+    const footer = screen.getByTestId('bottom-sheet-footer');
+    expect(within(footer).getByRole('button', { name: "ENREGISTRER L'EXERCICE" })).toBeTruthy();
+  });
+});

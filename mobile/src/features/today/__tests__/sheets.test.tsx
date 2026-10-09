@@ -39,3 +39,11 @@ describe('SwapSheet', () => {
     expect(onSelect).toHaveBeenLastCalledWith(null);
   });
 });
+
+describe('SetEditSheet — actions toujours visibles', () => {
+  it('Enregistrer dans le pied fixe de la feuille', async () => {
+    const { within } = require('@testing-library/react-native') as typeof import('@testing-library/react-native');
+    await renderWithProviders(<SetEditSheet visible setIndex={0} units="kg" initialWeight={100} initialReps={8} onSave={jest.fn()} onClose={jest.fn()} />);
+    expect(within(screen.getByTestId('bottom-sheet-footer')).getAllByRole('button')).toHaveLength(2);
+  });
+});

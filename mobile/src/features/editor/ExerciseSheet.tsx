@@ -49,8 +49,19 @@ export function ExerciseSheet({ visible, initial, isNew, units, restDefault, onS
     } as ExerciseInput);
   };
 
+  const actions = (
+    <View style={styles.row}>
+      <Pressable accessibilityRole="button" onPress={onClose} style={[styles.btn, { backgroundColor: colors.bgCardSoft, borderRadius: radius.md }]}>
+        <Text style={{ color: colors.text, fontFamily: fonts.uiBold }}>{t('exo_cancel')}</Text>
+      </Pressable>
+      <Pressable accessibilityRole="button" accessibilityState={{ disabled: !valid }} onPress={submit} style={[styles.btn, { backgroundColor: colors.gold, borderRadius: radius.md, opacity: valid ? 1 : 0.5 }]}>
+        <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('exo_save')}</Text>
+      </Pressable>
+    </View>
+  );
+
   return (
-    <BottomSheet visible={visible} title={isNew ? t('editor_new_exo') : t('editor_edit_exo')} onClose={onClose}>
+    <BottomSheet visible={visible} title={isNew ? t('editor_new_exo') : t('editor_edit_exo')} onClose={onClose} footer={actions}>
       <Text style={label}>{t('exo_name_label').toUpperCase()}</Text>
       <TextInput testID="exo-name" value={form.name} maxLength={100} placeholder={t('exo_name_ph')} placeholderTextColor={colors.textDim} onChangeText={(name) => set({ name })} style={field} />
       <View style={styles.row}>
@@ -73,14 +84,6 @@ export function ExerciseSheet({ visible, initial, isNew, units, restDefault, onS
       <TextInput testID="exo-cue" value={form.cue ?? ''} maxLength={300} placeholder={t('exo_cue_ph')} placeholderTextColor={colors.textDim} onChangeText={(cue) => set({ cue })} style={field} />
       <Text style={label}>{t('exo_alt_label').toUpperCase()}</Text>
       <AlternativeEditor value={form.alternatives} onChange={(alternatives) => set({ alternatives })} />
-      <View style={styles.row}>
-        <Pressable accessibilityRole="button" onPress={onClose} style={[styles.btn, { backgroundColor: colors.bgCardSoft, borderRadius: radius.md }]}>
-          <Text style={{ color: colors.text, fontFamily: fonts.uiBold }}>{t('exo_cancel')}</Text>
-        </Pressable>
-        <Pressable accessibilityRole="button" accessibilityState={{ disabled: !valid }} onPress={submit} style={[styles.btn, { backgroundColor: colors.gold, borderRadius: radius.md, opacity: valid ? 1 : 0.5 }]}>
-          <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('exo_save')}</Text>
-        </Pressable>
-      </View>
     </BottomSheet>
   );
 }

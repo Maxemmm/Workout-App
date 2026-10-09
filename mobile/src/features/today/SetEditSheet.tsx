@@ -31,8 +31,23 @@ export function SetEditSheet({ visible, setIndex, units, initialWeight, initialR
   const field = [styles.input, { color: colors.text, fontFamily: fonts.uiBold, borderColor: colors.border, borderRadius: radius.sm }];
   const label = { color: colors.textDim, fontFamily: fonts.uiBold, fontSize: 11, letterSpacing: 1.5 };
 
+  const actions = (
+    <View style={styles.row}>
+      <Pressable accessibilityRole="button" onPress={onClose} style={[styles.btn, { backgroundColor: colors.bgCardSoft, borderRadius: radius.md }]}>
+        <Text style={{ color: colors.text, fontFamily: fonts.uiBold }}>{t('today_cancel')}</Text>
+      </Pressable>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => onSave({ weight: parseWeightInput(weight), reps: parseReps(reps) })}
+        style={[styles.btn, { backgroundColor: colors.gold, borderRadius: radius.md }]}
+      >
+        <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('today_save')}</Text>
+      </Pressable>
+    </View>
+  );
+
   return (
-    <BottomSheet visible={visible} title={t('today_set_title', setIndex + 1)} onClose={onClose}>
+    <BottomSheet visible={visible} title={t('today_set_title', setIndex + 1)} onClose={onClose} footer={actions}>
       <View style={styles.row}>
         <View style={styles.col}>
           <Text style={label}>{`${t('today_weight').toUpperCase()} (${units})`}</Text>
@@ -42,18 +57,6 @@ export function SetEditSheet({ visible, setIndex, units, initialWeight, initialR
           <Text style={label}>{t('today_reps').toUpperCase()}</Text>
           <TextInput testID="set-edit-reps" value={reps} onChangeText={setReps} keyboardType="number-pad" placeholder="—" placeholderTextColor={colors.textDim} style={field} />
         </View>
-      </View>
-      <View style={styles.row}>
-        <Pressable accessibilityRole="button" onPress={onClose} style={[styles.btn, { backgroundColor: colors.bgCardSoft, borderRadius: radius.md }]}>
-          <Text style={{ color: colors.text, fontFamily: fonts.uiBold }}>{t('today_cancel')}</Text>
-        </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => onSave({ weight: parseWeightInput(weight), reps: parseReps(reps) })}
-          style={[styles.btn, { backgroundColor: colors.gold, borderRadius: radius.md }]}
-        >
-          <Text style={{ color: '#0a0a0a', fontFamily: fonts.uiBold }}>{t('today_save')}</Text>
-        </Pressable>
       </View>
     </BottomSheet>
   );
