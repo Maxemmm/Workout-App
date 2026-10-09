@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useRepoCtx } from '@/db/DbContext';
 import { DbProvider } from '@/db/DbProvider';
+import { HideSplashWhenReady } from '@/features/common/SplashGate';
 import { Toast } from '@/features/common/Toast';
 import { I18nProvider } from '@/i18n/I18nProvider';
 import { useDraftStore } from '@/state/draftStore';
@@ -26,10 +27,8 @@ export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({ BarlowCondensed_800ExtraBold, DMSans_400Regular, DMSans_500Medium, DMSans_700Bold });
   const ready = fontsLoaded || fontError != null;
 
-  useEffect(() => {
-    if (ready) SplashScreen.hideAsync().catch(() => {});
-  }, [ready]);
-
+  // L'écran de lancement reste affiché pendant polices, migrations et préférences ;
+  // il est masqué par HideSplashWhenReady une fois l'interface thémée montée (pas de flash blanc)
   if (!ready) return null;
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -80,6 +79,7 @@ function ThemedStack() {
         <Stack.Screen name="onboarding" />
       </Stack>
       <Toast />
+      <HideSplashWhenReady />
     </NavigationThemeProvider>
   );
 }

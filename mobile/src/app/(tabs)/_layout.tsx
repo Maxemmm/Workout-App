@@ -22,6 +22,8 @@ export default function TabsLayout() {
         headerShown: false,
         // Fondu court entre onglets : changement fluide sans glissement latéral
         animation: 'fade',
+        // Fond des scènes pendant le fondu = fond de l'app
+        sceneStyle: { backgroundColor: colors.bg },
         tabBarActiveTintColor: colors.gold,
         tabBarInactiveTintColor: colors.textDim,
         tabBarStyle: { backgroundColor: colors.bgCard, borderTopColor: colors.border },

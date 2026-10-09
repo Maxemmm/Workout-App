@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import { dumpRawTables } from '@/db/client';
+import { HideSplashWhenReady } from './SplashGate';
 
 export function MigrationErrorScreen({ error }: { error: Error }) {
   const [exportError, setExportError] = useState<string | null>(null);
@@ -16,6 +17,7 @@ export function MigrationErrorScreen({ error }: { error: Error }) {
   };
   return (
     <View style={styles.root}>
+      <HideSplashWhenReady />
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>Mise à jour des données impossible</Text>
         <Text style={styles.body}>
