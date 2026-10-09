@@ -19,18 +19,16 @@ interface Props {
   bottomInset?: number;
   /** Écran sans barre d'onglets (éditeur, import, onboarding) : marge de la barre d'accueil */
   safeBottom?: boolean;
-  /** false : écran déjà placé sous la barre d'état (modale « feuille » iOS) */
-  safeTop?: boolean;
 }
 
-export function Screen({ children, scrollRef, scrollEnabled = true, overlay, bottomInset = 0, safeBottom = false, safeTop = true }: Props) {
+export function Screen({ children, scrollRef, scrollEnabled = true, overlay, bottomInset = 0, safeBottom = false }: Props) {
   const { colors, spacing } = useTheme();
   const insets = useSafeAreaInsets();
   const homeIndicator = safeBottom ? Math.max(insets.bottom, spacing.md) : 0;
   return (
     <View
       testID="screen-root"
-      style={[styles.root, { backgroundColor: colors.bg, paddingTop: safeTop ? insets.top : 0, paddingLeft: insets.left, paddingRight: insets.right }]}
+      style={[styles.root, { backgroundColor: colors.bg, paddingTop: insets.top, paddingLeft: insets.left, paddingRight: insets.right }]}
     >
       <ScrollView
         testID="screen-scroll"

@@ -29,8 +29,4 @@ describe('Screen — zone de l\'encoche', () => {
     expect(StyleSheet.flatten(screen.getByTestId('screen-root').props.style).paddingTop).toBe(59);
   });
 
-  it('modale « feuille » iOS (déjà sous la barre d\'état) : pas de marge haute', async () => {
-    await renderWithProviders(<Screen safeTop={false}><Text>x</Text></Screen>, { insets: IPHONE });
-    expect(StyleSheet.flatten(screen.getByTestId('screen-root').props.style).paddingTop).toBe(0);
-  });
 });

@@ -70,10 +70,10 @@ describe('ImportScreen', () => {
   });
 });
 
-describe('ImportScreen — modale « feuille » iOS', () => {
-  it('pas de marge d\'encoche en haut (la feuille commence déjà sous la barre d\'état)', async () => {
+describe("ImportScreen — plein écran comme le reste de l'app", () => {
+  it("marge d'encoche en haut, comme l'éditeur (plus de feuille iOS à coins arrondis)", async () => {
     const { StyleSheet } = require('react-native') as typeof import('react-native');
     await renderWithProviders(<ImportScreen onDone={jest.fn()} onCancel={jest.fn()} />, { ctx: createTestCtx(), insets: { top: 59, left: 0, right: 0, bottom: 34 } });
-    expect(StyleSheet.flatten(screen.getByTestId('screen-root').props.style).paddingTop).toBe(0);
+    expect(StyleSheet.flatten(screen.getByTestId('screen-root').props.style).paddingTop).toBe(59);
   });
 });

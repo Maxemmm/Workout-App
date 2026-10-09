@@ -75,7 +75,8 @@ function ThemedStack() {
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="editor" options={{ presentation: 'fullScreenModal', gestureEnabled: false }} />
-        <Stack.Screen name="import" options={{ presentation: 'modal' }} />
+        {/* Plein écran comme l'éditeur : pas de « feuille » iOS à coins arrondis */}
+        <Stack.Screen name="import" options={{ presentation: 'fullScreenModal' }} />
         <Stack.Screen name="onboarding" />
       </Stack>
       <Toast />
