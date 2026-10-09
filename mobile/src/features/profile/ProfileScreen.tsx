@@ -16,6 +16,7 @@ import { ActiveProgramCard } from './ActiveProgramCard';
 import { DangerSection } from './DangerSection';
 import { DataSection } from './DataSection';
 import { SettingsSection } from './SettingsSection';
+import { TimerSection } from './TimerSection';
 
 const readActive = (ctx: RepoCtx) => getActiveProgram(ctx)?.definition ?? null;
 
@@ -42,6 +43,7 @@ export function ProfileScreen({ onManagePrograms, onOpenEditor, onImport }: Prop
       <Text style={[styles.title, { color: colors.text, fontFamily: fonts.display }]}>{t('profile_title')}</Text>
       <ActiveProgramCard program={active} onManage={onManagePrograms} onCreate={() => void create()} onImport={onImport} />
       <SettingsSection />
+      <TimerSection />
       <DataSection onImport={onImport} />
       <DangerSection />
       <Text style={[styles.section, { color: colors.text, fontFamily: fonts.uiBold }]}>{t('profile_about').toUpperCase()}</Text>
