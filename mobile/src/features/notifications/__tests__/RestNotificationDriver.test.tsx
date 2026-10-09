@@ -100,3 +100,19 @@ describe('RestNotificationDriver — planification', () => {
     expect(restNotifier.configure).toHaveBeenCalledWith({ plus15: '+15 s', validate: 'Valider la série' });
   });
 });
+
+describe('RestNotificationDriver — actions', () => {
+  beforeEach(async () => {
+    jest.clearAllMocks();
+    await act(async () => { usePrefs.setState(PREFS_INITIAL); useTimerStore.setState(TIMER_INITIAL); });
+  });
+
+  it('écoute les réponses et lit la dernière réponse au lancement', async () => {
+    const { w } = await setup();
+    expect(restNotifier.onAction).toHaveBeenCalled();
+    expect(restNotifier.lastAction).toHaveBeenCalled();
+    const cb = jest.mocked(restNotifier.onAction).mock.calls[0][0];
+    await act(async () => { cb({ id: 'x', action: 'plus15', kind: 'rest', target: { workoutId: w.id, exerciseId: 'presse', setIndex: 0 } }); });
+    expect(useTimerStore.getState().timer).toMatchObject({ mode: 'rest', exerciseId: 'presse' });
+  });
+});

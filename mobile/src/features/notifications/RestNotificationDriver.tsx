@@ -16,6 +16,7 @@ import type { StringKey } from '@/i18n/translate';
 import { restNotifier } from '@/platform/restNotifier';
 import type { ScheduledNotice } from '@/platform/types';
 import { useTimerStore } from '@/state/timerStore';
+import { applyAction } from './applyAction';
 import { formatNotice } from './formatNotice';
 import { alertsEnabled } from './permissionFlow';
 
@@ -63,6 +64,13 @@ export function RestNotificationDriver() {
   useEffect(() => {
     void sync(ctx, timer, enabled, t);
   }, [ctx, timer, enabled, t]);
+
+  // Actions des notifications : en temps réel, et celle reçue pendant que l'app était fermée
+  useEffect(() => {
+    const off = restNotifier.onAction((a) => { applyAction(ctx, a, Date.now()); });
+    restNotifier.lastAction().then((a) => { if (a) applyAction(ctx, a, Date.now()); }).catch(() => {});
+    return off;
+  }, [ctx]);
 
   return null;
 }
