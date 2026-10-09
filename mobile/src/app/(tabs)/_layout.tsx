@@ -20,6 +20,8 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
+        // Fondu court entre onglets : changement fluide sans glissement latéral
+        animation: 'fade',
         tabBarActiveTintColor: colors.gold,
         tabBarInactiveTintColor: colors.textDim,
         tabBarStyle: { backgroundColor: colors.bgCard, borderTopColor: colors.border },
