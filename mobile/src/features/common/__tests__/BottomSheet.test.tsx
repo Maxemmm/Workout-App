@@ -37,3 +37,14 @@ describe('BottomSheet', () => {
     expect(within(screen.getByTestId('bottom-sheet-footer')).getByText('Enregistrer')).toBeTruthy();
   });
 });
+
+describe('BottomSheet — transition', () => {
+  it('le voile apparaît en fondu (il ne glisse pas avec la feuille)', async () => {
+    await renderWithProviders(
+      <BottomSheet visible title="Titre" onClose={jest.fn()}>
+        <Text>contenu</Text>
+      </BottomSheet>,
+    );
+    expect(screen.getByTestId('bottom-sheet-modal').props.animationType).toBe('fade');
+  });
+});

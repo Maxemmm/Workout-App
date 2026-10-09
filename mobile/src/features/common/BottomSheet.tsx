@@ -2,9 +2,11 @@
 // Hauteur bornée et contenu défilant : les formulaires longs restent utilisables clavier ouvert.
 // - zone haute réservée (barre d'état / encoche) : la feuille ne passe jamais dessous ;
 // - la feuille rétrécit quand le clavier réduit la place (son contenu défile) au lieu de déborder ;
-// - pied optionnel hors du défilement : les actions (Annuler / Enregistrer) restent visibles.
+// - pied optionnel hors du défilement : les actions (Annuler / Enregistrer) restent visibles ;
+// - transition : le voile apparaît en fondu, seule la feuille glisse depuis le bas.
 import type { ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View, Modal } from 'react-native';
+import Animated, { SlideInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -24,14 +26,15 @@ export function BottomSheet({ visible, title, onClose, children, footer }: Props
   const insets = useSafeAreaInsets();
   const bottomPad = spacing.md + insets.bottom;
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
+    <Modal testID="bottom-sheet-modal" visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
       <KeyboardAvoidingView
         testID="bottom-sheet-frame"
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={[styles.flex, styles.backdrop, { paddingTop: insets.top + TOP_GAP }]}
       >
         <Pressable accessibilityRole="button" accessibilityLabel={title} onPress={onClose} style={styles.flex} />
-        <View
+        <Animated.View
+          entering={SlideInDown.duration(240)}
           testID="bottom-sheet"
           style={[styles.sheet, { backgroundColor: colors.bgElevated, borderTopLeftRadius: radius.lg, borderTopRightRadius: radius.lg, paddingTop: spacing.md }]}
         >
@@ -50,7 +53,7 @@ export function BottomSheet({ visible, title, onClose, children, footer }: Props
               {footer}
             </View>
           ) : null}
-        </View>
+        </Animated.View>
       </KeyboardAvoidingView>
     </Modal>
   );

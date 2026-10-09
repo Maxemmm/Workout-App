@@ -96,3 +96,12 @@
 - [ ] Onglets du bas : fondu court ; Plan « Cette semaine » / « Mes programmes » : fondu, sans saut.
 - [ ] Bas des écrans éditeur / import / onboarding : le dernier bouton ne touche pas la barre d'accueil.
 - [ ] Thème clair : boutons dorés (texte blanc), carte complète verte (textes blancs lisibles), barre de repos rouge < 10 s lisible, courbe et cases du calendrier visibles.
+
+## Fonds et transitions (Expo Go, thèmes sombre et clair)
+- [ ] Démarrage : l'écran de lancement reste jusqu'à l'app complète (aucun flash blanc).
+- [ ] Éditeur : étape 2 → 3 et glisser-retour 3 → 2 : fond de l'app derrière les écrans (jamais blanc), même en tirant loin.
+- [ ] Ouverture / fermeture de l'éditeur (plein écran) et de l'import (modale) : fond de l'app, pas de blanc.
+- [ ] Onglets du bas : fondu sans fond blanc entre deux onglets.
+- [ ] Feuilles du bas (série, exercice, jour, échange) : le voile sombre apparaît en fondu, la feuille glisse seule depuis le bas.
+- [ ] Thème sombre : le clavier iOS est sombre (poids, nom de programme, import) ; curseur doré.
+- [ ] Web : fond de page aux couleurs du thème (y compris en tirant la page au-delà du bord).
