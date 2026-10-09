@@ -61,7 +61,10 @@ export interface TodaySessionBodyProps {
   date: string;
   focused: boolean;
   onDragStateChange(dragging: boolean): void;
+  /** Position d'une carte dans la liste (relative à la liste) */
   onCardLayout(exerciseId: string, y: number): void;
+  /** Position de la liste dans le bloc de séance */
+  onListLayout(y: number): void;
   /** Noms des exercices affichés, pour la barre de repos */
   onExerciseNames(names: Record<string, string>): void;
 }
@@ -74,7 +77,6 @@ export function TodaySessionBody(p: TodaySessionBodyProps) {
   const timer = useTimerStore((s) => s.timer);
   const [editing, setEditing] = useState<{ ex: EffectiveExercise; setIndex: number } | null>(null);
   const [swapping, setSwapping] = useState<EffectiveExercise | null>(null);
-  const [listY, setListY] = useState(0);
 
   const meta = p.program.definition.meta;
   const units = meta.units;
@@ -161,13 +163,13 @@ export function TodaySessionBody(p: TodaySessionBodyProps) {
       <ProgressBar done={progress.done} total={progress.total} accent={accent} />
       {p.session.note ? <SessionNote text={p.session.note} /> : null}
       <WarmupBlock items={p.session.warmup} />
-      <View onLayout={(e) => setListY(e.nativeEvent.layout.y)}>
+      <View testID="today-list" onLayout={(e) => p.onListLayout(e.nativeEvent.layout.y)}>
         <ReorderableList
           items={view.exercises}
           keyOf={(ex) => ex.id}
           onMove={(from, to) => run(() => moveExercise(env(), view, from, to))}
           onDragStateChange={p.onDragStateChange}
-          onItemLayout={(id, y) => p.onCardLayout(id, listY + y)}
+          onItemLayout={p.onCardLayout}
           moveUpLabel={t('today_move_up')}
           moveDownLabel={t('today_move_down')}
           renderItem={(ex, _i, handle) => card(ex, completed ? undefined : handle)}

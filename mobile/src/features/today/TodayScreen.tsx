@@ -3,7 +3,7 @@
 // barre de repos flottante. Aucune séance ni jour en dur : tout vient du programme.
 // ============================================================
 import { useEffect, useRef, useState } from 'react';
-import { AppState, type ScrollView } from 'react-native';
+import { AppState, View, type ScrollView } from 'react-native';
 import { useRepoCtx } from '@/db/DbContext';
 import { findStaleInProgress } from '@/db/repos/workoutsRepo';
 import { localDateKey, resolveDay, weekdayOf, weekStrip, type DayPlan, type Weekday } from '@/domain/schedule';
@@ -67,6 +67,9 @@ export function TodayScreen({ focused = true, onOpenEditor, onOpenImport }: Prop
   const [names, setNames] = useState<Record<string, string>>({});
   const scrollRef = useRef<ScrollView>(null);
   const cardY = useRef<Record<string, number>>({});
+  // Position du bloc de séance dans la page : les positions de cartes sont relatives à ce bloc
+  const bodyY = useRef(0);
+  const listY = useRef(0);
   const stale = useDbQuery(findStaleInProgress, todayKey);
   const timerVisible = useTimerStore((s) => s.timer !== null || s.flash !== null);
 
@@ -110,7 +113,7 @@ export function TodayScreen({ focused = true, onOpenEditor, onOpenImport }: Prop
   };
   const scrollToCard = (exerciseId: string) => {
     const y = cardY.current[exerciseId];
-    if (y !== undefined) scrollRef.current?.scrollTo({ y: Math.max(0, y - 16), animated: true });
+    if (y !== undefined) scrollRef.current?.scrollTo({ y: Math.max(0, bodyY.current + listY.current + y - 16), animated: true });
   };
 
   return (
@@ -141,6 +144,7 @@ export function TodayScreen({ focused = true, onOpenEditor, onOpenImport }: Prop
         <TipsList tips={plan.session.tips} accent={plan.session.accent} />
       ) : null}
       {plan.kind === 'session' && (plan.session.type === 'lift' || plan.session.type === 'mixed') ? (
+        <View testID="today-session" onLayout={(e) => { bodyY.current = e.nativeEvent.layout.y; }}>
         <TodaySessionBody
           key={`${plan.sessionKey}-${date}`}
           program={program}
@@ -150,8 +154,10 @@ export function TodayScreen({ focused = true, onOpenEditor, onOpenImport }: Prop
           focused={focused}
           onDragStateChange={setDragging}
           onCardLayout={(id, y) => { cardY.current[id] = y; }}
+          onListLayout={(y) => { listY.current = y; }}
           onExerciseNames={setNames}
         />
+        </View>
       ) : null}
     </Screen>
   );

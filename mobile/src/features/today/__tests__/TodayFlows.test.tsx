@@ -131,3 +131,27 @@ describe('Today — parcours', () => {
     expect(screen.getAllByText('SÉANCE 6').length).toBeGreaterThan(0);
   });
 });
+
+describe('Today — barre de repos → carte', () => {
+  beforeEach(async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(MONDAY);
+    await act(async () => { usePrefs.setState(PREFS_INITIAL); useTimerStore.setState(TIMER_INITIAL); });
+  });
+  afterEach(() => jest.useRealTimers());
+
+  it('défile jusqu\'à la carte de l\'exercice en tenant compte de la position de la séance dans la page', async () => {
+    const { ScrollView } = require('react-native') as typeof import('react-native');
+    const scrollTo = ScrollView.prototype.scrollTo as unknown as jest.Mock;
+    await setup();
+    const layout = (y: number) => ({ nativeEvent: { layout: { x: 0, y, width: 390, height: 200 } } });
+    // Ordre réel sur appareil : les enfants sont mesurés avant leurs parents
+    await fireEvent(screen.getByTestId('reorder-gainage'), 'layout', layout(260));
+    await fireEvent(screen.getByTestId('today-list'), 'layout', layout(150));
+    await fireEvent(screen.getByTestId('today-session'), 'layout', layout(420));
+    await fireEvent.press(screen.getByTestId('set-gainage-0'));
+    scrollTo.mockClear();
+    await fireEvent.press(screen.getByTestId('rest-bar'));
+    expect(scrollTo).toHaveBeenLastCalledWith({ y: 420 + 150 + 260 - 16, animated: true });
+  });
+});
