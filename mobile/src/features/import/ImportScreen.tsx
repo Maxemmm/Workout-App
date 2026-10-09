@@ -3,7 +3,7 @@
 // Sauvegarde : remplacement total en une transaction, après confirmation.
 // ============================================================
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { TextField } from '@/features/common/TextField';
 import { useRepoCtx } from '@/db/DbContext';
 import { importProgram, replaceAll } from '@/db/repos/importRepo';
@@ -80,7 +80,8 @@ export function ImportScreen({ onDone, onCancel }: { onDone(kind: 'program' | 'b
   const primary = [styles.btn, { backgroundColor: colors.gold, borderRadius: radius.md }];
   const ignored = analysis.kind === 'backup' ? ignoredLine(analysis.bundle) : null;
   return (
-    <Screen safeBottom>
+    // iOS : modale « feuille », déjà sous la barre d'état ; Android : plein écran
+    <Screen safeBottom safeTop={Platform.OS !== 'ios'}>
       <View style={styles.header}>
         <Pressable accessibilityRole="button" onPress={onCancel} style={styles.back}>
           <Text style={{ color: colors.textDim, fontFamily: fonts.uiBold }}>{t('editor_cancel')}</Text>

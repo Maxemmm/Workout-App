@@ -69,3 +69,11 @@ describe('ImportScreen', () => {
     expect(screen.getByText('Fichier trop volumineux (5 Mo max).')).toBeTruthy();
   });
 });
+
+describe('ImportScreen — modale « feuille » iOS', () => {
+  it('pas de marge d\'encoche en haut (la feuille commence déjà sous la barre d\'état)', async () => {
+    const { StyleSheet } = require('react-native') as typeof import('react-native');
+    await renderWithProviders(<ImportScreen onDone={jest.fn()} onCancel={jest.fn()} />, { ctx: createTestCtx(), insets: { top: 59, left: 0, right: 0, bottom: 34 } });
+    expect(StyleSheet.flatten(screen.getByTestId('screen-root').props.style).paddingTop).toBe(0);
+  });
+});

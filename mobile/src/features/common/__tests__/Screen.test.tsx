@@ -20,3 +20,17 @@ describe('Screen', () => {
     expect(withSafe).toBeGreaterThan(base);
   });
 });
+
+describe('Screen — zone de l\'encoche', () => {
+  const IPHONE = { top: 59, left: 0, right: 0, bottom: 34 };
+
+  it('marge haute = encoche dès le premier rendu (valeur du provider racine, pas du SafeAreaView natif)', async () => {
+    await renderWithProviders(<Screen><Text>x</Text></Screen>, { insets: IPHONE });
+    expect(StyleSheet.flatten(screen.getByTestId('screen-root').props.style).paddingTop).toBe(59);
+  });
+
+  it('modale « feuille » iOS (déjà sous la barre d\'état) : pas de marge haute', async () => {
+    await renderWithProviders(<Screen safeTop={false}><Text>x</Text></Screen>, { insets: IPHONE });
+    expect(StyleSheet.flatten(screen.getByTestId('screen-root').props.style).paddingTop).toBe(0);
+  });
+});

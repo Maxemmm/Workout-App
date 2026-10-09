@@ -12,10 +12,13 @@ import { ThemeProvider } from '@/theme/ThemeProvider';
 // Dans l'app, Expo Router fournit le SafeAreaProvider ; en test on le fournit avec des métriques fixes
 const METRICS = { frame: { x: 0, y: 0, width: 390, height: 844 }, insets: { top: 0, left: 0, right: 0, bottom: 0 } };
 
-export async function renderWithProviders(ui: ReactElement, opts: { lang?: Lang; theme?: ThemePref; ctx?: RepoCtx } = {}) {
+type Insets = { top: number; left: number; right: number; bottom: number };
+
+export async function renderWithProviders(ui: ReactElement, opts: { lang?: Lang; theme?: ThemePref; ctx?: RepoCtx; insets?: Insets } = {}) {
+  const metrics = opts.insets ? { ...METRICS, insets: opts.insets } : METRICS;
   const wrap = (node: ReactElement) => {
     const tree = (
-      <SafeAreaProvider initialMetrics={METRICS}>
+      <SafeAreaProvider initialMetrics={metrics}>
         <GestureHandlerRootView style={{ flex: 1 }}>
           <ThemeProvider pref={opts.theme ?? 'dark'}>
             <I18nProvider lang={opts.lang ?? 'fr'}>{node}</I18nProvider>
