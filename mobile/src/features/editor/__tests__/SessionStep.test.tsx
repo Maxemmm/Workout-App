@@ -53,6 +53,18 @@ describe('SessionStep', () => {
     expect(n.closeSession).toHaveBeenCalled();
   });
 
+  it('supprimer un exercice demande confirmation (comme une séance) ; refus → conservé', async () => {
+    const { confirm } = require('@/platform/confirm') as typeof import('@/platform/confirm');
+    const { session } = await setup();
+    await fireEvent.press(screen.getByRole('button', { name: 'AJOUTER UN EXERCICE' }));
+    await fireEvent.changeText(screen.getByTestId('exo-name'), 'Squat');
+    await fireEvent.press(screen.getByRole('button', { name: "ENREGISTRER L'EXERCICE" }));
+    jest.mocked(confirm).mockResolvedValueOnce(false);
+    await fireEvent.press(screen.getByRole('button', { name: 'Supprimer Squat' }));
+    expect(confirm).toHaveBeenCalled();
+    expect(session().exercises.map((e) => e.name)).toEqual(['Squat']);
+  });
+
   it('type cardio : conseils à la place des exercices', async () => {
     const { session } = await setup();
     await fireEvent.press(screen.getByRole('button', { name: 'Cardio' }));

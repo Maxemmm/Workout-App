@@ -14,6 +14,7 @@ import { ListEditor } from '@/features/common/ListEditor';
 import { Segmented } from '@/features/profile/Segmented';
 import { ReorderableList } from '@/features/today/ReorderableList';
 import { useI18n } from '@/i18n/I18nProvider';
+import { confirm } from '@/platform/confirm';
 import type { StringKey } from '@/i18n/translate';
 import { useDraftStore } from '@/state/draftStore';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -48,6 +49,11 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
   const field = [styles.input, { color: colors.text, fontFamily: fonts.ui, borderColor: colors.border, borderRadius: radius.sm }];
   const update = (patch: SessionPatch) => apply(ctx, (d) => updateSession(d, sessionKey, patch));
 
+  const removeExercise = async (section: ExerciseSection, e: Exercise) => {
+    const ok = await confirm({ title: t('editor_delete'), message: t('editor_confirm_delete_session', e.name), confirmLabel: t('editor_delete'), cancelLabel: t('editor_cancel'), destructive: true });
+    if (ok) apply(ctx, (d) => deleteExercise(d, sessionKey, section, e.id));
+  };
+
   const exerciseList = (section: ExerciseSection, onDragStateChange: (dragging: boolean) => void) => {
     if (!session) return null;
     const list = sectionExercises(session, section);
@@ -65,7 +71,7 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
             header={handle}
             onEdit={() => setSheet({ section, exercise: e })}
             onDuplicate={() => apply(ctx, (d) => duplicateExercise(d, sessionKey, section, e.id).draft)}
-            onDelete={() => apply(ctx, (d) => deleteExercise(d, sessionKey, section, e.id))}
+            onDelete={() => void removeExercise(section, e)}
           />
         )}
       />
