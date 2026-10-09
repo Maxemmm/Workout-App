@@ -13,9 +13,12 @@ import type { Session } from '@/domain/program';
 import { restDurationSec, sessionProgress, sessionSummary } from '@/domain/progress';
 import { schemeReps } from '@/domain/scheme';
 import { useDbQuery } from '@/features/common/useDbQuery';
+import { AlertsPermissionSheet } from '@/features/notifications/AlertsPermissionSheet';
+import { shouldAskForAlerts } from '@/features/notifications/permissionFlow';
 import { useI18n } from '@/i18n/I18nProvider';
 import { confirm } from '@/platform/confirm';
 import { keepAwake } from '@/platform/keepAwake';
+import { restNotifier } from '@/platform/restNotifier';
 import { usePrefs } from '@/state/prefsStore';
 import { useTimerStore } from '@/state/timerStore';
 import { useToastStore } from '@/state/toastStore';
@@ -53,6 +56,16 @@ function attempt(write: () => void, errorMessage: string): boolean {
   }
 }
 
+/** Après une série qui démarre un minuteur : faut-il proposer les alertes de fin de repos ? */
+async function needsAlertsPrompt(ctx: RepoCtx): Promise<boolean> {
+  if (useTimerStore.getState().timer === null) return false;
+  try {
+    return shouldAskForAlerts(ctx, await restNotifier.permission());
+  } catch {
+    return false;
+  }
+}
+
 export interface TodaySessionBodyProps {
   program: StoredProgram;
   sessionKey: string;
@@ -77,6 +90,7 @@ export function TodaySessionBody(p: TodaySessionBodyProps) {
   const timer = useTimerStore((s) => s.timer);
   const [editing, setEditing] = useState<{ ex: EffectiveExercise; setIndex: number } | null>(null);
   const [swapping, setSwapping] = useState<EffectiveExercise | null>(null);
+  const [askAlerts, setAskAlerts] = useState(false);
 
   const meta = p.program.definition.meta;
   const units = meta.units;
@@ -139,7 +153,11 @@ export function TodaySessionBody(p: TodaySessionBodyProps) {
       last={view.last[weightKey(ex.id, ex.performedName)] ?? null}
       locked={completed}
       pendingSet={pendingFor(ex)}
-      onPressSet={(i) => run(() => pressSet(env(), view, ex, i))}
+      onPressSet={(i) => {
+        if (run(() => pressSet(env(), view, ex, i))) {
+          void needsAlertsPrompt(ctx).then((ask) => { if (ask) setAskAlerts(true); });
+        }
+      }}
       onLongPressSet={(i) => setEditing({ ex, setIndex: i })}
       onChangeWeight={(v) => run(() => changeWeight(env(), ex, v))}
       onSwap={ex.alternatives.length > 0 && !completed ? () => setSwapping(ex) : undefined}
@@ -204,6 +222,7 @@ export function TodaySessionBody(p: TodaySessionBodyProps) {
           }}
         />
       ) : null}
+      <AlertsPermissionSheet visible={askAlerts} onClose={() => setAskAlerts(false)} />
       <SwapSheet visible={swapping !== null} exercise={swapping} onSelect={onSwapSelect} onClose={() => setSwapping(null)} />
     </View>
   );
