@@ -33,3 +33,12 @@ export type PickedFile = { kind: 'ok'; text: string } | { kind: 'cancel' } | { k
 
 /** Issue d'un partage de fichier. iOS signale l'annulation ; Android non ('shared' dès que la feuille se ferme sans erreur) */
 export type ShareResult = 'shared' | 'cancelled';
+
+/** Autorisation des notifications ; 'unavailable' sur le web */
+export type NotifierPermission = 'granted' | 'denied' | 'undetermined' | 'unavailable';
+/** Série visée par une notification de minuteur */
+export type NoticeTarget = { workoutId: string; exerciseId: string; setIndex: number };
+export type NoticeKind = 'rest' | 'work';
+/** Réponse à une notification : bouton touché (ou notification ouverte) ; id unique pour ne l'appliquer qu'une fois */
+export type NoticeAction = { id: string; action: 'plus15' | 'validate' | 'open'; kind: NoticeKind; target: NoticeTarget };
+export type ScheduledNotice = { endAt: number; title: string; body: string; kind: NoticeKind; target: NoticeTarget };

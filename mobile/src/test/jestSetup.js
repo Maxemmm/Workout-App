@@ -16,3 +16,16 @@ jest.mock('@/platform/pickJsonFile', () => ({
 }));
 jest.mock('@/platform/shareJsonFile', () => ({ shareJsonFile: jest.fn(() => Promise.resolve('shared')) }));
 jest.mock('@/platform/appVersion', () => ({ appVersion: () => '1.0.0' }));
+jest.mock('@/platform/restNotifier', () => ({
+  REST_NOTICE_ID: 'rest-end',
+  restNotifier: {
+    permission: jest.fn(() => Promise.resolve('granted')),
+    requestPermission: jest.fn(() => Promise.resolve(true)),
+    schedule: jest.fn(() => Promise.resolve()),
+    cancel: jest.fn(() => Promise.resolve()),
+    configure: jest.fn(() => Promise.resolve()),
+    onAction: jest.fn(() => () => {}),
+    lastAction: jest.fn(() => Promise.resolve(null)),
+    openSettings: jest.fn(() => Promise.resolve()),
+  },
+}));
