@@ -13,6 +13,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useRepoCtx } from '@/db/DbContext';
 import { DbProvider } from '@/db/DbProvider';
 import { HideSplashWhenReady } from '@/features/common/SplashGate';
+import { RestNotificationDriver } from '@/features/notifications/RestNotificationDriver';
 import { Toast } from '@/features/common/Toast';
 import { I18nProvider } from '@/i18n/I18nProvider';
 import { useDraftStore } from '@/state/draftStore';
@@ -80,6 +81,7 @@ function ThemedStack() {
         <Stack.Screen name="onboarding" />
       </Stack>
       <Toast />
+      <RestNotificationDriver />
       <HideSplashWhenReady />
     </NavigationThemeProvider>
   );
