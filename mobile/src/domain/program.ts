@@ -33,6 +33,8 @@ export const ExerciseSchema = z.looseObject({
   restSec: z.coerce.number().int().nonnegative().nullish(),
   cue: optText,
   alternatives: listOf(AlternativeSchema),
+  /** Lien vers la bibliothèque (ds:… | wg:… | custom:…) */
+  libraryId: z.string().trim().min(1).optional(),
 });
 
 export const SessionTypeSchema = z.enum(['lift', 'cardio', 'rest', 'mixed']);

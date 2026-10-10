@@ -5,10 +5,12 @@
 // ============================================================
 import { asc, isNotNull, isNull } from 'drizzle-orm';
 import { makeReport, type BundleProgram, type BundleSettings, type ImportBundle } from '@/domain/importBundle';
+import { isEquipmentKey } from '@/domain/library/equipment';
 import { isLang, isThemePref } from '@/domain/prefs';
 import { parseProgram } from '@/domain/program';
 import { programs, sessionLayouts, setEntries, workouts } from '../schema';
 import type { RepoCtx } from '../types';
+import { listCustomExercises } from './customExercisesRepo';
 import { getLayout } from './layoutsRepo';
 import { getActiveProgram, listPrograms } from './programsRepo';
 import { getSetting } from './settingsRepo';
@@ -26,6 +28,10 @@ function readSettings(ctx: RepoCtx): BundleSettings {
   if (typeof aiEnabled === 'boolean') s.aiEnabled = aiEnabled;
   if (typeof keepAwake === 'boolean') s.keepAwake = keepAwake;
   if (defaultUnits === 'kg' || defaultUnits === 'lbs') s.defaultUnits = defaultUnits;
+  const favorites = getSetting(ctx, 'favoriteExercises');
+  const mine = getSetting(ctx, 'myEquipment');
+  if (Array.isArray(favorites)) s.favoriteExercises = favorites.filter((f): f is string => typeof f === 'string');
+  if (Array.isArray(mine)) s.myEquipment = mine.filter(isEquipmentKey);
   return s;
 }
 
@@ -79,6 +85,7 @@ export function readBundle(ctx: RepoCtx): ImportBundle {
     })),
     weights: Object.entries(getAllWeights(ctx)).map(([key, w]) => ({ key, weight: w.weight, unit: w.unit })),
     layouts,
+    customExercises: listCustomExercises(ctx),
     settings: readSettings(ctx),
   };
   return { ...body, report: makeReport(body, []) };

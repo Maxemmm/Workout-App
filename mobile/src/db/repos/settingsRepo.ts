@@ -4,6 +4,7 @@
 import { eq } from 'drizzle-orm';
 import type { Lang, ThemePref } from '@/domain/prefs';
 import type { Draft } from '@/domain/draft';
+import type { EquipmentKey } from '@/domain/library/equipment';
 import type { Units } from '@/domain/program';
 import type { StatsPeriod } from '@/domain/stats/period';
 import type { TimerState } from '@/domain/timer';
@@ -28,6 +29,10 @@ export interface SettingsMap {
   statsPeriod: StatsPeriod;
   /** Alertes de fin de repos : true activées, false refusées / désactivées ; absent = jamais demandé */
   restAlerts: boolean;
+  /** Bibliothèque : ids favoris */
+  favoriteExercises: string[];
+  /** Bibliothèque : matériel disponible (filtre « Mon matériel ») */
+  myEquipment: EquipmentKey[];
 }
 export type SettingKey = keyof SettingsMap;
 

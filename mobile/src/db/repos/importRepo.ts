@@ -4,9 +4,10 @@
 // ============================================================
 import { isNull } from 'drizzle-orm';
 import type { ImportBundle } from '@/domain/importBundle';
-import { exerciseWeights, programs, sessionLayouts, setEntries, workouts } from '../schema';
+import { customExercises, exerciseWeights, programs, sessionLayouts, setEntries, workouts } from '../schema';
 import { inTransaction } from '../transaction';
 import type { RepoCtx } from '../types';
+import { upsertCustomExercise } from './customExercisesRepo';
 import { createProgram, setActiveProgram, softDeleteProgram, type StoredProgram } from './programsRepo';
 import { deleteSetting, setSetting } from './settingsRepo';
 import { setWeight } from './weightsRepo';
@@ -63,12 +64,19 @@ export function replaceAll(ctx: RepoCtx, bundle: ImportBundle): { activeProgramI
       }).run();
     }
 
+    // Exercices personnalisés : ids conservés (les libraryId custom:… des programmes restent valides) ;
+    // tout est retiré puis remis à jour, les absents du paquet restent supprimés
+    tx.db.update(customExercises).set(retire).where(isNull(customExercises.deletedAt)).run();
+    for (const c of bundle.customExercises) upsertCustomExercise(tx, c.id, c);
+
     const s = bundle.settings;
     if (s.lang) setSetting(tx, 'lang', s.lang);
     if (s.theme) setSetting(tx, 'theme', s.theme);
     if (s.aiEnabled !== undefined) setSetting(tx, 'aiEnabled', s.aiEnabled);
     if (s.keepAwake !== undefined) setSetting(tx, 'keepAwake', s.keepAwake);
     if (s.defaultUnits) setSetting(tx, 'defaultUnits', s.defaultUnits);
+    if (s.favoriteExercises) setSetting(tx, 'favoriteExercises', s.favoriteExercises);
+    if (s.myEquipment) setSetting(tx, 'myEquipment', s.myEquipment);
     setSetting(tx, 'onboarded', true);
     deleteSetting(tx, 'programDraft');
     deleteSetting(tx, 'activeRest');

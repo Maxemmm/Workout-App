@@ -83,6 +83,16 @@ export const sessionLayouts = sqliteTable(
   (t) => [uniqueIndex('session_layouts_program_session_uq').on(t.programId, t.sessionKey).where(notDeleted)],
 );
 
+/** Exercices personnalisés de la bibliothèque (synchronisables) */
+export const customExercises = sqliteTable('custom_exercises', {
+  ...syncColumns(),
+  name: text('name').notNull(),
+  primary: text('primary_muscle').notNull(),
+  secondary: text('secondary_muscles').notNull().default('[]'),
+  equipment: text('equipment').notNull(),
+  steps: text('steps'),
+});
+
 /** Réglages propres à l'appareil (non synchronisés) — valeurs JSON */
 export const settings = sqliteTable('settings', {
   key: text('key').primaryKey(),

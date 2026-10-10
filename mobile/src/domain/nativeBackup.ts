@@ -3,9 +3,11 @@
 // Lecture au M3b ; l'export du M4 utilisera toNativeBackup.
 // ============================================================
 import {
-  isIsoDay, makeReport, type BundleLayout, type BundleProgram, type BundleSet, type BundleSettings, type BundleSource,
+  isIsoDay, makeReport, type BundleCustomExercise, type BundleLayout, type BundleProgram, type BundleSet, type BundleSettings, type BundleSource,
   type BundleWeight, type BundleWorkout, type IgnoredItem, type ImportBundle, type ParseResult, type WorkoutStatus,
 } from './importBundle';
+import { isEquipmentKey } from './library/equipment';
+import { isMuscleKey } from './library/muscles';
 import { isLang, isThemePref } from './prefs';
 import { parseProgram, type Program } from './program';
 
@@ -22,6 +24,8 @@ export type NativeBackup = {
   }[];
   weights: BundleWeight[];
   layouts: { programId: string; sessionKey: string; order: string[]; swaps: Record<string, string> }[];
+  /** Facultatif : absent des sauvegardes antérieures au M10 */
+  customExercises?: BundleCustomExercise[];
   settings: BundleSettings;
 };
 
@@ -47,6 +51,7 @@ export function toNativeBackup(bundle: ImportBundle, exportedAt: string): Native
     setEntries: bundle.sets.map(({ workoutRef, ...rest }) => ({ workoutId: workoutRef, ...rest })),
     weights: bundle.weights,
     layouts: bundle.layouts.map(({ programRef, ...rest }) => ({ programId: programRef, ...rest })),
+    customExercises: bundle.customExercises,
     settings: bundle.settings,
   };
 }
@@ -114,6 +119,18 @@ export function parseNativeBackup(value: unknown): ParseResult {
     layouts.push({ programRef: l.programId, sessionKey: l.sessionKey, order: l.order.filter(str), swaps });
   });
 
+  const customExercises: BundleCustomExercise[] = [];
+  list(value.customExercises).forEach((c, i) => {
+    if (!isObj(c) || !str(c.id) || !str(c.name) || !c.name.trim() || c.name.trim().length > 100 || !isMuscleKey(c.primary) || !isEquipmentKey(c.equipment)) {
+      ignored.push({ key: `customExercises[${i}]`, reason: 'invalid_value' });
+      return;
+    }
+    const primary = c.primary;
+    const secondary = [...new Set(list(c.secondary).filter(isMuscleKey))].filter((m) => m !== primary);
+    const steps = Array.isArray(c.steps) ? c.steps.filter(str) : null;
+    customExercises.push({ id: c.id, name: c.name.trim(), primary, secondary, equipment: c.equipment, steps: steps && steps.length ? steps : null });
+  });
+
   const raw = isObj(value.settings) ? value.settings : {};
   const settings: BundleSettings = {};
   if (isLang(raw.lang)) settings.lang = raw.lang;
@@ -121,8 +138,10 @@ export function parseNativeBackup(value: unknown): ParseResult {
   if (typeof raw.aiEnabled === 'boolean') settings.aiEnabled = raw.aiEnabled;
   if (typeof raw.keepAwake === 'boolean') settings.keepAwake = raw.keepAwake;
   if (raw.defaultUnits === 'kg' || raw.defaultUnits === 'lbs') settings.defaultUnits = raw.defaultUnits;
+  if (Array.isArray(raw.favoriteExercises)) settings.favoriteExercises = raw.favoriteExercises.filter(str);
+  if (Array.isArray(raw.myEquipment)) settings.myEquipment = raw.myEquipment.filter(isEquipmentKey);
 
   const active = str(value.activeProgramId) && visible.some((p) => p.sourceId === value.activeProgramId) ? value.activeProgramId : visible[0].sourceId;
-  const body = { programs, activeProgramRef: active, workouts, sets, weights, layouts, settings };
+  const body = { programs, activeProgramRef: active, workouts, sets, weights, layouts, customExercises, settings };
   return { ok: true, bundle: { ...body, report: makeReport(body, ignored) } };
 }

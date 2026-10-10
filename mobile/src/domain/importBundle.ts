@@ -3,6 +3,8 @@
 // écrit ensuite en une seule transaction (db/repos/importRepo).
 // Les ids (sourceId, ref) ne servent qu'au remappage.
 // ============================================================
+import type { EquipmentKey } from './library/equipment';
+import type { MuscleKey } from './library/muscles';
 import type { Lang, ThemePref } from './prefs';
 import type { Program, Units } from './program';
 
@@ -20,7 +22,12 @@ export type BundleSet = {
 };
 export type BundleWeight = { key: string; weight: number; unit: Units };
 export type BundleLayout = { programRef: string; sessionKey: string; order: string[]; swaps: Record<string, string> };
-export type BundleSettings = { lang?: Lang; theme?: ThemePref; aiEnabled?: boolean; keepAwake?: boolean; defaultUnits?: Units };
+export type BundleSettings = {
+  lang?: Lang; theme?: ThemePref; aiEnabled?: boolean; keepAwake?: boolean; defaultUnits?: Units;
+  favoriteExercises?: string[]; myEquipment?: EquipmentKey[];
+};
+/** Exercice personnalisé de la bibliothèque — id natif conservé (les libraryId custom:… des programmes y renvoient) */
+export type BundleCustomExercise = { id: string; name: string; primary: MuscleKey; secondary: MuscleKey[]; equipment: EquipmentKey; steps: string[] | null };
 
 export type IgnoreReason =
   | 'unknown_key' | 'invalid_program' | 'unknown_program' | 'unknown_session'
@@ -35,6 +42,7 @@ export type ImportBundle = {
   sets: BundleSet[];
   weights: BundleWeight[];
   layouts: BundleLayout[];
+  customExercises: BundleCustomExercise[];
   settings: BundleSettings;
   report: ImportReport;
 };

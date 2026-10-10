@@ -211,6 +211,6 @@ export function parseLegacyBackup(raw: Record<string, unknown>, today: string): 
     ignored.push({ key, reason: 'unknown_key' });
   }
 
-  const body = { programs, activeProgramRef: active.sourceId, workouts, sets, weights, layouts, settings };
+  const body = { programs, activeProgramRef: active.sourceId, workouts, sets, weights, layouts, customExercises: [], settings };
   return { ok: true, bundle: { ...body, report: makeReport(body, ignored) } };
 }
