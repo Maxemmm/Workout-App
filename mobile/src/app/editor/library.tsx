@@ -1,10 +1,10 @@
 // Route éditeur · choix dans la bibliothèque (pile de l'éditeur) — réponse via useLibraryPickStore
 import { router } from 'expo-router';
 import { ExercisePicker } from '@/features/library/ExercisePicker';
-import { useLibraryPickStore } from '@/state/libraryPickStore';
+import { useLibraryPickStore, type PickResult } from '@/state/libraryPickStore';
 
 export default function EditorLibraryRoute() {
-  const done = (r: { libraryId: string; name: string } | null) => {
+  const done = (r: PickResult) => {
     useLibraryPickStore.getState().resolve(r);
     router.back();
   };
@@ -12,7 +12,7 @@ export default function EditorLibraryRoute() {
     <ExercisePicker
       onPick={(item) => done({ libraryId: item.id, name: item.name })}
       onFree={() => done(null)}
-      onCancel={() => { useLibraryPickStore.getState().cancel(); router.back(); }}
+      onCancel={() => done('cancel')}
     />
   );
 }

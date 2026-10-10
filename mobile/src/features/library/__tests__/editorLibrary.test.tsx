@@ -56,6 +56,35 @@ describe('éditeur ↔ bibliothèque', () => {
     expect(useDraftStore.getState().draft!.program.sessions[base.key].exercises[0].libraryId).toBeUndefined();
   });
 
+  it('« Changer » puis Annuler dans le sélecteur : la feuille revient avec la saisie en cours', async () => {
+    const ctx = createTestCtx();
+    const base = addSession(newDraft(), 'lift', () => 'aaaa');
+    await act(async () => { useDraftStore.getState().start(ctx, base.draft); });
+    await act(async () => {
+      const { addExercise } = require('@/domain/draft') as typeof import('@/domain/draft');
+      useDraftStore.getState().apply(ctx, (d) => addExercise(d, base.key, 'main', { name: 'Crunch', sets: 3, scheme: '', alternatives: [], libraryId: 'ds:0001' } as never).draft);
+    });
+    const n = nav();
+    await renderWithProviders(<SessionStep nav={n} sessionKey={base.key} />, { ctx });
+    await fireEvent.press(screen.getByRole('button', { name: /^Modifier l'exercice Crunch/ }));
+    await fireEvent.changeText(screen.getByTestId('exo-name'), 'Crunch lent');
+    await fireEvent.press(screen.getByRole('button', { name: 'Changer' }));
+    expect(n.openLibrary).toHaveBeenCalled();
+    await act(async () => { useLibraryPickStore.getState().resolve('cancel'); });
+    expect(screen.getByTestId('exo-name').props.value).toBe('Crunch lent');
+    expect(screen.getByText('Lié à : Relevé de buste 3/4')).toBeTruthy();
+  });
+
+  it('« Ajouter » puis Annuler dans le sélecteur : aucune feuille', async () => {
+    const ctx = createTestCtx();
+    const { draft, key } = addSession(newDraft(), 'lift', () => 'aaaa');
+    await act(async () => { useDraftStore.getState().start(ctx, draft); });
+    await renderWithProviders(<SessionStep nav={nav()} sessionKey={key} />, { ctx });
+    await fireEvent.press(screen.getByRole('button', { name: 'AJOUTER UN EXERCICE' }));
+    await act(async () => { useLibraryPickStore.getState().resolve('cancel'); });
+    expect(screen.queryByTestId('exo-name')).toBeNull();
+  });
+
   it('sélecteur : recherche puis choix ; Exercice libre', async () => {
     const onPick = jest.fn();
     const onFree = jest.fn();

@@ -53,8 +53,12 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
     const done = useLibraryPickStore.getState().consume();
     if (!done) return;
     const { request, result } = done;
+    // Annulé : nouvel exercice → rien ; exercice en cours → feuille rendue avec la saisie intacte
+    if (result === 'cancel' && !request.form) return;
     const base = request.form ?? blankExercise();
-    const initial = (result ? { ...base, name: result.name, libraryId: result.libraryId } : { ...base, libraryId: undefined }) as ExerciseInput;
+    const initial = (result === 'cancel' ? base
+      : result ? { ...base, name: result.name, libraryId: result.libraryId }
+      : { ...base, libraryId: undefined }) as ExerciseInput;
     const existing = request.exerciseId ? sectionExercises(session, request.section).find((e) => e.id === request.exerciseId) ?? null : null;
     setSheet({ section: request.section, exercise: existing, initial, seq: Date.now() });
   }, [pick, session]);

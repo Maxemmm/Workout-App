@@ -3,11 +3,12 @@ import { create } from 'zustand';
 import type { ExerciseInput, ExerciseSection } from '@/domain/draft';
 
 export type PickRequest = { sessionKey: string; section: ExerciseSection; form: ExerciseInput | null; exerciseId: string | null };
-export type PickResult = { libraryId: string; name: string } | null;
+/** Entrée choisie ; null = « Exercice libre » ; 'cancel' = sélecteur annulé (formulaire en cours rendu tel quel) */
+export type PickResult = { libraryId: string; name: string } | null | 'cancel';
 
 interface State {
   request: PickRequest | null;
-  /** undefined = pas encore de réponse ; null = « Exercice libre » */
+  /** undefined = pas encore de réponse */
   result: PickResult | undefined;
   start(req: PickRequest): void;
   resolve(r: PickResult): void;
