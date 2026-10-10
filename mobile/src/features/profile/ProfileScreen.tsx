@@ -13,8 +13,10 @@ import { appVersion } from '@/platform/appVersion';
 import { confirm } from '@/platform/confirm';
 import { useTheme } from '@/theme/ThemeProvider';
 import { ActiveProgramCard } from './ActiveProgramCard';
+import { CreditsSection } from './CreditsSection';
 import { DangerSection } from './DangerSection';
 import { DataSection } from './DataSection';
+import { MyEquipmentSection } from './MyEquipmentSection';
 import { SettingsSection } from './SettingsSection';
 import { TimerSection } from './TimerSection';
 
@@ -44,10 +46,12 @@ export function ProfileScreen({ onManagePrograms, onOpenEditor, onImport }: Prop
       <ActiveProgramCard program={active} onManage={onManagePrograms} onCreate={() => void create()} onImport={onImport} />
       <SettingsSection />
       <TimerSection />
+      <MyEquipmentSection />
       <DataSection onImport={onImport} />
       <DangerSection />
       <Text style={[styles.section, { color: colors.text, fontFamily: fonts.uiBold }]}>{t('profile_about').toUpperCase()}</Text>
       <Text style={{ color: colors.textDim, fontFamily: fonts.ui }}>{t('profile_version_fmt', appVersion())}</Text>
+      <CreditsSection />
     </Screen>
   );
 }
