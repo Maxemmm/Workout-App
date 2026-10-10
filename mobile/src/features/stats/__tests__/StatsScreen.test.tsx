@@ -24,6 +24,11 @@ describe('StatsScreen', () => {
   });
   afterEach(() => jest.useRealTimers());
 
+  it('exercice demandé (fiche → Stats) : sélectionné', async () => {
+    await renderWithProviders(<StatsScreen exerciseRequest={{ key: 'tirage-vertical', at: '1' }} />, { ctx: restoredCtx() });
+    expect(screen.getByRole('button', { name: 'Tirage vertical' }).props.accessibilityState).toMatchObject({ selected: true });
+  });
+
   it('sans séance terminée : message d\'accueil seulement', async () => {
     await renderWithProviders(<StatsScreen />, { ctx: createTestCtx() });
     expect(screen.getByText('Termine ta première séance pour voir tes stats')).toBeTruthy();

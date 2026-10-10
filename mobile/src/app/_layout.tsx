@@ -79,6 +79,8 @@ function ThemedStack() {
         {/* Plein écran comme l'éditeur : pas de « feuille » iOS à coins arrondis */}
         <Stack.Screen name="import" options={{ presentation: 'fullScreenModal' }} />
         <Stack.Screen name="onboarding" />
+        <Stack.Screen name="exercise/[id]" />
+        <Stack.Screen name="exercise/custom" options={{ presentation: 'fullScreenModal' }} />
       </Stack>
       <Toast />
       <RestNotificationDriver />

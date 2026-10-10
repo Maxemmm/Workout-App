@@ -1,5 +1,5 @@
 // Stats · progression par exercice : pastilles, bascule Charge / 1RM, courbe, chiffres
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { displayUnits, exerciseSeries, exerciseStats, trackedExercises, type SeriesMetric } from '@/domain/stats/exerciseSeries';
 import type { StatsHistory } from '@/domain/stats/types';
@@ -10,12 +10,18 @@ import { TOUCH_MIN } from '@/theme/tokens';
 import { formatDay, formatLoad, formatNumber } from './format';
 import { LineChart } from './LineChart';
 
-export function ExerciseSection({ history, since }: { history: StatsHistory; since: string | null }) {
+export function ExerciseSection({ history, since, request }: { history: StatsHistory; since: string | null; request?: { key: string; at: string } }) {
   const { colors, fonts, radius } = useTheme();
   const { t, tList, lang } = useI18n();
   const exercises = trackedExercises(history);
   const [selected, setSelected] = useState<string | null>(null);
   const [metric, setMetric] = useState<SeriesMetric>('load');
+  const requestKey = request?.key;
+  const requestAt = request?.at;
+  // Exercice demandé depuis une fiche : sélectionné à chaque nouvelle demande
+  useEffect(() => {
+    if (requestKey) setSelected(requestKey);
+  }, [requestKey, requestAt]);
   const current = exercises.find((e) => e.key === selected) ?? exercises[0];
   if (!current) return null;
 

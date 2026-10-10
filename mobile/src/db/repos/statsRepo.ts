@@ -25,6 +25,19 @@ function addNames(names: Record<string, string>, def: Program) {
   }
 }
 
+/** Exercices de programmes (même supprimés) liés à une entrée de bibliothèque → clés d'historique */
+export function exerciseKeysForLibrary(ctx: RepoCtx, libraryId: string): string[] {
+  const keys = new Set<string>();
+  for (const p of ctx.db.select({ definition: programs.definition }).from(programs).all()) {
+    const def = parseDefinition(p.definition);
+    if (!def) continue;
+    for (const s of Object.values(def.sessions)) {
+      for (const ex of [...s.exercises, ...(s.bonus?.exercises ?? [])]) if (ex.libraryId === libraryId) keys.add(ex.id);
+    }
+  }
+  return [...keys];
+}
+
 export function readHistory(ctx: RepoCtx): StatsHistory {
   const activeStored = getActiveProgram(ctx);
   const defs = new Map<string, Program | null>(

@@ -40,11 +40,14 @@ function savePeriod(ctx: RepoCtx, period: StatsPeriod, errorMessage: string): vo
 }
 
 /** Onglet sans focus : rien n'est lu ni calculé (les séries cochées dans Today relancent bumpData) */
-export function StatsScreen({ focused = true }: { focused?: boolean }) {
-  return focused ? <StatsContent /> : null;
+/** Exercice demandé (fiche exercice → Stats) ; `at` distingue deux demandes du même exercice */
+export type ExerciseRequest = { key: string; at: string };
+
+export function StatsScreen({ focused = true, exerciseRequest }: { focused?: boolean; exerciseRequest?: ExerciseRequest }) {
+  return focused ? <StatsContent exerciseRequest={exerciseRequest} /> : null;
 }
 
-function StatsContent() {
+function StatsContent({ exerciseRequest }: { exerciseRequest?: ExerciseRequest }) {
   const ctx = useRepoCtx();
   const { colors, fonts } = useTheme();
   const { t } = useI18n();
@@ -78,7 +81,7 @@ function StatsContent() {
         value={period}
         onChange={(p) => savePeriod(ctx, p, t('error_not_saved'))}
       />
-      <ExerciseSection history={history} since={since} />
+      <ExerciseSection history={history} since={since} request={exerciseRequest} />
       <AttendanceSection history={history} today={today} since={since} />
       <RecordsList records={personalRecords(history, today)} units={units} />
     </Screen>
