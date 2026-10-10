@@ -13,6 +13,7 @@ const NAV: EditorNav = {
   openSession: (key) => router.push({ pathname: '/editor/session/[key]', params: { key } }),
   closeSession: () => router.dismissTo('/editor/sessions'),
   finish: () => router.dismissTo('/plan'),
+  openLibrary: () => router.push('/editor/library'),
 };
 
 export function useRouterNav(): EditorNav {

@@ -2,10 +2,14 @@ import { act, fireEvent, screen } from '@testing-library/react-native';
 import { createTestCtx } from '@/db/testing/createTestCtx';
 import { addSession, newDraft } from '@/domain/draft';
 import { DRAFT_INITIAL, useDraftStore } from '@/state/draftStore';
+import { LIBRARY_PICK_INITIAL, useLibraryPickStore } from '@/state/libraryPickStore';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { SessionStep } from '../SessionStep';
 
-const nav = () => ({ goToStep: jest.fn(), openSession: jest.fn(), closeSession: jest.fn(), finish: jest.fn() });
+/** Sélecteur simulé : « Exercice libre » (réponse immédiate) */
+const pickFree = () => useLibraryPickStore.getState().resolve(null);
+
+const nav = () => ({ goToStep: jest.fn(), openSession: jest.fn(), closeSession: jest.fn(), finish: jest.fn(), openLibrary: jest.fn(pickFree) });
 
 async function setup() {
   const ctx = createTestCtx();
@@ -18,7 +22,7 @@ async function setup() {
 }
 
 describe('SessionStep', () => {
-  beforeEach(() => useDraftStore.setState(DRAFT_INITIAL));
+  beforeEach(() => { useDraftStore.setState(DRAFT_INITIAL); useLibraryPickStore.setState(LIBRARY_PICK_INITIAL); });
 
   it('nom, couleur, échauffement, exercices (ajout, édition, duplication, suppression), bonus', async () => {
     const { n, session } = await setup();

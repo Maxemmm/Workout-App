@@ -9,6 +9,7 @@ import type { LastPerformance } from '@/db/repos/historyRepo';
 import type { EffectiveExercise } from '@/domain/exerciseView';
 import type { Units } from '@/domain/program';
 import { formatScheme } from '@/domain/scheme';
+import { LibraryThumb } from '@/features/library/LibraryThumb';
 import { useI18n } from '@/i18n/I18nProvider';
 import { accentColors } from '@/theme/resolve';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -34,6 +35,8 @@ export interface ExerciseCardProps {
   onPressRest(): void;
   /** Enveloppe du titre (poignée de glisser-déposer) */
   header?: (title: ReactElement) => ReactElement;
+  /** Exercice lié à la bibliothèque : la vignette ouvre la fiche */
+  onOpenExercise?(libraryId: string): void;
 }
 
 export function ExerciseCard(p: ExerciseCardProps) {
@@ -62,6 +65,8 @@ export function ExerciseCard(p: ExerciseCardProps) {
       style={[styles.card, { backgroundColor: complete ? colors.greenDone : colors.bgCard, borderColor: colors.border, borderRadius: radius.lg, padding: spacing.md }]}
     >
       <View style={styles.headerRow}>
+        {/* Vignette hors de la poignée de glisser-déposer ; masquée quand une alternative est réalisée */}
+        {ex.libraryId && !ex.performedName ? <LibraryThumb libraryId={ex.libraryId} onOpen={p.onOpenExercise} /> : null}
         <View style={styles.flex}>{p.header ? p.header(title) : title}</View>
         {ex.alternatives.length > 0 && p.onSwap ? (
           <Pressable accessibilityRole="button" accessibilityLabel={t('today_swap_title')} onPress={p.onSwap} style={styles.iconBtn}>

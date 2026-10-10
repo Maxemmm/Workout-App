@@ -8,4 +8,6 @@ export interface EditorNav {
   closeSession(): void;
   /** Sortie de l'éditeur (après enregistrement ou annulation) → Plan */
   finish(): void;
+  /** Sélecteur de la bibliothèque (réponse via useLibraryPickStore) */
+  openLibrary(): void;
 }

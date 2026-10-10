@@ -8,9 +8,11 @@ import { TextField } from '@/features/common/TextField';
 import { useRepoCtx } from '@/db/DbContext';
 import {
   addExercise, deleteExercise, duplicateExercise, moveExercise, sectionExercises, setBonusTitle,
-  setSessionAccent, updateExercise, updateSession, type ExerciseSection, type SessionPatch,
+  setSessionAccent, updateExercise, updateSession, type ExerciseInput, type ExerciseSection, type SessionPatch,
 } from '@/domain/draft';
 import type { Exercise, SessionType } from '@/domain/program';
+import { useDbQuery } from '@/features/common/useDbQuery';
+import { findLibraryItem, readLibraryUser } from '@/features/library/libraryData';
 import { ListEditor } from '@/features/common/ListEditor';
 import { Segmented } from '@/features/profile/Segmented';
 import { ReorderableList } from '@/features/today/ReorderableList';
@@ -18,6 +20,7 @@ import { useI18n } from '@/i18n/I18nProvider';
 import { confirm } from '@/platform/confirm';
 import type { StringKey } from '@/i18n/translate';
 import { useDraftStore } from '@/state/draftStore';
+import { useLibraryPickStore } from '@/state/libraryPickStore';
 import { useTheme } from '@/theme/ThemeProvider';
 import { TOUCH_MIN } from '@/theme/tokens';
 import { AccentPicker } from './AccentPicker';
@@ -32,14 +35,36 @@ const TYPES: SessionType[] = ['lift', 'cardio', 'rest', 'mixed'];
 export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: string }) {
   const ctx = useRepoCtx();
   const { colors, fonts, radius } = useTheme();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const draft = useDraftStore((s) => s.draft);
   const apply = useDraftStore((s) => s.apply);
-  const [sheet, setSheet] = useState<{ section: ExerciseSection; exercise: Exercise | null } | null>(null);
+  const library = useDbQuery(readLibraryUser);
+  // initial : formulaire prérempli au retour du sélecteur ; seq : remonte la feuille à chaque ouverture
+  const [sheet, setSheet] = useState<{ section: ExerciseSection; exercise: Exercise | null; initial?: ExerciseInput; seq?: number } | null>(null);
+  // Réponse du sélecteur de la bibliothèque pour cette séance (undefined = pas de réponse)
+  const pick = useLibraryPickStore((s) => (s.request?.sessionKey === sessionKey ? s.result : undefined));
   const session = draft?.program.sessions[sessionKey];
   const units = draft?.program.meta.units ?? 'kg';
   const restDefault = draft?.program.meta.restDefaultSec ?? 90;
   const { closeSession } = nav;
+
+  useEffect(() => {
+    if (pick === undefined || !session) return;
+    const done = useLibraryPickStore.getState().consume();
+    if (!done) return;
+    const { request, result } = done;
+    const base = request.form ?? blankExercise();
+    const initial = (result ? { ...base, name: result.name, libraryId: result.libraryId } : { ...base, libraryId: undefined }) as ExerciseInput;
+    const existing = request.exerciseId ? sectionExercises(session, request.section).find((e) => e.id === request.exerciseId) ?? null : null;
+    setSheet({ section: request.section, exercise: existing, initial, seq: Date.now() });
+  }, [pick, session]);
+
+  /** Sélecteur de la bibliothèque : form null = nouvel exercice, sinon formulaire en cours */
+  const openPicker = (section: ExerciseSection, form: ExerciseInput | null, exerciseId: string | null) => {
+    useLibraryPickStore.getState().start({ sessionKey, section, form, exerciseId });
+    setSheet(null);
+    nav.openLibrary();
+  };
 
   // Séance disparue (supprimée ailleurs, lien périmé) → retour à la liste
   useEffect(() => {
@@ -79,7 +104,7 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
     );
   };
   const addButton = (section: ExerciseSection, text: string) => (
-    <Pressable accessibilityRole="button" onPress={() => setSheet({ section, exercise: null })} style={[styles.btn, { borderColor: colors.gold, borderWidth: 1, borderRadius: radius.md }]}>
+    <Pressable accessibilityRole="button" onPress={() => openPicker(section, null, null)} style={[styles.btn, { borderColor: colors.gold, borderWidth: 1, borderRadius: radius.md }]}>
       <Text style={{ color: colors.gold, fontFamily: fonts.uiBold }}>{text}</Text>
     </Pressable>
   );
@@ -156,10 +181,15 @@ export function SessionStep({ nav, sessionKey }: { nav: EditorNav; sessionKey: s
 
           {sheet ? (
             <ExerciseSheet
-              key={sheet.exercise?.id ?? `new-${sheet.section}`}
+              key={`${sheet.exercise?.id ?? `new-${sheet.section}`}-${sheet.seq ?? 0}`}
               visible
               isNew={sheet.exercise === null}
-              initial={sheet.exercise ?? blankExercise()}
+              initial={sheet.initial ?? sheet.exercise ?? blankExercise()}
+              onPickLibrary={(form) => openPicker(sheet.section, form, sheet.exercise?.id ?? null)}
+              libraryName={(() => {
+                const id = (sheet.initial ?? sheet.exercise)?.libraryId;
+                return typeof id === 'string' ? findLibraryItem(id, library.customs, lang)?.name ?? null : null;
+              })()}
               units={units}
               restDefault={restDefault}
               onClose={() => setSheet(null)}

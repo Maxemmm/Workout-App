@@ -157,8 +157,14 @@ export function addExercise(d: Draft, key: string, section: ExerciseSection, inp
   return { draft: updateSectionList(d, key, section, (list) => [...list, { ...input, id } as Exercise]), id };
 }
 
+/** input = l'exercice complet (feuille) : sans libraryId, le lien éventuel est retiré (« Délier ») */
 export function updateExercise(d: Draft, key: string, section: ExerciseSection, id: string, input: ExerciseInput): Draft {
-  return updateSectionList(d, key, section, (list) => list.map((e) => (e.id === id ? ({ ...e, ...input, id } as Exercise) : e)));
+  return updateSectionList(d, key, section, (list) => list.map((e) => {
+    if (e.id !== id) return e;
+    const next = { ...e, ...input, id } as Exercise;
+    if (input.libraryId === undefined) delete next.libraryId;
+    return next;
+  }));
 }
 
 export function deleteExercise(d: Draft, key: string, section: ExerciseSection, id: string): Draft {

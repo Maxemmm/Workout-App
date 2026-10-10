@@ -4,6 +4,7 @@ import type { ReactElement } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Exercise } from '@/domain/program';
 import { formatScheme } from '@/domain/scheme';
+import { LibraryThumb } from '@/features/library/LibraryThumb';
 import { useI18n } from '@/i18n/I18nProvider';
 import { useTheme } from '@/theme/ThemeProvider';
 import { TOUCH_MIN } from '@/theme/tokens';
@@ -32,6 +33,11 @@ export function ExerciseRow({ exercise, onEdit, onDuplicate, onDelete, header }:
   );
   return (
     <View style={[styles.row, { backgroundColor: colors.bgCardSoft, borderRadius: radius.md }]}>
+      {exercise.libraryId ? (
+        <View style={styles.thumb}>
+          <LibraryThumb libraryId={exercise.libraryId} />
+        </View>
+      ) : null}
       <View style={styles.flex}>{header ? header(title) : title}</View>
       {icon('create-outline', t('editor_edit_exo'), onEdit)}
       {icon('copy-outline', t('editor_duplicate'), onDuplicate)}
@@ -43,5 +49,6 @@ export function ExerciseRow({ exercise, onEdit, onDuplicate, onDelete, header }:
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', paddingLeft: 12 },
   flex: { flex: 1 },
+  thumb: { marginRight: 8 },
   icon: { width: TOUCH_MIN, height: TOUCH_MIN, alignItems: 'center', justifyContent: 'center' },
 });

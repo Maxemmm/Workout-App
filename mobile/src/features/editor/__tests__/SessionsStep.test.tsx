@@ -7,7 +7,7 @@ import { DRAFT_INITIAL, useDraftStore } from '@/state/draftStore';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { SessionsStep } from '../SessionsStep';
 
-const nav = () => ({ goToStep: jest.fn(), openSession: jest.fn(), closeSession: jest.fn(), finish: jest.fn() });
+const nav = () => ({ goToStep: jest.fn(), openSession: jest.fn(), closeSession: jest.fn(), finish: jest.fn(), openLibrary: jest.fn() });
 const program = parseOrThrow(makeProgramInput({ '1': 'a' }, {
   a: makeSession('HAUT', [makeExercise('dc', 3), makeExercise('row', 3)]),
   b: makeSession('BAS', [], { type: 'cardio' }),

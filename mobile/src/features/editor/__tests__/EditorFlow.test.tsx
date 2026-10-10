@@ -7,6 +7,7 @@ import { createTestCtx } from '@/db/testing/createTestCtx';
 import type { RepoCtx } from '@/db/types';
 import { confirm } from '@/platform/confirm';
 import { DRAFT_INITIAL, useDraftStore } from '@/state/draftStore';
+import { LIBRARY_PICK_INITIAL, useLibraryPickStore } from '@/state/libraryPickStore';
 import { PREFS_INITIAL, usePrefs } from '@/state/prefsStore';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { TodayScreen } from '@/features/today/TodayScreen';
@@ -26,6 +27,8 @@ function EditorHarness({ initial, onFinish }: { initial: EditorStep; onFinish():
     openSession: (key) => setRoute({ session: key }),
     closeSession: () => setRoute({ step: 2 }),
     finish: onFinish,
+    // Sélecteur de la bibliothèque : « Exercice libre »
+    openLibrary: () => useLibraryPickStore.getState().resolve(null),
   }));
   if ('session' in route) return <SessionStep nav={nav} sessionKey={route.session} />;
   if (route.step === 1) return <MetaStep nav={nav} />;

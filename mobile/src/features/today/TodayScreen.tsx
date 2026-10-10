@@ -37,9 +37,11 @@ interface Props {
   /** Pas de programme : ouvrir l'éditeur (brouillon neuf déjà prêt) */
   onOpenEditor?(): void;
   onOpenImport?(): void;
+  /** Fiche d'un exercice lié à la bibliothèque */
+  onOpenExercise?(libraryId: string): void;
 }
 
-export function TodayScreen({ focused = true, onOpenEditor, onOpenImport }: Props) {
+export function TodayScreen({ focused = true, onOpenEditor, onOpenImport, onOpenExercise }: Props) {
   const ctx = useRepoCtx();
   const program = useActiveProgram();
   const { t, tList } = useI18n();
@@ -156,6 +158,7 @@ export function TodayScreen({ focused = true, onOpenEditor, onOpenImport }: Prop
           onCardLayout={(id, y) => { cardY.current[id] = y; }}
           onListLayout={(y) => { listY.current = y; }}
           onExerciseNames={setNames}
+          onOpenExercise={onOpenExercise}
         />
         </View>
       ) : null}

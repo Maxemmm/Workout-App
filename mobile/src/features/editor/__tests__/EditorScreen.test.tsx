@@ -6,7 +6,7 @@ import { DRAFT_INITIAL, useDraftStore } from '@/state/draftStore';
 import { renderWithProviders } from '@/test/renderWithProviders';
 import { EditorScreen } from '../EditorScreen';
 
-const nav = { goToStep: jest.fn(), openSession: jest.fn(), closeSession: jest.fn(), finish: jest.fn() };
+const nav = { goToStep: jest.fn(), openSession: jest.fn(), closeSession: jest.fn(), finish: jest.fn(), openLibrary: jest.fn() };
 
 describe('EditorScreen', () => {
   beforeEach(() => useDraftStore.setState(DRAFT_INITIAL));

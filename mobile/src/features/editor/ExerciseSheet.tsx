@@ -25,9 +25,13 @@ interface Props {
   restDefault: number;
   onSave(input: ExerciseInput): void;
   onClose(): void;
+  /** Ouvre le sélecteur de la bibliothèque avec le formulaire en cours */
+  onPickLibrary?(form: ExerciseInput): void;
+  /** Nom de l'entrée liée (langue de l'app) ; null si inconnue */
+  libraryName?: string | null;
 }
 
-export function ExerciseSheet({ visible, initial, isNew, units, restDefault, onSave, onClose }: Props) {
+export function ExerciseSheet({ visible, initial, isNew, units, restDefault, onSave, onClose, onPickLibrary, libraryName }: Props) {
   const { colors, fonts, radius } = useTheme();
   const { t } = useI18n();
   const { id: _id, ...rest } = initial as Exercise;
@@ -40,8 +44,11 @@ export function ExerciseSheet({ visible, initial, isNew, units, restDefault, onS
 
   const submit = () => {
     if (!valid) return;
+    // Délié : la clé disparaît (pas de libraryId: undefined dans le programme)
+    const { libraryId, ...unlinked } = form;
     onSave({
-      ...form,
+      ...unlinked,
+      ...(typeof libraryId === 'string' && libraryId ? { libraryId } : {}),
       name: form.name.trim(),
       scheme: form.scheme.trim(),
       load: text(form.load ?? ''),
@@ -63,6 +70,23 @@ export function ExerciseSheet({ visible, initial, isNew, units, restDefault, onS
 
   return (
     <BottomSheet visible={visible} title={isNew ? t('editor_new_exo') : t('editor_edit_exo')} onClose={onClose} footer={actions}>
+      {typeof form.libraryId === 'string' && form.libraryId ? (
+        <View style={styles.linkRow}>
+          <Text style={[styles.flexText, { color: colors.textDim, fontFamily: fonts.uiMedium }]}>{t('lib_linked_fmt', libraryName ?? form.libraryId)}</Text>
+          {onPickLibrary ? (
+            <Pressable accessibilityRole="button" accessibilityLabel={t('lib_change')} onPress={() => onPickLibrary(form)} style={styles.linkBtn}>
+              <Text style={{ color: colors.gold, fontFamily: fonts.uiBold }}>{t('lib_change')}</Text>
+            </Pressable>
+          ) : null}
+          <Pressable accessibilityRole="button" accessibilityLabel={t('lib_unlink')} onPress={() => set({ libraryId: undefined })} style={styles.linkBtn}>
+            <Text style={{ color: colors.textDim, fontFamily: fonts.uiBold }}>{t('lib_unlink')}</Text>
+          </Pressable>
+        </View>
+      ) : onPickLibrary ? (
+        <Pressable accessibilityRole="button" accessibilityLabel={t('lib_choose_from_library')} onPress={() => onPickLibrary(form)} style={[styles.pickBtn, { borderColor: colors.gold, borderRadius: radius.md }]}>
+          <Text style={{ color: colors.gold, fontFamily: fonts.uiBold }}>{t('lib_choose_from_library')}</Text>
+        </Pressable>
+      ) : null}
       <Text style={label}>{t('exo_name_label').toUpperCase()}</Text>
       <TextField testID="exo-name" value={form.name} maxLength={100} placeholder={t('exo_name_ph')} placeholderTextColor={colors.textDim} onChangeText={(name) => set({ name })} style={field} />
       <View style={styles.row}>
@@ -95,4 +119,8 @@ const styles = StyleSheet.create({
   col: { flex: 1, gap: 6 },
   timed: { alignItems: 'center', gap: 6 },
   btn: { flex: 1, minHeight: TOUCH_MIN + 4, alignItems: 'center', justifyContent: 'center' },
+  linkRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  flexText: { flex: 1 },
+  linkBtn: { minHeight: TOUCH_MIN, justifyContent: 'center', paddingHorizontal: 6 },
+  pickBtn: { minHeight: TOUCH_MIN + 4, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
 });

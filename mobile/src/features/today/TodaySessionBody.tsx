@@ -80,6 +80,8 @@ export interface TodaySessionBodyProps {
   onListLayout(y: number): void;
   /** Noms des exercices affichés, pour la barre de repos */
   onExerciseNames(names: Record<string, string>): void;
+  /** Fiche d'un exercice lié à la bibliothèque */
+  onOpenExercise?(libraryId: string): void;
 }
 
 export function TodaySessionBody(p: TodaySessionBodyProps) {
@@ -163,6 +165,7 @@ export function TodaySessionBody(p: TodaySessionBodyProps) {
       onSwap={ex.alternatives.length > 0 && !completed ? () => setSwapping(ex) : undefined}
       onPressRest={() => { if (timer?.exerciseId === ex.id) useTimerStore.getState().clear(ctx); }}
       header={handle}
+      onOpenExercise={p.onOpenExercise}
     />
   );
 

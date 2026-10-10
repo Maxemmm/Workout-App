@@ -11,6 +11,7 @@ export default function TodayRoute() {
         focused={focused}
         onOpenEditor={() => router.push('/editor/meta')}
         onOpenImport={() => router.push('/import')}
+        onOpenExercise={(id) => router.push({ pathname: '/exercise/[id]', params: { id } })}
       />
     </TabErrorBoundary>
   );
