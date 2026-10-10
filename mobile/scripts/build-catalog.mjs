@@ -63,6 +63,8 @@ const equipment = (v, ctx) => EQUIPMENT[v] ?? fail(`matériel inconnu « ${v} »
 const uniq = (list, primary) => [...new Set(list)].filter((m) => m !== primary);
 const readJson = (f, fallback) => (fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : fallback);
 const writeJson = (f, v) => fs.writeFileSync(f, `${JSON.stringify(v, null, 2)}\n`);
+/** Nom anglais : majuscule initiale ; « в° » (encodage cassé dans la source) → « ° » */
+const cleanName = (s) => { const t = s.replace(/в°/g, '°'); return t.charAt(0).toUpperCase() + t.slice(1); };
 const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\bs\b/g, '').trim().replace(/s$/, '');
 
 async function cached(url, file) {
@@ -91,7 +93,7 @@ for (const e of ds) {
   const primary = muscle(e.target, `ds:${e.id}`);
   entries.push({
     id: `ds:${e.id}`,
-    name: { fr: '', en: e.name.charAt(0).toUpperCase() + e.name.slice(1) },
+    name: { fr: '', en: cleanName(e.name) },
     primary,
     secondary: uniq((e.secondary_muscles ?? []).map((m) => muscle(m, `ds:${e.id}`)), primary),
     equipment: equipment(e.equipment, `ds:${e.id}`),
@@ -118,6 +120,9 @@ entries.sort((a, b) => a.id.localeCompare(b.id));
 const namesFile = path.join(OUT, 'names.fr.json');
 const names = readJson(namesFile, {});
 let missing = 0;
+const ids = new Set(entries.map((e) => e.id));
+const orphans = Object.keys(names).filter((k) => !ids.has(k));
+if (orphans.length) console.log(`noms orphelins (hors catalogue, à retirer à la main) : ${orphans.join(', ')}`);
 for (const e of entries) {
   if (!(e.id in names)) names[e.id] = '';
   if (!names[e.id]) missing += 1;

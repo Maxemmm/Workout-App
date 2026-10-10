@@ -57,3 +57,12 @@ describe('catalogue généré', () => {
     for (const e of entries) expect(Object.hasOwn(names, e.id)).toBe(true);
   });
 });
+
+describe('noms français', () => {
+  it('chaque entrée a une traduction (pas de repli anglais) ; la grande majorité diffère de l\'anglais', () => {
+    const table = names as Record<string, string>;
+    for (const e of entries) expect(table[e.id]?.trim().length).toBeGreaterThan(0);
+    const same = entries.filter((e) => e.name.fr.toLowerCase() === e.name.en.toLowerCase()).length;
+    expect(same / entries.length).toBeLessThan(0.05);
+  });
+});
