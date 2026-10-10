@@ -1,4 +1,4 @@
-// Barre d'onglets : Today · Plan · Stats · Profil (REFONTE_V2 §3)
+// Barre d'onglets : Today · Plan · Exercices · Stats · Profil (REFONTE_V2 §3)
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Redirect, Tabs } from 'expo-router';
 import type { ColorValue } from 'react-native';
@@ -32,6 +32,7 @@ export default function TabsLayout() {
     >
       <Tabs.Screen name="today" options={{ title: t('nav_today'), tabBarIcon: icon('barbell') }} />
       <Tabs.Screen name="plan" options={{ title: t('nav_plan'), tabBarIcon: icon('calendar') }} />
+      <Tabs.Screen name="exercises" options={{ title: t('nav_exercises'), tabBarIcon: icon('fitness') }} />
       <Tabs.Screen name="stats" options={{ title: t('nav_stats'), tabBarIcon: icon('stats-chart') }} />
       <Tabs.Screen name="profile" options={{ title: t('nav_profile'), tabBarIcon: icon('person') }} />
     </Tabs>
