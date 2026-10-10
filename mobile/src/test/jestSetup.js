@@ -29,3 +29,6 @@ jest.mock('@/platform/restNotifier', () => ({
     openSettings: jest.fn(() => Promise.resolve()),
   },
 }));
+jest.mock('@/platform/assetText', () => ({
+  readAssetText: jest.fn(() => Promise.resolve('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><path fill="#fff" d="M0 0h10v10H0z"/></svg>')),
+}));
