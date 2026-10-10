@@ -10,6 +10,7 @@
     "@types/jest": "29.5.14",
     "drizzle-orm": "^0.45.3",
     "expo": "~57.0.26",
+    "expo-asset": "~57.0.19",
     "expo-audio": "~57.0.5",
     "expo-constants": "~57.0.20",
     "expo-crypto": "~57.0.3",
@@ -54,6 +55,7 @@
     "babel-plugin-inline-import": "^3.0.0",
     "better-sqlite3": "^13.0.3",
     "drizzle-kit": "^0.31.11",
+    "svgo": "^4.1.0",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -70,6 +72,7 @@
   "jest": {
     "preset": "jest-expo",
     "moduleNameMapper": {
+      "\\.svg$": "<rootDir>/src/test/svgStub.js",
       "^@/(.*)$": "<rootDir>/src/$1"
     },
     "testPathIgnorePatterns": [

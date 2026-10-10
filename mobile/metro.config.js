@@ -5,6 +5,8 @@ const config = getDefaultConfig(__dirname);
 
 config.resolver.sourceExts.push('sql');
 config.resolver.assetExts.push('wasm');
+// Illustrations d'exercices : SVG embarqués comme fichiers (lus à la demande, pas dans le bundle JS)
+config.resolver.assetExts.push('svg');
 
 config.server.enhanceMiddleware = (middleware) => (req, res, next) => {
   res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');

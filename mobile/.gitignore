@@ -41,3 +41,6 @@ example
 # generated native folders
 /ios
 /android
+
+# sources de la bibliothèque (scripts/build-catalog.mjs)
+/.cache/
