@@ -117,3 +117,17 @@
 - [ ] App fermée (balayée) pendant le repos : la notification arrive quand même ; une action dessus est appliquée à la réouverture.
 - [ ] Profil › Minuteur : désactiver → plus de notification ; refuser dans Réglages iOS → « Refusées » + « Ouvrir les Réglages ».
 - [ ] Web : ni feuille ni section Minuteur.
+
+## M10 — Bibliothèque d'exercices (Expo Go)
+- [ ] Onglet « Exercices » : ~1 400 exercices ; défilement fluide ; vignettes des exercices illustrés en tête.
+- [ ] Recherche « developpe couche », « pull up », « squat » : résultats pertinents en FR et en EN.
+- [ ] Filtres Muscle / Matériel / Favoris / Mon matériel combinables ; compteur à jour.
+- [ ] Fiche : illustration animée (3 images), muscles, matériel, étapes en français ; « Réduire les animations » (Réglages iOS) → image fixe.
+- [ ] Thème clair et sombre : illustrations lisibles (dessin recoloré).
+- [ ] Favori depuis la liste et depuis la fiche.
+- [ ] Nouvel exercice personnalisé → fiche ; Modifier ; Supprimer (confirmation).
+- [ ] Éditeur › séance › « Ajouter un exercice » → sélecteur → choix → feuille préremplie « Lié à : … » ; « Exercice libre » ; « Délier ».
+- [ ] Today : vignette sur la carte d'un exercice lié → fiche ; historique (record, dernière fois) → « Voir dans Stats » sélectionne l'exercice.
+- [ ] Profil › Mon matériel ; Profil › À propos › Crédits (lien CC BY-SA 4.0).
+- [ ] Export puis restauration : exercices personnalisés, favoris et mon matériel conservés.
+- [ ] Web : onglet, recherche, fiche et illustrations.
