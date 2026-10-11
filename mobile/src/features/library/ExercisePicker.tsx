@@ -1,10 +1,15 @@
-// Sélecteur d'exercice (éditeur) : même recherche / filtres que l'onglet, « Exercice libre », Annuler
+// Sélecteur d'exercice (éditeur) : même recherche / filtres que l'onglet, « Exercice libre », Annuler,
+// « Nouvel exercice » (créé sur place puis choisi directement, sans navigation)
+import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useRepoCtx } from '@/db/DbContext';
+import { listCustomExercises } from '@/db/repos/customExercisesRepo';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { LibraryItem } from '@/domain/library/types';
 import { useI18n } from '@/i18n/I18nProvider';
 import { useTheme } from '@/theme/ThemeProvider';
 import { TOUCH_MIN } from '@/theme/tokens';
+import { CustomExerciseEditor } from './CustomExerciseEditor';
 import { LibraryContent } from './LibraryScreen';
 import { findLibraryItem, readLibraryUser } from './libraryData';
 import { useDbQuery } from '@/features/common/useDbQuery';
@@ -14,6 +19,20 @@ export function ExercisePicker({ onPick, onFree, onCancel }: { onPick(item: Libr
   const { t, lang } = useI18n();
   const insets = useSafeAreaInsets();
   const user = useDbQuery(readLibraryUser);
+  const ctx = useRepoCtx();
+  const [creating, setCreating] = useState(false);
+  if (creating) {
+    return (
+      <CustomExerciseEditor
+        onCancel={() => setCreating(false)}
+        onDone={(id) => {
+          const item = findLibraryItem(`custom:${id}`, listCustomExercises(ctx), lang);
+          if (item) onPick(item);
+          else setCreating(false);
+        }}
+      />
+    );
+  }
   const header = (
     <View style={{ gap: 8 }}>
       <View style={styles.row}>
@@ -25,6 +44,10 @@ export function ExercisePicker({ onPick, onFree, onCancel }: { onPick(item: Libr
       <Pressable accessibilityRole="button" accessibilityLabel={t('lib_pick_free')} onPress={onFree}
         style={[styles.free, { borderColor: colors.gold, borderRadius: radius.md }]}>
         <Text style={{ color: colors.gold, fontFamily: fonts.uiBold }}>{t('lib_pick_free')}</Text>
+      </Pressable>
+      <Pressable accessibilityRole="button" accessibilityLabel={t('lib_new_custom')} onPress={() => setCreating(true)}
+        style={[styles.free, { borderColor: colors.border, borderRadius: radius.md }]}>
+        <Text style={{ color: colors.text, fontFamily: fonts.uiBold }}>{`+ ${t('lib_new_custom')}`}</Text>
       </Pressable>
     </View>
   );

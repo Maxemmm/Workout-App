@@ -85,6 +85,26 @@ describe('éditeur ↔ bibliothèque', () => {
     expect(screen.queryByTestId('exo-name')).toBeNull();
   });
 
+  it('sélecteur : créer un exercice personnalisé puis le choisir directement', async () => {
+    const onPick = jest.fn();
+    await renderWithProviders(<ExercisePicker onPick={onPick} onFree={jest.fn()} onCancel={jest.fn()} />, { ctx: createTestCtx() });
+    await fireEvent.press(screen.getByRole('button', { name: 'Nouvel exercice' }));
+    await fireEvent.changeText(screen.getByTestId('custom-name'), 'Presse 45°');
+    await fireEvent.press(screen.getByRole('button', { name: 'Muscle principal' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Quadriceps' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Matériel' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Machine' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Enregistrer' }));
+    expect(onPick).toHaveBeenCalledWith(expect.objectContaining({ id: expect.stringMatching(/^custom:/), name: 'Presse 45°', custom: true }));
+  });
+
+  it('sélecteur : créer puis annuler → retour à la liste', async () => {
+    await renderWithProviders(<ExercisePicker onPick={jest.fn()} onFree={jest.fn()} onCancel={jest.fn()} />, { ctx: createTestCtx() });
+    await fireEvent.press(screen.getByRole('button', { name: 'Nouvel exercice' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Annuler' }));
+    expect(screen.getByTestId('lib-search')).toBeTruthy();
+  });
+
   it('sélecteur : recherche puis choix ; Exercice libre', async () => {
     const onPick = jest.fn();
     const onFree = jest.fn();
