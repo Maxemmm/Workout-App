@@ -53,6 +53,15 @@ describe('catalogue généré', () => {
     expect(raw.length).toBeLessThanOrEqual(3 * 1024 * 1024);
   });
 
+  it('mentions MIT des données embarquées (exercises-dataset, workout-guide) versionnées', () => {
+    const f = path.join(ROOT, 'mobile/src/data/library/LICENSE-DATA.md');
+    expect(fs.existsSync(f)).toBe(true);
+    const text = fs.readFileSync(f, 'utf8');
+    expect(text).toContain('Copyright (c) 2026 Hasan Emir Yıldırım');
+    expect(text).toContain('Copyright (c) 2026 Bryl Lim');
+    expect(text.match(/Permission is hereby granted/g)).toHaveLength(2);
+  });
+
   it('table de noms français : une entrée par exercice', () => {
     for (const e of entries) expect(Object.hasOwn(names, e.id)).toBe(true);
   });

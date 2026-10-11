@@ -139,6 +139,27 @@ for (const slug of slugs) {
     fs.writeFileSync(path.join(ASSETS, slug, `frame-${n}.svg`), out);
   }
 }
+// Mentions MIT des données reprises (noms, muscles, matériel, instructions, métadonnées) : textes d'origine, aux commits figés
+const dsLicense = await cached(`https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/${DS_SHA}/LICENSE`, 'LICENSE-exercises-dataset');
+const wgLicense = await cached(`https://raw.githubusercontent.com/bryllim/workout-guide/${WG_SHA}/LICENSE`, 'LICENSE-workout-guide');
+fs.writeFileSync(path.join(OUT, 'LICENSE-DATA.md'), `# Données de la bibliothèque d'exercices
+
+Les fichiers de ce dossier (catalog.json, wg-match.json, illustrations.ts) sont dérivés de :
+
+## exercises-dataset (https://github.com/hasaneyldrm/exercises-dataset, commit ${DS_SHA})
+
+\`\`\`
+${dsLicense.trim()}
+\`\`\`
+
+## workout-guide (https://github.com/bryllim/workout-guide, commit ${WG_SHA}) — code et métadonnées
+
+\`\`\`
+${wgLicense.trim()}
+\`\`\`
+
+Les illustrations sont sous CC BY-SA 4.0 : voir assets/exercises/LICENSE-ASSETS.md.
+`);
 fs.writeFileSync(path.join(ASSETS, 'LICENSE-ASSETS.md'), `# Illustrations d'exercices
 
 Adaptées (optimisées avec svgo, recolorées à l'affichage) de [workout-guide](https://github.com/bryllim/workout-guide)
