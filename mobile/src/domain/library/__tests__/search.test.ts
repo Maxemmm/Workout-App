@@ -46,6 +46,15 @@ describe('searchLibrary', () => {
     expect(ids(searchLibrary(items, { ...none, myEquipmentOnly: true }, { ...ctx, myEquipment: ['barbell', 'dumbbell'] }))).toEqual(['ds:3', 'ds:1']);
   });
 
+  it('recherche sur le catalogue complet : rapide (clés normalisées en cache)', () => {
+    const { libraryItems } = require('@/features/library/libraryData') as typeof import('@/features/library/libraryData');
+    const all = libraryItems([], 'fr');
+    searchLibrary(all, none, ctx);
+    const t0 = Date.now();
+    for (let i = 0; i < 20; i++) searchLibrary(all, { ...none, query: i % 2 ? 'd' : '' }, ctx);
+    expect(Date.now() - t0).toBeLessThan(200);
+  });
+
   it('mon matériel vide : filtre sans effet', () => {
     expect(searchLibrary(items, { ...none, myEquipmentOnly: true }, ctx)).toHaveLength(4);
   });

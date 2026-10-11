@@ -37,8 +37,21 @@ function fromCustom(c: CustomExercise): LibraryItem {
   };
 }
 
+/** Catalogue affichable par langue (construit une fois) */
+const catalogItems = new Map<Lang, LibraryItem[]>();
+/** Dernier résultat : même langue + mêmes exercices perso (contenu) → même tableau, sans reconstruction */
+let last: { key: string; items: LibraryItem[] } | null = null;
+
 export function libraryItems(customs: CustomExercise[], lang: Lang): LibraryItem[] {
-  return [...load().list.map((e) => fromEntry(e, lang)), ...customs.map(fromCustom)];
+  const key = `${lang}|${JSON.stringify(customs)}`;
+  if (last?.key === key) return last.items;
+  let base = catalogItems.get(lang);
+  if (!base) {
+    base = load().list.map((e) => fromEntry(e, lang));
+    catalogItems.set(lang, base);
+  }
+  last = { key, items: [...base, ...customs.map(fromCustom)] };
+  return last.items;
 }
 
 export function findLibraryItem(id: string, customs: CustomExercise[], lang: Lang): LibraryItem | null {

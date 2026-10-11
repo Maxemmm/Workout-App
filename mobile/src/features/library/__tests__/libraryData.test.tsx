@@ -22,6 +22,13 @@ describe('libraryData', () => {
     expect(fr.steps?.[0]).not.toBe(en.steps?.[0]);
   });
 
+  it('mêmes données (nouvelle liste au contenu identique) → même tableau, sans reconstruction', () => {
+    const a = libraryItems([{ ...custom }], 'fr');
+    expect(libraryItems([{ ...custom }], 'fr')).toBe(a);
+    expect(libraryItems([], 'fr')).not.toBe(a);
+    expect(libraryItems([{ ...custom }], 'en')).not.toBe(a);
+  });
+
   it('id inconnu → null', () => {
     expect(findLibraryItem('custom:nope', [], 'fr')).toBeNull();
     expect(findLibraryItem('ds:9999', [], 'fr')).toBeNull();
